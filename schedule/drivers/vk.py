@@ -11,6 +11,8 @@ from bottex.messaging.drivers import AbstractDriver
 from bottex.messaging.keyboard import Keyboard, Color
 from bottex.messaging import Request
 
+from drivers.vk_parser import Event, parse_event
+
 vk_empty_text = '\u200b'
 
 
@@ -106,9 +108,13 @@ class VkDriver(AbstractDriver):
             except asyncio.TimeoutError:
                 continue
             for event in response['updates']:
-                if event['type'] == 'message_new':
-                    msg = event['object']['message']
-                    user_info = event['object']['client_info']
-                    text, uid = msg['text'], msg['peer_id']
+                evtype, obj = parse_event(event)
+                if evtype == 'message_new':
+                    msg = obj.message
+                    text = msg.text
+                    uid = msg.peer_id
                     user = self.get_user(uid)
+
+                    user_info = obj.client_info
+
                     yield Request(user, text)

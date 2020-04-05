@@ -85,10 +85,10 @@ obj_classes = {
 }
 
 
-def parse(request: dict):
+def parse_event(request: dict):
     event_name, obj = request['type'], request['object']
     obj_cls = obj_classes[event_name]
-    return obj_cls(obj)
+    return event_name, obj_cls(obj)
 
 
 class Event(DictParser):
