@@ -1,0 +1,14 @@
+aiovk
+aioviber
+aiogram
+vk-api
+pymongo
+mongoengine
+# retrying
+xlrd
+xlutils
+requests
+lazy-property
+sqlalchemy
+# psycopg2  # (for postrgres)
+Babel

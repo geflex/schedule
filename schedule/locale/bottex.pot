@@ -1,0 +1,263 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR ORGANIZATION
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"POT-Creation-Date: 2020-04-01 17:02+0300\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=cp65001\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: pygettext.py 1.5\n"
+
+
+#: schedule/app\schedule.py:16
+msgid "Занятий нет"
+msgstr ""
+
+#: schedule/app\text\views.py:6
+msgid "ах"
+msgstr ""
+
+#: schedule/app\text\views.py:6
+msgid "пх"
+msgstr ""
+
+#: schedule/app\views.py:12
+msgid "Вкл"
+msgstr ""
+
+#: schedule/app\views.py:13
+msgid "Выкл"
+msgstr ""
+
+#: schedule/app\views.py:17
+msgid "ты что-то сломал"
+msgstr ""
+
+#: schedule/app\views.py:18
+msgid "нипонял("
+msgstr ""
+
+#: schedule/app\views.py:22
+msgid ""
+"Ура! Всё настроили.\n"
+"Теперь ты можешь жмакать на кнопочки и смотреть расписание)"
+msgstr ""
+
+#: schedule/app\views.py:30
+msgid "Сегодня"
+msgstr ""
+
+#: schedule/app\views.py:31
+msgid "Завтра"
+msgstr ""
+
+#: schedule/app\views.py:32
+msgid "Неделя"
+msgstr ""
+
+#: schedule/app\views.py:33
+msgid "След. неделя"
+msgstr ""
+
+#: schedule/app\views.py:35
+msgid "Какая неделя"
+msgstr ""
+
+#: schedule/app\views.py:36
+msgid "Настройки"
+msgstr ""
+
+#: schedule/app\views.py:46
+msgid "Откл. уведомления"
+msgstr ""
+
+#: schedule/app\views.py:48
+msgid "Отключили"
+msgstr ""
+
+#: schedule/app\views.py:51
+msgid "Вкл. уведомления"
+msgstr ""
+
+#: schedule/app\views.py:53
+msgid "Включили"
+msgstr ""
+
+#: schedule/app\views.py:60 schedule/app\views.py:111
+msgid "Фамилия"
+msgstr ""
+
+#: schedule/app\views.py:62
+msgid "Стать студентом"
+msgstr ""
+
+#: schedule/app\views.py:64
+msgid "Теперь ты студент"
+msgstr ""
+
+#: schedule/app\views.py:71 schedule/app\views.py:108
+msgid "Группа"
+msgstr ""
+
+#: schedule/app\views.py:73 schedule/app\views.py:109
+msgid "Подгруппа"
+msgstr ""
+
+#: schedule/app\views.py:75
+msgid "Стать преподом"
+msgstr ""
+
+#: schedule/app\views.py:77
+msgid "Теперь ты препод"
+msgstr ""
+
+#: schedule/app\views.py:86
+msgid "Время"
+msgstr ""
+
+#: schedule/app\views.py:94 schedule/app\views.py:122
+msgid "Язык"
+msgstr ""
+
+#: schedule/app\views.py:106
+msgid "Тип профиля"
+msgstr ""
+
+#: schedule/app\views.py:120
+msgid "Уведомления"
+msgstr ""
+
+#: schedule/app\views.py:128
+msgid "Выбери язык из списка ниже"
+msgstr ""
+
+#: schedule/app\views.py:129
+msgid "Язык установили"
+msgstr ""
+
+#: schedule/app\views.py:143
+msgid "Введи номер своей группы"
+msgstr ""
+
+#: schedule/app\views.py:144
+msgid "Номер группы должен состоять из восьми цифр"
+msgstr ""
+
+#: schedule/app\views.py:145
+msgid "Группу установили"
+msgstr ""
+
+#: schedule/app\views.py:148
+msgid "Не знаю номер группы("
+msgstr ""
+
+#: schedule/app\views.py:158
+msgid "Теперь введи с клавиатуры номер своей группы"
+msgstr ""
+
+#: schedule/app\views.py:167
+msgid "Выбери подгруппу"
+msgstr ""
+
+#: schedule/app\views.py:168
+msgid "Подгруппу установили"
+msgstr ""
+
+#: schedule/app\views.py:178
+msgid "И последнее. Выбери свою подгруппу"
+msgstr ""
+
+#: schedule/app\views.py:180
+msgid "1"
+msgstr ""
+
+#: schedule/app\views.py:181
+msgid "2"
+msgstr ""
+
+#: schedule/app\views.py:187
+msgid "Введи время с клавиатуры или жмакни нужную кнопочку"
+msgstr ""
+
+#: schedule/app\views.py:188
+msgid "Время установили"
+msgstr ""
+
+#: schedule/app\views.py:189
+msgid "С форматом проблемка("
+msgstr ""
+
+#: schedule/app\views.py:211
+msgid "Введи свою фамилию с клавиатуры"
+msgstr ""
+
+#: schedule/app\views.py:212
+msgid "Фамилию установили"
+msgstr ""
+
+#: schedule/app\views.py:221
+msgid "Теперь введи с клавиатуры свою фамилию"
+msgstr ""
+
+#: schedule/app\views.py:230
+msgid "Выбери тип профиля"
+msgstr ""
+
+#: schedule/app\views.py:231
+msgid "Так, тип профиля установили"
+msgstr ""
+
+#: schedule/app\views.py:233
+msgid "Студент"
+msgstr ""
+
+#: schedule/app\views.py:234
+msgid "Преподаватель"
+msgstr ""
+
+#: schedule/app\views.py:240
+msgid "Привет! Чтобы все заработало, сначала нужно кое-что настроить (все это можно будет поменять позже в настройках)"
+msgstr ""
+
+#: schedule/app\views.py:246
+msgid "Начать"
+msgstr ""
+
+#: schedule/bases.py:16
+msgid "Назад"
+msgstr ""
+
+#: schedule/bases.py:16
+msgid "Переходим назад"
+msgstr ""
+
+#: schedule/bases.py:21
+msgid "Отмена"
+msgstr ""
+
+#: schedule/bases.py:21
+msgid "Отменяем"
+msgstr ""
+
+#: schedule/bases.py:26
+msgid "Не меняем"
+msgstr ""
+
+#: schedule/bases.py:26
+msgid "Не менять"
+msgstr ""
+
+#: schedule/bases.py:31
+msgid "Пропускаем"
+msgstr ""
+
+#: schedule/bases.py:31
+msgid "Пропустить"
+msgstr ""
+
