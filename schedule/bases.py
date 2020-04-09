@@ -37,7 +37,3 @@ class NotChangeButton(ButtonLink):
 class PassButton(ButtonLink):
     def __init__(self, handler, *, next_line=True):
         super().__init__(_('Пропустить'), handler, Text(_('Пропускаем')), color=Color.WHITE, next_line=next_line)
-
-
-def rand():
-    return random.randint(0, sys.maxsize)

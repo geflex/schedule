@@ -1,4 +1,6 @@
 import asyncio
+import sys
+from random import randint
 
 import aiohttp
 from vk_api.keyboard import VkKeyboard as VkApiKeyboard, VkKeyboardColor as VkColor
@@ -6,7 +8,6 @@ from vk_api.keyboard import VkKeyboard as VkApiKeyboard, VkKeyboardColor as VkCo
 from aiovk import TokenSession, API
 from aiovk.longpoll import BotsLongPoll
 
-from bases import rand
 from bottex.utils import json
 from bottex.drivers import Request, Color, Driver
 from bottex.views import viewnames
@@ -53,20 +54,6 @@ class VkKeyboard:
         return self.get_str()
 
 
-class VerticalKeyboard(VkKeyboard):
-    @classmethod
-    def from_buttons(cls, buttons):
-        if buttons is None:
-            return ''
-        self = cls()
-        for line in buttons:
-            for button in line:
-                self.add_button(button)
-                self.add_line()
-        self.pop_line()
-        return self.get_str()
-
-
 class VkDriver(Driver):
     def get_handler(self, name):
         return viewnames[name]
@@ -86,7 +73,7 @@ class VkDriver(Driver):
         if not message.text:
             message.text = '...'
         keyboard = self.create_kb(message.buttons)
-        await self.api.messages.send(random_id=rand(),
+        await self.api.messages.send(random_id=randint(0, sys.maxsize),
                                      user_id=peer_id,
                                      message=message.text,
                                      # attachment=attachments,
@@ -102,7 +89,7 @@ class VkDriver(Driver):
                 try:
                     await self.send_text(msg, user.uid)
                     break
-                except asyncio.TimeoutError:
+                except (asyncio.TimeoutError, aiohttp.ClientOSError):
                     pass
 
     async def listen(self):

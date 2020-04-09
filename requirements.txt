@@ -1,6 +1,7 @@
 aiovk
 aioviber
 aiogram
+aiohttp
 vk-api
 pymongo
 mongoengine
