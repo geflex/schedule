@@ -45,6 +45,8 @@ class View(ABC):
         if not isbase:
             if '.' in cls.__viewname__:
                 raise ValueError('__viewname__ must not contain dots')
+            if not isinstance(cls.__viewname__, str):
+                raise TypeError('__viewname__ must be str')
             viewnames[cls.__viewname__] = cls.handle
             classnames[cls.__name__] = cls
 
