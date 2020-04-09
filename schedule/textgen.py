@@ -19,7 +19,7 @@ def repeat(request):
     axax = axaxax()
     axax += ' ' if axax else ''
     scopes = positive_scopes(4)
-    return axax + request.msg.lower() + scopes
+    return axax + request.msg.text + scopes
 
 
 def too_big_msg(request):

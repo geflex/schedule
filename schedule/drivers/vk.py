@@ -11,7 +11,7 @@ from bottex.utils import json
 from bottex.drivers import Request, Color, Driver
 from bottex.views import viewnames
 
-from drivers.vk_parser import Event, parse_event
+from drivers.vk_objects.events import Events, parse_event
 
 vk_empty_text = '\u200b'
 
@@ -109,16 +109,14 @@ class VkDriver(Driver):
         while True:
             try:
                 response = await self.longpoll.wait(need_pts=True)
-            except asyncio.TimeoutError:
+            except (asyncio.TimeoutError, aiohttp.ClientOSError):
                 continue
             for event in response['updates']:
                 evtype, obj = parse_event(event)
-                if evtype == 'message_new':
+                if evtype == Events.message_new:
                     msg = obj.message
-                    text = msg.text
                     uid = msg.peer_id
-                    user = self.get_user(uid)
+                    user = self.get_user(str(uid))
+                    # user_info = obj.client_info
 
-                    user_info = obj.client_info
-
-                    yield Request(user, text)
+                    yield Request(user, msg)

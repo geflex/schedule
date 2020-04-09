@@ -1,6 +1,6 @@
 import time
 from abc import ABC, abstractmethod
-from typing import Callable, Optional, Iterable, Iterator
+from typing import Callable, Optional, Iterable, AsyncIterator
 
 import bottex
 from bottex.drivers import Message, Text
@@ -40,12 +40,14 @@ class Driver(ABC):
 
     async def run(self):
         async for request in self.listen():
-            t = time.time()
-            bottex.logger.debug(f'New message {text!r} from {uid!r}')
-            parser_func = self.get_view(user.current_view)
-            response = parser_func(request)
-            bottex.logger.debug(f'Message time {time.time() - t}')
-            await self.send(response, user)
+            t = time.time_ns()
+            bottex.logger.debug(f'New message {request.msg.text!r} from {request.user.uid!r}')
+
+            handler = self.get_handler(request.user.last_view)
+            response = handler(request)
+
+            bottex.logger.debug(f'Handle time {(time.time_ns() - t)/1E6} ms')
+            await self.send(response, request.user)
 
     # abstract methods
 
@@ -69,7 +71,7 @@ class Driver(ABC):
     async def listen(self):
         """
         :yields: request
-        :rtype: AsyncIterable[Request]
+        :rtype: AsyncIterator[Request]
         """
         yield
 

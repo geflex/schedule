@@ -62,7 +62,7 @@ class StrictLink(AbstractLink):
         super().__init__(handler, response, next_handler)
 
     def match(self, request):
-        return self.string == request.msg
+        return self.string.lower() == request.msg.text.lower()
 
 
 class ReLink(AbstractLink):
@@ -75,7 +75,7 @@ class ReLink(AbstractLink):
         super().__init__(handler, response, next_handler)
 
     def match(self, request):
-        m = self.regexp.match(request.msg)
+        m = self.regexp.match(request.msg.text.lower())
         if m:
             request.parsed = m
         return bool(m)
@@ -92,7 +92,7 @@ class ButtonLink(AbstractLink, Button):
         Button.__init__(self, label, color, next_line=next_line, translate=translate)
 
     def match(self, request):
-        return request.msg == self.label
+        return request.msg.text.lower() == self.label.lower()
 
     def __repr__(self):
         return f'{self.__class__.__name__}' \

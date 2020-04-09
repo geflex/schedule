@@ -11,19 +11,19 @@ def ptype_setter(t):
 
 def set_group(request):
     user = request.user
-    user.group = request.msg
+    user.group = request.msg.text
     user.save()
 
 
 def set_subgroup(request):
     user = request.user
-    user.subgroup = request.msg
+    user.subgroup = request.msg.text
     user.save()
 
 
 def set_fio(request):
     user = request.user
-    user.name = request.msg
+    user.name = request.msg.text
     user.save()
 
 

@@ -14,12 +14,12 @@ class Formatter:
         return f'{lesson.time} {lesson.auditory} к{lesson.building}\n{lesson.name}'
 
     def format_day(self, db_objects):
-        if not db_objects:
-            return _('Занятий нет')
         lessons = []
         for lesson in db_objects:
             s = self.str_lesson(lesson)
             lessons.append(s)
+        if not lessons:
+            return _('Занятий нет')
         return self.splitter.join(lessons)
 
     def format_week(self, db_objects):

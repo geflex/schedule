@@ -1,6 +1,6 @@
-from bottex.messaging import Text, Color, Button
-from bottex.views import View, ButtonLink, InputLink, ReLink, manager
-from bottex.core.i18n import gettext as _
+from bottex.drivers import Text, Color, Button
+from bottex.views import View, ButtonLink, InputLink, ReLink, classnames
+from bottex.utils.i18n import gettext as _
 
 from models import Lang, PType
 from bases import BackButton, NotChangeButton, group_fmt, time_fmt
