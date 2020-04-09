@@ -12,11 +12,11 @@ class UserModel:
     uid: str
     locale: str
     rights: int
-    current_view: str
+    last_view: str
     notifications: NotificationsModel
 
     @classmethod
-    def get_user(cls, site, uid):
+    def get_or_add(cls, site, uid):
         pass
 
     def __init_subclass__(cls, **kwargs):
@@ -25,7 +25,3 @@ class UserModel:
 
 
 user_model = UserModel
-
-
-def get_user_model():
-    return user_model

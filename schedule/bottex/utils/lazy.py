@@ -1,6 +1,3 @@
-from bottex.views.views import classnames
-
-
 class Unloaded:
     def __init__(self, name, obj):
         self.name = name
@@ -21,9 +18,3 @@ class Unloaded:
 
     def __repr__(self):
         return f'{self.__class__.__name__}({type(self.obj)}, {self.name})'
-
-
-def __getattr__(name):
-    return Unloaded(name, classnames)
-
-

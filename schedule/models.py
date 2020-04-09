@@ -5,9 +5,10 @@ from mongoengine import *
 import bottex
 from bottex.models.mongodriver import EnumField, TimeField
 from bottex.models import UserModel, NotificationsModel
+from bottex.utils.enums import StrEnum
 
 
-class Lang(Enum):
+class Lang(StrEnum):
     ru = 'ru'
     en = 'en'
     be = 'be'
@@ -19,7 +20,7 @@ class Rights(IntFlag):
     notifying = auto()
 
 
-class Department(Enum):
+class Department(StrEnum):
     atf = auto()
     fgde = auto()
     msf = auto()
@@ -71,7 +72,7 @@ class User(UserModel, DynamicDocument):
         Notifications,
         default=Notifications(allowed=False, time=None)
     )
-    current_view = StringField(default='')
+    last_view = StringField(default='')
     rights = IntField(default=Rights.view)
 
     ptype = EnumField(PType, default=PType.student)
@@ -85,7 +86,7 @@ class User(UserModel, DynamicDocument):
     logger = bottex.logging.get_logger('User')
 
     @classmethod
-    def get_user(cls, site, uid):
+    def get_or_add(cls, site, uid):
         user = cls.objects(site=site, uid=uid).first()
         if user is None:
             user = cls(site=site, uid=uid)

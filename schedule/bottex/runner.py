@@ -2,12 +2,12 @@ import asyncio
 from functools import partial
 
 import bottex
-from bottex.messaging.drivers import AbstractDriver
+from bottex.drivers.drivers import Driver
 from bottex.core.error_handling import on_error, err_safe_run
 
 
 async def _create_coro(drivers):
-    await asyncio.gather(*[d.run() if isinstance(d, AbstractDriver) else d() for d in drivers])
+    await asyncio.gather(*[d.run() if isinstance(d, Driver) else d() for d in drivers])
 
 
 def _run(drivers):

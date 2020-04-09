@@ -1,5 +1,6 @@
 import asyncio
 
+import aiohttp
 from vk_api.keyboard import VkKeyboard as VkApiKeyboard, VkKeyboardColor as VkColor
 
 from aiovk import TokenSession, API
@@ -7,16 +8,15 @@ from aiovk.longpoll import BotsLongPoll
 
 from bases import rand
 from bottex.utils import json
-from bottex.messaging.drivers import AbstractDriver
-from bottex.messaging.keyboard import Keyboard, Color
-from bottex.messaging import Request
+from bottex.drivers import Request, Color, Driver
+from bottex.views import viewnames
 
 from drivers.vk_parser import Event, parse_event
 
 vk_empty_text = '\u200b'
 
 
-class VkKeyboard(Keyboard):
+class VkKeyboard:
     colors = {
         Color.RED: VkColor.NEGATIVE,
         Color.WHITE: VkColor.DEFAULT,
@@ -67,12 +67,16 @@ class VerticalKeyboard(VkKeyboard):
         return self.get_str()
 
 
-class VkDriver(AbstractDriver):
-    site_name = 'vk'
-    kb_class = VkKeyboard
+class VkDriver(Driver):
+    def get_handler(self, name):
+        return viewnames[name]
 
-    def __init__(self, name, config_filename):
-        super().__init__(name)
+    site_name = 'vk'
+
+    def create_kb(self, buttons):
+        return VkKeyboard.from_buttons(buttons)
+
+    def __init__(self, config_filename):
         config = json.from_path(config_filename)
         session = TokenSession(access_token=config['token'])
         self.api = API(session)

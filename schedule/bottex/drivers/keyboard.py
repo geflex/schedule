@@ -10,7 +10,7 @@ class Color(Enum):
 
 
 class Button:
-    def __init__(self, title, color=None, *, next_line=True, translated=True):
+    def __init__(self, title, color=None, *, next_line=True, translate=True):
         """
         :type title: str
         :type color:
@@ -18,7 +18,7 @@ class Button:
         self.label = title
         self.color = color
         self.next_line = next_line
-        self.translated = translated
+        self.translate = translate
 
     def __repr__(self):
         return f'{self.__class__.__name__}({self.label}, color={self.color}, next_line={self.next_line})'

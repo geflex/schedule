@@ -2,6 +2,10 @@ from copy import copy
 
 
 class Message:
+    """
+    :type messages: list[Message]
+    :type buttons: list[Button]
+    """
     def __init__(self, messages=None, buttons=None):
         self.messages = messages or []
         self.buttons = buttons or []
@@ -35,26 +39,31 @@ class Message:
     def merge(self, other):
         if other is None:
             return
-        self.override_buttons(other.buttons)
+        self.update_buttons(other.buttons)
         if other.messages:
             self.extend(other.messages)
 
-    def override_buttons(self, buttons):
+    def update_buttons(self, buttons):
         if not self.buttons or self.buttons == NoButtons:
             self.buttons = buttons
 
     def with_buttons(self, buttons):
         copied = self.copy()
-        copied.override_buttons(buttons)
+        copied.update_buttons(buttons)
         return copied
 
 
 class Text(Message):
-    def __init__(self, text, buttons=None, attachments=None, translated=True):
+    """
+    :type text: str
+    :type attachments: Attachment
+    :type translate: bool
+    """
+    def __init__(self, text, buttons=None, attachments=None, translate=True):
         super().__init__([], buttons)
         self.text = text if text else None
         self.attachments = [] if attachments is None else attachments
-        self.translated = translated
+        self.translate = translate
         if self.text:
             self.messages.append(self)
 
@@ -66,6 +75,7 @@ class Text(Message):
 
 
 class Buttons(Message):
+    """Message with only buttons"""
     def __init__(self, buttons):
         super().__init__([], buttons)
 

@@ -1,11 +1,11 @@
-from collections import defaultdict
-from typing import List, Optional as Opt
+from typing import List
 from abc import ABC
 
 import bottex
 from bottex.views.links import AbstractLink
-from bottex.typing import Message, Receiver
-from bottex.messaging import Text, Button
+from bottex.drivers import Message, Text, Button, Handler
+from bottex.utils.manager import NameManager
+from bottex.utils.lazy import Unloaded
 
 
 class View(ABC):
@@ -45,15 +45,14 @@ class View(ABC):
         if not isbase:
             if '.' in cls.__viewname__:
                 raise ValueError('__viewname__ must not contain dots')
-            viewnames[cls.__viewname__] = cls.parse_request
+            viewnames[cls.__viewname__] = cls.handle
             classnames[cls.__name__] = cls
-            cls.logger = bottex.logging.get_logger(cls.__name__)
 
     def __init__(self, request):
         self.request = request
 
     @classmethod
-    def parse_request(cls, request) -> Message:
+    def handle(cls, request) -> Message:
         return cls(request)._get_response()
 
     @classmethod
@@ -67,22 +66,22 @@ class View(ABC):
         """
         Should parse the text message passed in request and return the response
         """
-        receiver = self._get_receiver()
+        handler = self._get_handler()
         try:
-            response = receiver(self.request)
+            response = handler(self.request)
         except Exception as e:
-            self.logger.error(e, exc_info=True)
+            bottex.logger.error(e, exc_info=True)
             response = self.error_handler(self.request, e)
         return response.with_buttons(self.buttons)
 
-    def _get_receiver(self) -> Receiver:
+    def _get_handler(self) -> Handler:
         """
-        Returns the receiver of this view that matches current request.
+        Returns the handler of this view that matches current request.
         If the link does not exist, returns `self.cannot_parse_handler`
         """
         for link in self.links:
             if isinstance(link, AbstractLink) and link.match(self.request):
-                return link.receiver
+                return link.handler
         return self.cannot_parse_handler
 
     def _save_state(self) -> None:
@@ -91,11 +90,11 @@ class View(ABC):
         This is necessary for the next request from the current
         user to be sent for parsing to this view.
         """
-        self.request.user.current_view = self.__viewname__
+        self.request.user.last_view = self.__viewname__
         self.request.user.save()
 
 
-class ViewManager(defaultdict):
+class ViewManager(NameManager):
     @property
     def default_view(self):
         return self.default_factory()
@@ -104,41 +103,23 @@ class ViewManager(defaultdict):
     def default_view(self, func_or_cls):
         func = func_or_cls
         if issubclass(func_or_cls, View):
-            func = func_or_cls.parse_request
+            func = func_or_cls.handle
 
         def factory():
             return func
         self.default_factory = factory
 
-    def __init__(self):
-        super().__init__()
-
     def __setitem__(self, name, cls):
         assert name not in self, f'View with name {name!r} already exists.'
         super().__setitem__(name, cls)
 
-    def register(self, name=None):
-        if name is None:
-            def _reg(f):
-                if hasattr(f, '__viewname__'):
-                    self[f.__viewname__] = f
-                else:
-                    self[f.__name__] = f
-        else:
-            def _reg(f):
-                self[name] = f
+    def __getitem__(self, name):
+        try:
+            return super().__getitem__(name)
+        except KeyError:
+            return Unloaded(name, self)
 
-        def _register(func):
-            _reg(func)
-            return func
-        return _register
-
-    def copy(self):
-        new = ViewManager()
-        new.default_view = self.default_view
-        for k, v in self.items():
-            new[k] = v
-        return new
+    __getattr__ = __getitem__
 
 
 viewnames = ViewManager()

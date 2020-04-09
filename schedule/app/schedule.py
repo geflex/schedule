@@ -1,7 +1,7 @@
 from datetime import timedelta
 
-from bottex.messaging import Text, Message
-from bottex.core.i18n import gettext as _
+from bottex.drivers import Text, Message
+from bottex.utils.i18n import gettext as _
 
 from date_utils import Date
 from models import Lesson, PType

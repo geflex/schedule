@@ -1,5 +1,5 @@
 import random
-from bottex.core.i18n import gettext as _
+from bottex.utils.i18n import gettext as _
 
 
 def axaxax(limit=10):

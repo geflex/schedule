@@ -6,15 +6,11 @@ default_domain = 'bottex'
 localedir = ''
 
 
-def dummy(s):
-    return s
-
-
-class BottexNullTranslation(gettext_module.NullTranslations):
+class NullTranslation(gettext_module.NullTranslations):
     pass
 
 
-null_translation = BottexNullTranslation()
+null_translation = NullTranslation()
 
 
 class BottexTranslation(gettext_module.GNUTranslations):
@@ -33,12 +29,12 @@ class LcManager:
 
     def get_locale(self, locale):
         if locale not in self.locales:
-            return BottexNullTranslation()
+            return NullTranslation()
         return self.locales[locale].gettext
 
     def add_locales(self, *locales):
         for locale in locales:
-            self.locales[locale] = BottexNullTranslation()  # gettext_module.translation('bottex', self.localedir, [locale])
+            self.locales[locale] = NullTranslation()  # gettext_module.translation('bottex', self.localedir, [locale])
 
     def set_default(self, locale):
         self.locales.setdefault(locale)

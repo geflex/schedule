@@ -3,7 +3,7 @@ import logging
 
 import bottex
 from bottex.views import views
-from bottex.core import i18n
+from bottex.utils import i18n
 
 import loggers
 from drivers.vk import VkDriver
@@ -16,8 +16,8 @@ def run_app():
     i18n.add_locales('be', 'en', 'ru')
     views.viewnames.default_view = StartView
 
-    vkdriver = VkDriver(app_name, 'drivers/vkdriver.json')
-    # socketdriver = SocketDriver(app_name, 'localhost', 8888)
+    vkdriver = VkDriver('drivers/vkdriver.json')
+    # socketdriver = SocketDriver('localhost', 8888)
     bottex.run([vkdriver], restart_on_error=True)
 
 

@@ -38,7 +38,7 @@ class MainView(BaseView):
         ButtonLink(_('След. неделя'), schedule.next_week, next_line=False),
 
         ButtonLink(_('Какая неделя'), schedule.week_num),
-        ButtonLink(_('Настройки'), manager.SettingsView.switch),
+        ButtonLink(_('Настройки'), classnames.SettingsView.switch),
     ]
 
 
@@ -96,8 +96,8 @@ class SettingsView(BaseView):
         else:
             self._add_teacher_butttons(links)
 
-        links.append(ButtonLink(_('Язык'), manager.LanguageSettings.switch))
-        links.append(BackButton(manager.MainView.switch))
+        links.append(ButtonLink(_('Язык'), classnames.LanguageSettings.switch))
+        links.append(BackButton(classnames.MainView.switch))
         # links.append(ButtonLink('Начать сначала',
         #                         manager.StartProfileTypeSetter.switch,
         #                         start_message))
@@ -163,7 +163,7 @@ class StartGroupSetter(GroupSetter):
     hello_resp = Text(_('Теперь введи с клавиатуры номер своей группы'))
     links = [
         GroupSetter.idontknow,
-        ReLink(group_fmt, profile_settings.set_group, GroupSetter.success_resp, manager.StartSubgroupSetter.switch),
+        ReLink(group_fmt, profile_settings.set_group, GroupSetter.success_resp, classnames.StartSubgroupSetter.switch),
     ]
 
 

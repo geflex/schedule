@@ -1,4 +1,4 @@
-from .responses import Attachment
+from .messages import Attachment
 
 
 class Picture(Attachment):
