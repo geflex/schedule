@@ -1,3 +1,3 @@
 from . import users, mongodriver
-from .users import UserModel, NotificationsModel, get_user_model
+from .users import UserModel, NotificationsModel
 from .mongodriver import Mapper
