@@ -1,18 +1,50 @@
 from typing import List
-from abc import ABC
+from abc import ABC, abstractmethod
 
 import bottex
-from bottex.views.links import AbstractLink
-from bottex.drivers import Message, Text, Button, Handler
+from bottex.drivers import Message, Text, Button, Handler, Request
 from bottex.utils.manager import NameManager
 from bottex.utils.lazy import Unloaded
+
+
+class Link(ABC):
+    def __init__(self,
+                 handler: Handler,
+                 response: Message = None,
+                 next_handler: Handler = None):
+        self._handler = handler
+        self.handler = self._create_handler()
+        self.response = response
+        self.next_handler = next_handler
+
+    @abstractmethod
+    def match(self, request: Request) -> bool:
+        pass
+
+    def _create_handler(self):
+        def new_handler(request):
+            response = self._handler(request)
+            if self.response:
+                response = self.response << response
+            if self.next_handler:
+                next_resp = self.next_handler(request)
+                if next_resp:
+                    response = response << next_resp
+            return response
+        return new_handler
+
+    def __repr__(self):
+        return f'{self.__class__.__name__}' \
+               f'(handler={self.handler}, ' \
+               f'response={self.response}, ' \
+               f'next_handler={self.next_handler})'
 
 
 class View(ABC):
     __viewname__: str
 
     @property
-    def links(self) -> List[AbstractLink]:
+    def links(self) -> List[Link]:
         return []
 
     @property
@@ -82,7 +114,7 @@ class View(ABC):
         If the link does not exist, returns `self.cannot_parse_handler`
         """
         for link in self.links:
-            if isinstance(link, AbstractLink) and link.match(self.request):
+            if isinstance(link, Link) and link.match(self.request):
                 return link.handler
         return self.cannot_parse_handler
 

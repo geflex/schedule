@@ -1,44 +1,11 @@
-from abc import ABC, abstractmethod
 from typing import Callable
 
 from bottex.drivers import Request, Handler, Message, Button
 from bottex.utils import regexp as re
+from bottex.views import Link
 
 
-class AbstractLink(ABC):
-    def __init__(self,
-                 handler: Handler,
-                 response: Message = None,
-                 next_handler: Handler = None):
-        self._handler = handler
-        self.handler = self._create_handler()
-        self.response = response
-        self.next_handler = next_handler
-
-    @abstractmethod
-    def match(self, request: Request) -> bool:
-        pass
-
-    def _create_handler(self):
-        def new_handler(request):
-            response = self._handler(request)
-            if self.response:
-                response = self.response << response
-            if self.next_handler:
-                next_resp = self.next_handler(request)
-                if next_resp:
-                    response = response << next_resp
-            return response
-        return new_handler
-
-    def __repr__(self):
-        return f'{self.__class__.__name__}' \
-               f'(handler={self.handler}, ' \
-               f'response={self.response}, ' \
-               f'next_handler={self.next_handler})'
-
-
-class FuncLink(AbstractLink):
+class FuncLink(Link):
     def __init__(self,
                  func: Callable[[Request], bool],
                  handler: Handler,
@@ -52,7 +19,7 @@ class FuncLink(AbstractLink):
         return self.func(request)
 
 
-class StrictLink(AbstractLink):
+class StrictLink(Link):
     def __init__(self,
                  string: str,
                  handler: Handler,
@@ -65,7 +32,7 @@ class StrictLink(AbstractLink):
         return self.string.lower() == request.msg.text.lower()
 
 
-class ReLink(AbstractLink):
+class ReLink(Link):
     def __init__(self,
                  regexp: str,
                  handler: Handler,
@@ -81,14 +48,14 @@ class ReLink(AbstractLink):
         return bool(m)
 
 
-class ButtonLink(AbstractLink, Button):
+class ButtonLink(Link, Button):
     def __init__(self,
                  label: str,
                  handler: Handler,
                  response: Message = None,
                  next_handler: Handler = None,
                  *, color=None, next_line=True, translate=True):
-        AbstractLink.__init__(self, handler, response, next_handler)
+        Link.__init__(self, handler, response, next_handler)
         Button.__init__(self, label, color, next_line=next_line, translate=translate)
 
     def match(self, request):
@@ -104,7 +71,7 @@ class ButtonLink(AbstractLink, Button):
                f'line={self.next_line})'
 
 
-class InputLink(AbstractLink):
+class InputLink(Link):
     def __init__(self,
                  handler: Handler,
                  response: Message = None,

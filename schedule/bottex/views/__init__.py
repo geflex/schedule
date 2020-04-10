@@ -1,3 +1,3 @@
 from . import views, links
-from .views import View, viewnames, classnames
-from .links import AbstractLink, ButtonLink, StrictLink, ReLink, FuncLink, InputLink
+from .views import View, viewnames, classnames, Link
+from .links import ButtonLink, StrictLink, ReLink, FuncLink, InputLink
