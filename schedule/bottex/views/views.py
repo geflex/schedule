@@ -1,7 +1,7 @@
 from typing import List
 from abc import ABC, abstractmethod
 
-import bottex
+from bottex.core.logging import logger
 from bottex.drivers import Message, Text, Button, Handler, Request
 from bottex.utils.manager import NameManager
 from bottex.utils.lazy import Unloaded
@@ -34,10 +34,10 @@ class Link(ABC):
         return new_handler
 
     def __repr__(self):
-        return f'{self.__class__.__name__}' \
-               f'(handler={self.handler}, ' \
-               f'response={self.response}, ' \
-               f'next_handler={self.next_handler})'
+        return '{}(handler={}, response={}, next_handler={})'.format(
+            self.__class__.__name__,
+            self.handler, self.response, self.next_handler,
+        )
 
 
 class View(ABC):
@@ -80,7 +80,7 @@ class View(ABC):
             if not isinstance(cls.__viewname__, str):
                 raise TypeError('__viewname__ must be str')
             viewnames[cls.__viewname__] = cls.handle
-            classnames[cls.__name__] = cls
+            viewclasses[cls.__name__] = cls
 
     def __init__(self, request):
         self.request = request
@@ -98,13 +98,13 @@ class View(ABC):
 
     def _get_response(self) -> Message:
         """
-        Should parse the text message passed in request and return the response
+        Parse the text message passed in request and return the response
         """
         handler = self._get_handler()
         try:
             response = handler(self.request)
         except Exception as e:
-            bottex.logger.error(e, exc_info=True)
+            logger.error(e, exc_info=True)
             response = self.error_handler(self.request, e)
         return response.with_buttons(self.buttons)
 
@@ -157,8 +157,4 @@ class ViewManager(NameManager):
 
 
 viewnames = ViewManager()
-classnames = ViewManager()
-
-
-def set_default_view(func_or_cls):
-    viewnames.default_view = func_or_cls
+viewclasses = ViewManager()

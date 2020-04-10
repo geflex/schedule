@@ -11,7 +11,6 @@ from views import StartView
 
 
 def run_app():
-    app_name = 'bntu_schedule'
     i18n.localedir = os.path.join(os.path.dirname(__file__), 'locale')
     i18n.add_locales('be', 'en', 'ru')
     views.viewnames.default_view = StartView
