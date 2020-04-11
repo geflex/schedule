@@ -13,7 +13,6 @@ class Link(ABC):
                  response: Message = None,
                  next_handler: Handler = None):
         self._handler = handler
-        self.handler = self._create_handler()
         self.response = response
         self.next_handler = next_handler
 
@@ -21,17 +20,15 @@ class Link(ABC):
     def match(self, request: Request) -> bool:
         pass
 
-    def _create_handler(self):
-        def new_handler(request):
-            response = self._handler(request)
-            if self.response:
-                response = self.response << response
-            if self.next_handler:
-                next_resp = self.next_handler(request)
-                if next_resp:
-                    response = response << next_resp
-            return response
-        return new_handler
+    def handler(self, request):
+        response = self._handler(request)
+        if self.response:
+            response = self.response << response
+        if self.next_handler:
+            next_resp = self.next_handler(request)
+            if next_resp:
+                response = response << next_resp
+        return response
 
     def __repr__(self):
         return '{}(handler={}, response={}, next_handler={})'.format(
@@ -40,12 +37,24 @@ class Link(ABC):
         )
 
 
+class Linked:
+    def __init__(self, link):
+        self.link = link
+        self.handler = None
+
+    def __call__(self, handler):
+        self.handler = handler
+        return self
+
+    def get_link(self):
+        self.link._handler = self.handler
+        return self.link
+
+
 class View(ABC):
     __viewname__: str
 
-    @property
-    def links(self) -> List[Link]:
-        return []
+    links: List[Link]
 
     @property
     def buttons(self) -> List[List[Button]]:
@@ -62,16 +71,16 @@ class View(ABC):
                     buttons[-1].append(link)
         return buttons
 
-    hello_resp = Text('')
-    success_resp = Text('')
-    error_resp = Text('Error')
-    cannot_parse_resp = Text('Unknown command')
+    hello = Text('')
+    success = Text('')
+    error = Text('Error')
+    cannot_parse = Text('Unknown command')
 
     def error_handler(self, request, e) -> Message:
-        return self.error_resp
+        return self.error
 
     def cannot_parse_handler(self, request) -> Message:
-        return self.cannot_parse_resp
+        return self.cannot_parse
 
     def __init_subclass__(cls, isbase=False, **kwargs):
         if not isbase:
@@ -79,6 +88,11 @@ class View(ABC):
                 raise ValueError('__viewname__ must not contain dots')
             if not isinstance(cls.__viewname__, str):
                 raise TypeError('__viewname__ must be str')
+
+            for name, val in cls.__dict__.items():
+                if isinstance(val, Linked):
+                    cls.links.append(val.get_link())
+
             viewnames[cls.__viewname__] = cls.handle
             viewclasses[cls.__name__] = cls
 
@@ -93,7 +107,7 @@ class View(ABC):
     def switch(cls, request) -> Message:
         self = cls(request)
         self._save_state()
-        response = self.hello_resp
+        response = self.hello
         return response.with_buttons(self.buttons)
 
     def _get_response(self) -> Message:

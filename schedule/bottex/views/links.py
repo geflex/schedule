@@ -2,7 +2,7 @@ from typing import Callable
 
 from bottex.drivers import Request, Handler, Message, Button
 from bottex.utils import regexp as re
-from bottex.views import Link
+from bottex.views.views import Link
 
 
 class FuncLink(Link):
