@@ -1,5 +1,5 @@
 from bottex.drivers import Text, Color, Button
-from bottex.views import View, ButtonLink, InputLink, ReLink, viewclasses, Linked
+from bottex.views import View, ButtonLink, InputLink, ReLink, viewclasses, AddLink
 from bottex.utils.i18n import gettext as _
 from bottex.utils.functional import none
 

@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Iterator
 from abc import ABC, abstractmethod
 
 from bottex.core.logging import logger
@@ -37,7 +37,7 @@ class Link(ABC):
         )
 
 
-class Linked:
+class AddLink:
     def __init__(self, link):
         self.link = link
         self.handler = None
@@ -90,7 +90,7 @@ class View(ABC):
                 raise TypeError('__viewname__ must be str')
 
             for name, val in cls.__dict__.items():
-                if isinstance(val, Linked):
+                if isinstance(val, AddLink):
                     cls.links.append(val.get_link())
 
             viewnames[cls.__viewname__] = cls.handle
@@ -124,7 +124,7 @@ class View(ABC):
 
     def _get_handler(self) -> Handler:
         """
-        Returns the handler of this view that matches current request.
+        Returns the handler of link that matches current request.
         If the link does not exist, returns `self.cannot_parse_handler`
         """
         for link in self.links:
