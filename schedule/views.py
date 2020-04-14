@@ -252,3 +252,11 @@ class StartView(BaseView):
     buttons = [
         Button(_('Начать'))
     ]
+
+
+class DepartmentGroups(BaseView):
+    __viewname__ = 'department_groups'
+
+
+class Departments(BaseView):
+    __viewname__ = 'departments'
