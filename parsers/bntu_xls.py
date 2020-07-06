@@ -1,12 +1,10 @@
-import re  # модуль регулярных выражений
-import os  # для объединения путей
-from itertools import zip_longest, chain  # утилиты для итерирования
-from collections import namedtuple
+import re
+import os
+from itertools import zip_longest, chain
+from typing import Match
 
-import xlrd  # библиотека для работы с excel
-from mongoengine.connection import _get_db  # для доступа к соединению с базой
-
-from models import Lesson as DbLesson  # импортируем нашу модель
+import xlrd
+from pymongo import MongoClient
 
 
 WEEKDAYS = [
@@ -19,39 +17,19 @@ WEEKDAYS = [
 ]
 
 
-_many_spaces = re.compile(r'\s+')
+client = MongoClient()
+collection = client.schedule_test.lessons
+
+
+re_multispace = re.compile(r'\s+')
 def normalize_spaces(s):
     """Удаляет ненужные пробелы"""
-    return _many_spaces.sub(' ', s).strip()
+    return re_multispace.sub(' ', s).strip()
 
 
-def del_match(m):
+def del_match(m: Match):
     """Удаляет совпадение из строки"""
     return m.string[:m.start()] + m.string[m.end():]
-
-
-class MatchWrapper:
-    def __init__(self, m):
-        self.m = m
-
-    def group(self, name=None):
-        if self.m is not None:
-            if name is None:
-                return self.m.group()
-            return self.m.group(name)
-        else:
-            return None
-
-
-class CellWrapper:
-    def __init__(self, cell):
-        self.cell = cell
-
-    def search(self, pat):
-        m = pat.search(self.cell.value)
-        if m:
-            self.cell.value = del_match(m)
-        return MatchWrapper(m)
 
 
 class Borders:
@@ -62,22 +40,23 @@ class Borders:
         self.left = left
         self.right = right
 
-    def confined(self):
-        """"""
-        return all([self.top, self.left, self.bottom, self.right])
-
     def __repr__(self):
         return f'Borders({self.top}, {self.left}, {self.bottom}, {self.right})'
 
 
-Point = namedtuple('Point', 'x, y')
-def __point_bool(self):
-    return bool(self.x and self.y)
-Point.__bool__ = __point_bool
+class Point:
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+
+    def __bool__(self):
+        return None not in (self.x, self.y)
+
+    def __repr__(self):
+        return f'Point({self.x}, {self.y})'
 
 
 class BaseArea:
-    """Прямоугольная область из нескольких ячеек"""
     @property
     def cells(self):
         return self._cells
@@ -120,7 +99,7 @@ class BaseArea:
                 cell.value = str(cell.value).strip()
 
     def parse(self):
-        """Че-то парсит и инициализирует объект"""
+        """Для подклассов"""
         pass
 
     def xrange(self):
@@ -134,12 +113,6 @@ class BaseArea:
 
     def ylen(self):
         return self.end.y - self.start.y
-
-    def __contains__(self, item: "BaseArea"):
-        return item.xrange() in self.xrange() and item.yrange() in self.yrange()
-
-    def __repr__(self):
-        return f'Area({(self.start.x, self.end.x)}, {(self.start.y, self.end.y)}, {self.text!r})'
 
     def ycontains(self, area: "BaseArea"):
         """Входит ли область area в эту область по оси y"""
@@ -158,6 +131,31 @@ class BaseArea:
         """Пересекается ли эта область с областью area по оси x"""
         r = self.xrange()
         return area.start.x in r or area.end.x in r
+
+    def __repr__(self):
+        return f'Area({(self.start.x, self.end.x)}, {(self.start.y, self.end.y)}, {self.text!r})'
+
+
+class MatchWrapper:
+    def __init__(self, m):
+        self.m = m
+
+    def group(self, *args, **kwargs):
+        if self.m:
+            return self.m.group(*args, **kwargs)
+        else:
+            return None
+
+
+class CellWrapper:
+    def __init__(self, cell):
+        self.cell = cell
+
+    def search(self, pat):
+        m = pat.search(self.cell.value)
+        if m:
+            self.cell.value = del_match(m)
+        return MatchWrapper(m)
 
 
 re_time = re.compile(r'([0-1]?\d|2[0-3])\.[0-5]\d')
@@ -189,77 +187,74 @@ exceptions = {
 
 
 class LessonArea(BaseArea):
-    @property
-    def doc(self):
-        if not hasattr(self, '_doc'):
-            self._doc = DbLesson(
-                group=self.group,
-                weeknum=self.weeknum,
-                weekday=self.weekday,
-                subgroup=self.subgroup,
-                time=self.time,
-                name=self.name,
-                teachers=self.teachers,
-                building=self.building,
-                auditories=self.auditories,
-            )
-        return self._doc
+    def save(self):
+        doc = dict(groups=self.groups,
+                   weeknum=self.weeknum,
+                   weekday=self.weekday,
+                   subgroup=self.subgroup,
+                   time=self.time,
+                   name=self.name,
+                   teachers=self.teachers,
+                   building=self.building,
+                   auditories=self.auditories)
+        if hasattr(self, '_doc_id'):
+            doc['_id'] = self._doc_id
+        self._doc_id = collection.insert_one(doc)
 
     def parse(self):
-        self.name = None
-        self.group = None
-        self.subgroup = None
-        self.weekday = None
-        self.time = None
-        self.weeknum = None
-        self.building = None
-        self.auditories = []
-        self.teachers = []
-        self.lenght = None
+        self.name = None  # строка, которая останется после парсинга
+        self.groups = []  # номера групп
+        self.subgroup = None  # номер подгруппы
+        self.weekday = None  # день недели
+        self.time = None  # время начала занятия
+        self.weeknum = None  # номер недели
+        self.building = None  # корпус
+        self.auditories = []  # аудитории
+        self.teachers = []  # преподаватели
+        self.lenght = None  # длительность занятия
 
-        for cell in chain(*self.cells):
-            if cell.value:
-                cell = CellWrapper(cell)
-                if not self.time:
-                    self.time = cell.search(re_time).group()
+        for cell in chain(*self.cells):  # для каждой ячейки
+            if cell.value:  # если ячейка не пустая
+                cell = CellWrapper(cell)  # оборачиваем ячейку для удобства
+                if not self.time:  # если время начала данного занятия еще не найдено
+                    self.time = cell.search(re_time).group()  # находим его
 
                 halfgroup = cell.search(re_halfgroup).group()
                 if halfgroup and not self.subgroup:
-                    self.subgroup = 1
+                    self.subgroup = 1  # номер подгруппы обычно не указан явно в тексте
 
-                if not self.lenght:
+                if not self.lenght:  # длительность занятия
                     self.lenght = cell.search(re_length).group('len')
 
-                weeknum = cell.search(re_week).group('num')
-                if not self.weeknum:
-                    self.weeknum = weeknum
+                if not self.weeknum:  # номер недели
+                    self.weeknum = cell.search(re_week).group('num')
 
-                if not self.building:
+                if not self.building:  # корпус
                     self.building = cell.search(re_building).group('b')
 
-                while True:
+                while True:  # ищем все упоминания аудиторий
                     auditory = cell.search(re_auditory).group('a')
                     if auditory:
                         self.auditories.append(auditory)
                     else:
                         break
-                while True:
+                while True:  # ищем все упоминания учителей
                     m = cell.search(re_teacher)
                     teacher = m.group('lastname') or m.group('lastname2')
                     if teacher:
                         self.teachers.append(teacher)
                     else:
                         break
-
+        # оставшийся текст будет названием занятия
         self.name = normalize_spaces(self.regen_text())
-        if self.name in exceptions:
-            self.name = exceptions[self.name]
+        if self.name in exceptions:  # проверяем исключительные случаи
+            self.name = exceptions[self.name]  # заменяем
 
     def __repr__(self):
         attrs = [
             f'area={super().__repr__()}',
             f'text={self.text!r}',
-            f'group={self.group!r}',
+            f'group={self.groups!r}',
             f'subgroup={self.subgroup!r}',
             f'weekday={self.weekday!r}',
             f'time={self.time!r}',
@@ -281,75 +276,16 @@ class TimeArea(BaseArea):
         self.tend = t.group('end')
 
 
-class SheetParser:
+class BaseSheetParser:
     def __init__(self, sheet, book):
-        self._cells = list(sheet.get_rows())
+        self._cells = list(sheet.get_rows())  # ячейки листа
         self._sheet = sheet
         self._book = book
-        self.name = sheet.name
+        self.name = sheet.name  # название листа
 
-        self._curr_header = None
-        self._title = None
-        self._group_areas = {}
-        self._curr_weekday = None
-        self._curr_time = None
-
-        self.broken_lessons = []
-
-    def slice(self, start: Point, end: Point = None):
-        """Возвращает двумерный срез ячеек листа"""
-        end = Point(self._sheet.ncols, self._sheet.nrows) if end is None else end
-        for y in range(start.y, end.y):
-            yield self._sheet.row_slice(y, start.x, end.x)
-
-    def is_day(self, area):
-        """Является ли область ячеек днем недели"""
-        return area.text in WEEKDAYS
-
-    def is_time(self, area):
-        """Является ли область"""
-        return re_fulltime.fullmatch(area.text)
-
-    def is_group(self, area):
-        return self._curr_header.end.y == area.end.y and re_group.match(area.text)
-
-    def is_title(self, area):
-        return self._curr_header.start.y == area.start.y and not re_group.match(area.text)
-
-    def _set_lesson_group(self, lesson):
-        for group in self._group_areas.values():
-            if group.xintersects(lesson):
-                self._curr_group = group
-                lesson.group = group.text
-                break
-
-    def _set_lesson_subgroup(self, lesson):
-        if self._curr_group:
-            if lesson.xlen() < self._curr_group.xlen():
-                if lesson.start.x == self._curr_group.start.x:
-                    lesson.subgroup = 1
-                elif lesson.end.x == self._curr_group.end.x:
-                    lesson.subgroup = 2
-
-    def _set_lesson_weekday(self, lesson):
-        if self._curr_weekday:
-            wd = self._curr_weekday.text
-            lesson.weekday = WEEKDAYS.index(wd)
-
-    def _set_lesson_time(self, lesson):
-        if self._curr_time and not lesson.time:
-            lesson.time = self._curr_time.tstart
-
-    def _set_lesson_weeknum(self, lesson):
-        if self._curr_time:
-            if lesson.ylen() < self._curr_time.ylen():
-                if lesson.start.y == self._curr_time.start.y:
-                    lesson.weeknum = '1'
-                elif lesson.end.y == self._curr_time.end.y:
-                    lesson.weeknum = '2'
-
-    def cell_borders(self, cell):
+    def get_cell_borders(self, cell):
         if cell is None:
+            # noinspection PyArgumentList
             return Borders()
         b = self._book.xf_list[cell.xf_index].border  # получаем стили ячейки
         return Borders(
@@ -357,12 +293,19 @@ class SheetParser:
             b.bottom_line_style, b.right_line_style,
         )
 
-    def areas(self):
+    def get_area(self, start: Point, end: Point = None):
+        end = Point(self._sheet.ncols, self._sheet.nrows) if end is None else end
+        cells = []
+        for y in range(start.y, end.y):
+            cells.append(self._sheet.row_slice(y, start.x, end.x))
+        return BaseArea(start, end, cells)
+
+    def get_areas(self):
         sheet = self._sheet  # сокращение для удобства
         for y, row in enumerate(self._cells):  # для каждой строки с координатой y
             for x, cell in enumerate(row):  # для каждой ячейки с координатой x в строке
-                b = self.cell_borders(cell)  # получаем границы ячейки
-                if x == 0:  # край листа тоже считаем границой
+                b = self.get_cell_borders(cell)  # получаем границы ячейки
+                if x == 0:  # края листа тоже считаем границоми
                     b.left = True
                 if y == 0:
                     b.top = True
@@ -375,8 +318,8 @@ class SheetParser:
                     xiter = zip_longest(sheet.row_slice(y, start.x, sheet.ncols),
                                         sheet.row_slice(y, start.x + 1, sheet.ncols))
                     for i, (firstcell, nextcell) in enumerate(xiter):
-                        fb = self.cell_borders(firstcell)
-                        nb = self.cell_borders(nextcell)
+                        fb = self.get_cell_borders(firstcell)
+                        nb = self.get_cell_borders(nextcell)
                         if fb.right or nb.left:
                             end.x = x + i + 1
                             break
@@ -385,57 +328,110 @@ class SheetParser:
                     yiter = zip_longest(sheet.col_slice(x, start.y, sheet.nrows),
                                         sheet.col_slice(x, start.y + 1, sheet.nrows))
                     for i, (firstcell, nextcell) in enumerate(yiter):
-                        fb = self.cell_borders(firstcell)
-                        nb = self.cell_borders(nextcell)
+                        fb = self.get_cell_borders(firstcell)
+                        nb = self.get_cell_borders(nextcell)
                         if fb.bottom or nb.top:
                             end.y = y + i + 1
                             break
 
                     if end:  # если конечная точка найдена
-                        cells = list(self.slice(start, end))
-                        area = BaseArea(start, end, cells)
-                        yield area
+                        area = self.get_area(start, end)  # создаем объект BaseArea
+                        yield area  # передаем area в место вызова
+
+
+class SheetParser(BaseSheetParser):
+    def __init__(self, sheet, book):
+        super().__init__(sheet, book)
+        self._curr_header = None
+        self._title = None
+        self._group_areas = []
+        self._curr_weekday = None
+        self._curr_time = None
+        self._curr_group = None
+
+    def _is_day(self, area):
+        return area.text in WEEKDAYS
+
+    def _is_time(self, area):
+        return re_fulltime.fullmatch(area.text)
+
+    def _is_group(self, area):
+        return self._curr_header.end.y == area.end.y and re_group.match(area.text)
+
+    def _is_title(self, area):
+        return self._curr_header.start.y == area.start.y and not re_group.match(area.text)
+
+    def _set_lesson_group(self, lesson):
+        """Добавляет все блоки групп, пересекающиеся с lesson по оси x"""
+        for group in self._group_areas:
+            if group.xintersects(lesson):
+                self._curr_group = group
+                lesson.groups.append(group.text)
+
+    def _set_lesson_subgroup(self, lesson):
+        """Устанавливает номер подгруппы объекта lesson"""
+        # если ни одна группа не определена, то и _curr_group, соответственно, тоже
+        if lesson.groups:
+            # если по оси x длина блока меньше чем длина блока с группой
+            if lesson.xlen() < self._curr_group.xlen():
+                # проверяем, находится ли блок слева
+                if lesson.start.x == self._curr_group.start.x:
+                    lesson.subgroup = 1
+                # или справа
+                elif lesson.end.x == self._curr_group.end.x:
+                    lesson.subgroup = 2
+
+    def _set_lesson_weekday(self, lesson):
+        """Устанавливает номер дня недели объекта lesson"""
+        if self._curr_weekday:
+            wd = self._curr_weekday.text
+            lesson.weekday = WEEKDAYS.index(wd)
+
+    def _set_lesson_time(self, lesson):
+        """Устанавливает время начала занятия объекта lesson, если оно не было определено в тексте"""
+        if self._curr_time and not lesson.time:
+            lesson.time = self._curr_time.tstart
+
+    def _set_lesson_weeknum(self, lesson):
+        """Устанавливает номер недели объекта lesson"""
+        if self._curr_time:
+            if lesson.ylen() < self._curr_time.ylen():
+                # проверяем, находится ли блок сверху
+                if lesson.start.y == self._curr_time.start.y:
+                    lesson.weeknum = '1'
+                # или снизу
+                elif lesson.end.y == self._curr_time.end.y:
+                    lesson.weeknum = '2'
 
     def lessons(self):
-        for area in self.areas():
+        for area in self.get_areas():
             if area.text:
+                # пытаемся узнать тип ячейки
                 if area.text.lower() in ('дни', 'часы'):
-                    self._curr_header.append(area)
+                    self._curr_header = area
 
-                elif self.is_title(area):
+                elif self._is_title(area):  # ячейка с названием факультета
                     self._title = area
 
-                elif self.is_group(area):
-                    self._group_areas[area.text] = area
+                elif self._is_group(area):  # ячейка с номером группы
+                    self._group_areas.append(area)
 
-                elif self.is_day(area):
+                elif self._is_day(area):  # ячейка с днем недели
                     self._curr_weekday = area
 
-                elif self.is_time(area):
+                elif self._is_time(area):  # ячейка с временем занятия
                     area = TimeArea.init_from(area)
                     self._curr_time = area
 
                 else:
-                    lesson = LessonArea.init_from(area)
+                    lesson = LessonArea.init_from(area)  # создаем Lesson
+                    # устанавливаем атрибуты, зависящие от положения ячейки
                     self._set_lesson_group(lesson)
                     self._set_lesson_weekday(lesson)
                     self._set_lesson_time(lesson)
                     self._set_lesson_subgroup(lesson)
                     self._set_lesson_weeknum(lesson)
-                    yield lesson
-
-
-def setup_teachers():
-    print('setting up teachers')
-    teachers = set(DbLesson.objects().distinct('teacher'))
-    lessons = list(DbLesson.objects())  # для использования len
-    for i, lesson in enumerate(lessons):
-        for teacher in teachers:  # set нельзя изменять во время итерации
-            lesson.teacher = lesson.sub(teacher).group()
-            lesson.normalize()
-
-        if i % 50 == 0:
-            print(f'{i}/{len(lessons)} lessons processed')
+                    yield lesson  # передаем lesson в место вызова
 
 
 def bntu_books():
@@ -455,9 +451,9 @@ def main():
             sheet = SheetParser(sheet, book)
             print('processing', sheet.name)
             for lesson in sheet.lessons():
-                lesson.doc.save()
+                lesson.save()
 
 
 if __name__ == '__main__':
-    _get_db().drop_collection('lessons')
+    # collection.drop()
     main()
