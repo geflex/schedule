@@ -73,13 +73,13 @@ class VkDriver(Driver):
         if not message.text:
             message.text = '...'
         keyboard = self.create_kb(message.buttons)
-        await self.api.messages.send(random_id=randint(0, sys.maxsize),
-                                     user_id=peer_id,
-                                     message=message.text,
-                                     # attachment=attachments,
-                                     keyboard=keyboard)
+        await self.api.messages.send_text(random_id=randint(0, sys.maxsize),
+                                          user_id=peer_id,
+                                          message=message.text,
+                                          # attachment=attachments,
+                                          keyboard=keyboard)
 
-    async def send(self, response, user):
+    async def write(self, response, user):
         if response.messages:
             for msg in response[:-1]:
                 await self.send_text(msg, user.uid)
@@ -92,7 +92,7 @@ class VkDriver(Driver):
                 except (asyncio.TimeoutError, aiohttp.ClientOSError):
                     pass
 
-    async def listen(self):
+    async def serve(self):
         while True:
             try:
                 response = await self.longpoll.wait(need_pts=True)

@@ -1,5 +1,4 @@
 import datetime
-from mongoengine import DynamicDocument
 
 
 class NotificationsModel:
@@ -13,6 +12,7 @@ class UserModel:
     locale: str
     rights: int
     last_view: str
+    view_args: dict
     notifications: NotificationsModel
 
     @classmethod

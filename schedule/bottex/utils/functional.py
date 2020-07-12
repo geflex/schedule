@@ -2,5 +2,5 @@ def dummy(obj):
     return obj
 
 
-def none(*args, **kwargs) -> None:
+def return_none(*args, **kwargs) -> None:
     return None

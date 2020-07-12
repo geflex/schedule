@@ -4,14 +4,14 @@ import time
 import traceback
 
 
-def error_formatter(e):
+def format_error(e):
     _, _, tb = sys.exc_info()
     s = traceback.format_exc()
     return '\n' + ''.join(s)
 
 
 def on_error(e):
-    s = error_formatter(e)
+    s = format_error(e)
     logging.critical(s)
     # reload_all_modules()
     time.sleep(0.3)

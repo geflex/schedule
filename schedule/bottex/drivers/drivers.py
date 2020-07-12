@@ -32,22 +32,14 @@ class Request(dict):
 
 
 class Driver(ABC):
-    site_name: str = None
-
-    def get_user(self, uid):
-        """get user by id"""
-        return users.user_model.get_or_add(self.site_name, uid)
-
     async def run(self):
-        async for request in self.listen():
+        async for request in self.serve():
             t = time.time_ns()
-            bottex.logger.debug(f'New message {request.msg.text!r} from {request.user.uid!r}')
-
             handler = self.get_handler(request.user.last_view)
             response = handler(request)
 
             bottex.logger.debug(f'Handle time {(time.time_ns() - t)/1E6} ms')
-            await self.send(response, request.user)
+            await self.write(response, request.user)
 
     # abstract methods
 
@@ -68,7 +60,7 @@ class Driver(ABC):
         """
 
     @abstractmethod
-    async def listen(self):
+    async def serve(self):
         """
         :yields: request
         :rtype: AsyncIterator[Request]
@@ -76,7 +68,7 @@ class Driver(ABC):
         yield
 
     @abstractmethod
-    async def send(self, response, user):
+    async def write(self, response, user):
         """
         Sends the response to the user
         :param response: text message, picture or other type supported by driver

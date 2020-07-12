@@ -1,7 +1,7 @@
 from bottex.drivers import Text, Color, Button
 from bottex.views import View, ButtonLink, InputLink, ReLink, viewclasses, AddLink
 from bottex.utils.i18n import gettext as _
-from bottex.utils.functional import none
+from bottex.utils.functional import return_none
 
 
 from models import Lang, PType, Department, Groups
@@ -247,7 +247,7 @@ class StartView(BaseView):
     success = Text(_('Привет! Чтобы все заработало, сначала нужно кое-что настроить '
                      '(все это можно будет поменять позже в настройках)'))
     links = [
-        InputLink(none, success, StartProfileTypeSetter.switch),
+        InputLink(return_none, success, StartProfileTypeSetter.switch),
     ]
     buttons = [
         Button(_('Начать'))

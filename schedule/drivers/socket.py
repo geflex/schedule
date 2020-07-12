@@ -19,14 +19,14 @@ class SocketDriver(Driver):
         self.host, self.port = host, port
         self.user = self.get_user(None)
 
-    async def send(self, response, user):
-        if hasattr(response, 'writer'):
+    async def write(self, response, user):
+        if hasattr(response, 'writer_class'):
             for msg in response:
                 if isinstance(msg, Text) and msg.text:
-                    response.writer.write((msg.text.replace('\n', '\n\r')+'\n\r').encode())
-            await response.writer.drain()
+                    response.writer_class.write((msg.text.replace('\n', '\n\r') + '\n\r').encode())
+            await response.writer_class.drain()
 
-    async def listen(self):
+    async def serve(self):
         yield
 
     async def handle_response(self, reader, writer):
@@ -42,10 +42,10 @@ class SocketDriver(Driver):
             request = Request(self.user, line)
             handler = self.get_handler(self.user.last_view)
             response = handler(request)
-            response.writer = writer
+            response.writer_class = writer
             bottex.logger.debug(f'Message time {time.time() - t}')
             try:
-                await self.send(response, self.user)
+                await self.write(response, self.user)
             except ConnectionResetError:
                 bottex.logger.info('connection closed')
                 break
