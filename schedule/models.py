@@ -73,6 +73,7 @@ class User(UserModel, DynamicDocument):
         default=Notifications(allowed=False, time=None)
     )
     last_view = StringField(default='')
+    view_args = DictField()
     rights = IntField(default=Rights.view)
 
     ptype = EnumField(PType, default=PType.student)
@@ -100,13 +101,13 @@ class Lesson(DynamicDocument):
 
     group = StringField()
     weeknum = IntField()
-    weekday = EnumField(Weekday)
-    subgroup = StringField()
+    weekday = IntField()
+    subgroup = IntField()
     time = StringField()
     name = StringField()
-    teacher = StringField()
+    teachers = ListField(StringField())
     building = StringField()
-    auditory = StringField()
+    auditories = ListField(StringField())
 
 
 class Groups(DynamicDocument):

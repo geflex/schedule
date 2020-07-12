@@ -170,5 +170,24 @@ class ViewManager(NameManager):
     __getattr__ = __getitem__
 
 
+def arg_setter(name):
+    def deleter(request):
+        request.user.view_args[name] = request.msg.text
+        request.user.save()
+    return deleter
+
+
+def arg_deleter(name):
+    def deleter(request):
+        del request.user.view_args[name]
+        request.user.save()
+    return deleter
+
+
+def clean_args(request):
+    request.user.view_args.clean()
+    request.user.save()
+
+
 viewnames = ViewManager()
 viewclasses = ViewManager()
