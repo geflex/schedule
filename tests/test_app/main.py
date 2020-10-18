@@ -25,4 +25,5 @@ receiver.set_handler(router)
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)
+    setup_users()
     receiver.serve_forever()
