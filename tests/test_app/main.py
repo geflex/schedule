@@ -19,10 +19,9 @@ def setup_users():
     mongo = motor.motor_asyncio.AsyncIOMotorClient('localhost', 27017)
     MongoUser.set_collection(mongo.schedule_test.users)
 
-receiver = TgReceiver('auth_data/tg.json')
-receiver.add_middleware(UserMiddleware.get_middleware(TgReceiver))
+receiver = Bottex(TgReceiver('auth_data/tg.json'))
+receiver.add_middleware(UserMiddleware)
 receiver.set_handler(router)
-# receiver.add_middleware(UserMiddleware, add_specific=True)
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)

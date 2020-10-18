@@ -64,9 +64,9 @@ class ReceiverParams(Params):
 class Bottex(Receiver):
     middlewares: List[MiddlewareAggregator]
 
-    def __init__(self, receivers: Collection[Receiver] = None):
+    def __init__(self, *receivers: Receiver):
         super().__init__()
-        self._receivers = set(receivers or [])  # type: Set[Receiver]
+        self._receivers = set(receivers)  # type: Set[Receiver]
 
     def add_middleware(self, aggregator: Type[MiddlewareAggregator], *, add_specific=True):
         super().add_middleware(aggregator)
