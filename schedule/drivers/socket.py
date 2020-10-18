@@ -2,7 +2,7 @@ import time
 import asyncio
 
 import bottex
-from bottex.drivers import Driver, Text, Request
+from bottex.apis import Driver, Text, Request
 from bottex.views import viewnames
 
 

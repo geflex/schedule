@@ -84,7 +84,7 @@ class User(UserModel, DynamicDocument):
     def __repr__(self):
         return f'{self.__class__.__name__}({self.site!r}, {self.uid})'
 
-    logger = bottex.logging.get_logger('User')
+    logger = bottex.utils.logging.get_logger('_user_class')
 
     @classmethod
     def get_or_add(cls, site, uid):

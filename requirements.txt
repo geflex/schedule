@@ -5,6 +5,7 @@ aiohttp
 vk-api
 pymongo
 mongoengine
+motor
 # retrying
 xlrd
 xlutils

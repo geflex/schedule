@@ -1,10 +1,8 @@
-import random
-import sys
 import datetime
 
 from bottex.views.links import ButtonLink
-from bottex.drivers import Text
-from bottex.drivers.keyboard import Color
+from bottex.apis import Text
+from bottex.apis.keyboard import Color
 from bottex.utils.i18n import gettext as _
 from bottex.utils import regexp as re
 
@@ -20,20 +18,20 @@ def str_time(t):
 
 
 class BackButton(ButtonLink):
-    def __init__(self, handler, *, next_line=True):
-        super().__init__(_('Назад'), handler, Text(_('Переходим назад')), color=Color.WHITE, next_line=next_line)
+    def __init__(self, callback, *, next_line=True):
+        super().__init__(_('Назад'), callback, Text(_('Переходим назад')), color=Color.WHITE, next_line=next_line)
 
 
 class CancelButton(ButtonLink):
-    def __init__(self, handler, *, next_line=True):
-        super().__init__(_('Отмена'), handler, Text(_('Отменяем')), color=Color.RED, next_line=next_line)
+    def __init__(self, callback, *, next_line=True):
+        super().__init__(_('Отмена'), callback, Text(_('Отменяем')), color=Color.RED, next_line=next_line)
 
 
 class NotChangeButton(ButtonLink):
-    def __init__(self, handler, *, next_line=True):
-        super().__init__(_('Не менять'), handler, Text(_('Не меняем')), color=Color.WHITE, next_line=next_line)
+    def __init__(self, callback, *, next_line=True):
+        super().__init__(_('Не менять'), callback, Text(_('Не меняем')), color=Color.WHITE, next_line=next_line)
 
 
 class PassButton(ButtonLink):
-    def __init__(self, handler, *, next_line=True):
-        super().__init__(_('Пропустить'), handler, Text(_('Пропускаем')), color=Color.WHITE, next_line=next_line)
+    def __init__(self, callback, *, next_line=True):
+        super().__init__(_('Пропустить'), callback, Text(_('Пропускаем')), color=Color.WHITE, next_line=next_line)

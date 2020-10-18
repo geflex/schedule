@@ -6,6 +6,7 @@ from typing import Match
 import xlrd
 from pymongo import MongoClient
 
+import bottex2.router
 
 WEEKDAYS = [
     'понедельник',
@@ -350,23 +351,23 @@ class SheetParser(BaseSheetParser):
         self._curr_group = None
 
     def _is_day(self, area):
-        return area.text in WEEKDAYS
+        return bottex2.router.text in WEEKDAYS
 
     def _is_time(self, area):
-        return re_fulltime.fullmatch(area.text)
+        return re_fulltime.fullmatch(bottex2.router.text)
 
     def _is_group(self, area):
-        return self._curr_header.end.y == area.end.y and re_group.match(area.text)
+        return self._curr_header.end.y == area.end.y and re_group.match(bottex2.router.text)
 
     def _is_title(self, area):
-        return self._curr_header.start.y == area.start.y and not re_group.match(area.text)
+        return self._curr_header.start.y == area.start.y and not re_group.match(bottex2.router.text)
 
     def _set_lesson_group(self, lesson):
         """Добавляет все блоки групп, пересекающиеся с lesson по оси x"""
         for group in self._group_areas:
             if group.xintersects(lesson):
                 self._curr_group = group
-                lesson.groups.append(group.text)
+                lesson.groups.append(bottex2.router.text)
 
     def _set_lesson_subgroup(self, lesson):
         """Устанавливает номер подгруппы объекта lesson"""
@@ -384,7 +385,7 @@ class SheetParser(BaseSheetParser):
     def _set_lesson_weekday(self, lesson):
         """Устанавливает номер дня недели объекта lesson"""
         if self._curr_weekday:
-            wd = self._curr_weekday.text
+            wd = bottex2.router.text
             lesson.weekday = WEEKDAYS.index(wd)
 
     def _set_lesson_time(self, lesson):

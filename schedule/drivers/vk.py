@@ -8,11 +8,12 @@ from vk_api.keyboard import VkKeyboard as VkApiKeyboard, VkKeyboardColor as VkCo
 from aiovk import TokenSession, API
 from aiovk.longpoll import BotsLongPoll
 
+import bottex2.router
 from bottex.utils import json
-from bottex.drivers import Request, Color, Driver
+from bottex.apis import Request, Color, Driver
 from bottex.views import viewnames
 
-from drivers.vk_objects.events import Events, parse_event
+from drivers.vk_objects.events import VkEvents, parse_event
 
 vk_empty_text = '\u200b'
 
@@ -70,12 +71,12 @@ class VkDriver(Driver):
         self.longpoll = BotsLongPoll(session, mode=0, group_id=config['group_id'])
 
     async def send_text(self, message, peer_id):
-        if not message.text:
-            message.text = '...'
+        if not bottex2.router.text:
+            bottex2.router.text = '...'
         keyboard = self.create_kb(message.buttons)
         await self.api.messages.send_text(random_id=randint(0, sys.maxsize),
                                           user_id=peer_id,
-                                          message=message.text,
+                                          message=bottex2.router.text,
                                           # attachment=attachments,
                                           keyboard=keyboard)
 
@@ -100,10 +101,10 @@ class VkDriver(Driver):
                 continue
             for event in response['updates']:
                 evtype, obj = parse_event(event)
-                if evtype == Events.message_new:
+                if evtype == VkEvents.message_new:
                     msg = obj.message
                     uid = msg.peer_id
                     user = self.get_user(str(uid))
-                    # user_info = obj.client_info
+                    # user_info = request.client_info
 
                     yield Request(user, msg)

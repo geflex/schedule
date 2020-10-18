@@ -1,6 +1,6 @@
-from datetime import datetime
+from datetime import datetime as dt
 
-from bottex.utils.dict_schema import DictSchema, Attr, array
+from bottex.utils.dict_schema import DictSchema, Attr, Array
 from drivers.vk_objects.media import parse_media
 
 
@@ -12,18 +12,18 @@ class Geo(DictSchema):
 
 class Message(DictSchema):
     """
-    api version from 5.80
+    api version >= 5.80
     https://vk.com/dev/objects/message
     """
     id: int = Attr()
-    date: datetime.utcfromtimestamp = Attr()
+    date: dt.utcfromtimestamp = Attr()
     peer_id = Attr()
     from_id = Attr()
     text = Attr()
     random_id = Attr()
-    attachments: array(parse_media) = Attr()
+    attachments: Array(parse_media) = Attr()
     important = Attr()
     geo: Geo = Attr()
     payload = Attr()
-    fwd_messages: 'Message' = Attr(optional=True)
+    fwd_messages: 'Message' = Attr(is_optional=True)
     action = Attr()

@@ -18,7 +18,7 @@ class MessageEvent(DictSchema):
     client_info: ClientInfo = Attr()
 
 
-class Events(StrEnum):
+class VkEvents(StrEnum):
     """
     https://vk.com/dev/groups_events
     """
@@ -71,13 +71,13 @@ class Events(StrEnum):
 
 
 event_parsers = {
-    Events.message_new: MessageEvent,
+    VkEvents.message_new: MessageEvent,
 }
 
 
 def parse_event(request: dict):
     event_name, obj = request['type'], request['object']
-    event = Events[event_name]
+    event = VkEvents[event_name]
     try:
         obj_parser = event_parsers[event]
     except KeyError:

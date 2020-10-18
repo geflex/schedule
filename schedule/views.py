@@ -1,4 +1,6 @@
-from bottex.drivers import Text, Color, Button
+from bottex.apis import Text, Color, Button
+
+import tests.test_app.router
 from bottex.views import View, ButtonLink, InputLink, ReLink, viewclasses, AddLink
 from bottex.utils.i18n import gettext as _
 from bottex.utils.functional import return_none
@@ -7,7 +9,7 @@ from bottex.utils.functional import return_none
 from models import Lang, PType, Department, Groups
 from bases import BackButton, NotChangeButton, group_fmt, time_fmt
 
-from app import schedule, profile_settings
+from logic import schedule, profile_settings
 
 
 def bool2onoff(value):
@@ -40,7 +42,7 @@ class MainView(BaseView):
         ButtonLink(_('След. неделя'), schedule.next_week, next_line=False),
 
         ButtonLink(_('Какая неделя'), schedule.week_num),
-        ButtonLink(_('Настройки'), viewclasses.SettingsView.switch),
+        ButtonLink(_('Настройки'), tests.test_app.router.router.switch),
     ]
 
 
@@ -98,8 +100,8 @@ class SettingsView(BaseView):
         else:
             self._add_teacher_butttons(links)
 
-        links.append(ButtonLink(_('Язык'), viewclasses.LanguageSettings.switch))
-        links.append(BackButton(viewclasses.MainView.switch))
+        links.append(ButtonLink(_('Язык'), tests.test_app.router.router.switch))
+        links.append(BackButton(tests.test_app.router.router.switch))
         # links.append(ButtonLink('Начать сначала',
         #                         manager.StartProfileTypeSetter.switch,
         #                         start_message))
@@ -165,7 +167,7 @@ class StartGroupSetter(GroupSetter):
     hello = Text(_('Теперь введи с клавиатуры номер своей группы'))
     links = [
         GroupSetter.idontknow,
-        ReLink(group_fmt, profile_settings.set_group, GroupSetter.success, viewclasses.StartSubgroupSetter.switch),
+        ReLink(group_fmt, profile_settings.set_group, GroupSetter.success, tests.test_app.router.router.switch),
     ]
 
 

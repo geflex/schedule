@@ -15,8 +15,8 @@ class Time:
 
 
 class Date(date):
-    def days_add(self, n):
+    def days_incr(self, n):
         return self + timedelta(days=n)
 
-    def days_sub(self, n):
+    def days_decr(self, n):
         return self - timedelta(days=n)
