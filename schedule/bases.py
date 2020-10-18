@@ -4,8 +4,7 @@ from bottex.views.links import ButtonLink
 from bottex.apis import Text
 from bottex.apis.keyboard import Color
 from bottex.utils.i18n import gettext as _
-from bottex.utils import regexp as re
-
+from bottex2.legacy import regexp as re
 
 group_fmt = re.compile(r'\d{8}')
 time_fmt = re.compile(r'(?P<hour>[01]?\d|2[0-3])[:.\-]?(?P<minute>[0-5]\d)')

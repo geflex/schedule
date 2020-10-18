@@ -1,24 +1,29 @@
-from .functional import dummy
+from collections import Callable
+from typing import Any, Optional, List
+
+
+def dummy(value):
+    pass
 
 noparser = dummy
 
 
 class DictSchema:
-    __attrs__ = []
+    __attrs__: List
 
     def __init__(self, obj: dict):
         self.raw = obj
 
     def __init_subclass__(cls, **kwargs):
-        cls.__attrs__ = attrs = []
+        cls.__attrs__ = []
         annotations = getattr(cls, '__annotations__', {})
         for name, attr in cls.__dict__.items():
             if isinstance(attr, Attr):
-                if not attr.name:
+                if attr.name is None:
                     attr.name = name
                 if not attr.parser:
                     attr.parser = annotations.get(attr.name, noparser)
-                attrs.append(attr)
+                cls.__attrs__.append(attr)
 
     def init_all(self):
         for attr in self.__attrs__:
@@ -26,7 +31,10 @@ class DictSchema:
 
 
 class Attr:
-    def __init__(self, parser=None, is_optional=True):
+    def __init__(self,
+                 name=Optional[str],
+                 parser: Callable[Any] = None,
+                 is_optional=True):
         self.name = None
         self.parser = parser
         self.is_optional = is_optional

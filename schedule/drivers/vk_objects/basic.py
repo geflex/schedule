@@ -1,6 +1,6 @@
 from datetime import datetime as dt
 
-from bottex.utils.dict_schema import DictSchema, Attr, Array
+from bottex2.legacy.dict_schema import DictSchema, Attr, Array
 from drivers.vk_objects.media import parse_media
 
 

@@ -1,7 +1,7 @@
 import warnings
 
 from bottex.utils.enums import LowerEnum, auto
-from bottex.utils.dict_schema import DictSchema, Attr
+from bottex2.legacy.dict_schema import DictSchema, Attr
 
 
 class Photo(DictSchema):
