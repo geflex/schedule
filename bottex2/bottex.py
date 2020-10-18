@@ -1,3 +1,4 @@
+import asyncio
 import warnings
 from typing import Type, Set, Iterable, Tuple, AsyncIterator, List, Collection
 
@@ -96,8 +97,9 @@ class Bottex(Receiver):
         async for message in merge_async_iterators2(aiters):
             yield message
 
-    async def _serve_async(self):
+    async def serve_async(self):
+        self._check()
         async for params in self.listen():
             handler = params['__handler__']
-            task = handler(**params)
-            self.multitask.add(task)
+            coro = handler(**params)
+            asyncio.create_task(coro)

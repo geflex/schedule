@@ -33,18 +33,22 @@ class Receiver(MiddlewareContainer, ABC):
         """Recieves and yields events"""
         yield
 
+    def _check(self):
+        if self._handler is None:
+            warnings.warn('Attribute `_handler` was not set. '
+                          'You must call `set_handler` or override '
+                          '`_handler` in a subclass.')
+
     async def serve_async(self):
         """
         Receives events from `listen` and handles it in `_handler`.
         Also uses middlewares for process events.
         """
-        if self._handler is None:
-            warnings.warn('Attribute `_handler` was not set. '
-                          'You must call `set_handler` or override '
-                          '`_handler` in a subclass.')
+        self._check()
         async for params in self.listen():
-            handler = self._wrapped_handler(**params)
-            asyncio.create_task(handler)
+            handler = self._wrapped_handler
+            coro = handler(**params)
+            asyncio.create_task(coro)
 
     def serve_forever(self):
         """The blocking version of `serve_async`"""

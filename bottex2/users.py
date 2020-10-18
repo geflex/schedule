@@ -65,7 +65,6 @@ class TempUser(AbstractUser):
 class UserMiddleware(MiddlewareAggregator):
     async def __call__(self, **params):
         user = await _user_class.get(None, 'guest')
-        print(_user_class)
         await self.handler(user=user, **params)
 
 
