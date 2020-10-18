@@ -65,19 +65,12 @@ def merge_async_iterators2(aiters):
     return merged(tasks_)
 
 
-class MultiTask:
-    def __init__(self):
-        self._queue = asyncio.Queue()
-
-    def add(self, task):
-        self._queue.put_nowait(task)
-
-    async def listen(self):
-        task = await self._queue.get()
-        await asyncio.gather(task, self.listen())
-
-
 def have_kwargs_parameter(function):
     """Checks whenever the function accepts **kwargs parameter"""
     sig = inspect.signature(function)
     return any(p.kind == p.VAR_KEYWORD for p in sig.parameters.values())
+
+
+def run_pending_tasks(loop):
+    pending = asyncio.Task.all_tasks()
+    loop.run_until_complete(asyncio.gather(*pending))

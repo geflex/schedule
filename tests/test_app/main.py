@@ -8,7 +8,6 @@ from bottex2.databases.mongodb import MongoUser
 from bottex2.bottex import Bottex
 
 from tests.test_app.router import router
-from tests.test_app.async_receiver import AsyncRecv
 
 
 import sys
@@ -20,10 +19,11 @@ def setup_users():
     mongo = motor.motor_asyncio.AsyncIOMotorClient('localhost', 27017)
     MongoUser.set_collection(mongo.schedule_test.users)
 
-bottex = Bottex([TgReceiver('auth_data/tg.json')])
-bottex.set_handler(router)
-bottex.add_middleware(UserMiddleware, add_specific=True)
+receiver = TgReceiver('auth_data/tg.json')
+receiver.add_middleware(UserMiddleware.get_middleware(TgReceiver))
+receiver.set_handler(router)
+# receiver.add_middleware(UserMiddleware, add_specific=True)
 
 if __name__ == '__main__':
-    logging.basicConfig(level=logging.DEBUG)
-    bottex.serve_forever()
+    logging.basicConfig(level=logging.INFO)
+    receiver.serve_forever()
