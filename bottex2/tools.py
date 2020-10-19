@@ -40,7 +40,11 @@ def merge_async_iterators(aiters):
         for t in tasks:
             t.cancel()
 
-    tasks_ = [asyncio.create_task(iterate(aiter)) for aiter in aiters]
+    tasks_ = []
+    for a in aiters:
+        task = asyncio.create_task(a)
+        task.add_done_callback(raise_exc_as_done)
+        tasks_.append(task)
     return merged(tasks_)
 
 
@@ -50,8 +54,10 @@ def have_kwargs_parameter(function):
     return any(p.kind == p.VAR_KEYWORD for p in sig.parameters.values())
 
 
-def loop_exception_handler(loop, context):
-    raise context['exception']
+def raise_exc_as_done(task):
+    exc = task.exception()
+    if exc:
+        raise exc
 
 
 async def gather(*coros):
@@ -65,6 +71,5 @@ def run_pending_tasks(loop):
 
 def run_async(*coros):
     loop = asyncio.get_event_loop()
-    loop.set_exception_handler(loop_exception_handler)
     loop.run_until_complete(gather(*coros))
     run_pending_tasks(loop)
