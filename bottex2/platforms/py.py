@@ -18,11 +18,11 @@ class PyMessage:
 
 class PyChat(Chat):
     def __init__(self, chat_queue, recv_queue):
-        self._chat_queue = chat_queue  # type: asyncio.Queue[PyMessage]
+        self._callback_queue = chat_queue  # type: asyncio.Queue[PyMessage]
         self._recv_queue = recv_queue  # type: asyncio.Queue[PyMessage]
 
     async def send_message(self, text: Optional[str] = None, kb: Optional[Keyboard] = None):
-        await self._chat_queue.put(PyMessage(text, self._recv_queue))
+        await self._callback_queue.put(PyMessage(text, self._recv_queue))
 
 
 class PyReceiver(Receiver):
@@ -32,6 +32,9 @@ class PyReceiver(Receiver):
 
     async def recv(self, obj: PyMessage):
         await self._queue.put(obj)
+
+    def recv_nowait(self, obj: PyMessage):
+        self._queue.put_nowait(obj)
 
     async def listen(self) -> AsyncIterator[Params]:
         while True:
