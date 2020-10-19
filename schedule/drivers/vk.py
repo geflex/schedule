@@ -9,9 +9,6 @@ from aiovk import TokenSession, API
 from aiovk.longpoll import BotsLongPoll
 
 import bottex2.router
-from bottex.utils import json
-from bottex.apis import Request, Color, Driver
-from bottex.views import viewnames
 
 from drivers.vk_objects.events import VkEvents, parse_event
 
@@ -55,21 +52,7 @@ class VkKeyboard:
         return self.get_str()
 
 
-class VkDriver(Driver):
-    def get_handler(self, name):
-        return viewnames[name]
-
-    site_name = 'vk'
-
-    def create_kb(self, buttons):
-        return VkKeyboard.from_buttons(buttons)
-
-    def __init__(self, config_filename):
-        config = json.from_path(config_filename)
-        session = TokenSession(access_token=config['token'])
-        self.api = API(session)
-        self.longpoll = BotsLongPoll(session, mode=0, group_id=config['group_id'])
-
+class VkDriver:
     async def send_text(self, message, peer_id):
         if not bottex2.router.text:
             bottex2.router.text = '...'
@@ -79,32 +62,3 @@ class VkDriver(Driver):
                                           message=bottex2.router.text,
                                           # attachment=attachments,
                                           keyboard=keyboard)
-
-    async def write(self, response, user):
-        if response.messages:
-            for msg in response[:-1]:
-                await self.send_text(msg, user.uid)
-            msg = response[-1]
-            msg.buttons = response.buttons
-            while True:
-                try:
-                    await self.send_text(msg, user.uid)
-                    break
-                except (asyncio.TimeoutError, aiohttp.ClientOSError):
-                    pass
-
-    async def serve(self):
-        while True:
-            try:
-                response = await self.longpoll.wait(need_pts=True)
-            except (asyncio.TimeoutError, aiohttp.ClientOSError):
-                continue
-            for event in response['updates']:
-                evtype, obj = parse_event(event)
-                if evtype == VkEvents.message_new:
-                    msg = obj.message
-                    uid = msg.peer_id
-                    user = self.get_user(str(uid))
-                    # user_info = request.client_info
-
-                    yield Request(user, msg)
