@@ -1,5 +1,5 @@
 import inspect
-from typing import Awaitable, TypedDict, Dict, Any, Callable
+from typing import Awaitable, TypedDict, Any, Callable
 
 from bottex2 import tools
 from bottex2.chat import Chat
@@ -8,7 +8,7 @@ from bottex2.chat import Chat
 class Params(TypedDict):
     text: str
     chat: Chat
-    raw: Dict[str, Any]
+    raw: Any
 
 
 Handler = Callable[..., Awaitable]
