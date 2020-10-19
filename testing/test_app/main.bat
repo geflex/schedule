@@ -1,3 +1,3 @@
-cd D:\Documents\Code\Python\schedule\tests\test_app
+cd /d D:\Documents\Code\Python\schedule\testing\test_app
 D:\Documents\Code\Python\schedule\venv\Scripts\python.exe main.py
 pause
