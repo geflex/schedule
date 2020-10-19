@@ -42,7 +42,7 @@ def merge_async_iterators(aiters):
 
     tasks_ = []
     for a in aiters:
-        task = asyncio.create_task(a)
+        task = asyncio.create_task(iterate(a))
         task.add_done_callback(raise_exc_as_done)
         tasks_.append(task)
     return merged(tasks_)
