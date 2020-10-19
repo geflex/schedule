@@ -2,15 +2,14 @@ import sys
 from random import randint
 import json
 import aiohttp
-from typing import Union, Optional, List
+from typing import Union, Optional, AsyncIterator
 import asyncio
 
 from aiovk import API
 from aiovk.sessions import BaseSession, TokenSession
 from aiovk.longpoll import BotsLongPoll
 
-from bottex2.handler import Handler
-from bottex2.messages import Media
+from bottex2.handler import Handler, Params
 from bottex2.chat import Chat, Keyboard
 from bottex2.receiver import Receiver
 from bottex2 import users
@@ -60,7 +59,7 @@ class VkReceiver(Receiver):
         self.session = TokenSession(access_token=config['token'])
         self._longpoll = BotsLongPoll(self.session, mode=0, group_id=config['group_id'])
 
-    async def listen(self):
+    async def listen(self) -> AsyncIterator[Params]:
         while True:
             try:
                 response = await self._longpoll.wait(need_pts=True)
@@ -71,9 +70,9 @@ class VkReceiver(Receiver):
                 if event['type'] == 'message_new':
                     message = event['object']['message']
                     chat = VkChat(self.session, message['peer_id'])
-                    yield {'text': message['text'],
-                           'chat': chat,
-                           'raw': event}
+                    yield Params(text=message['text'],
+                                 chat=chat,
+                                 raw=event)
 
 
 @users.middleware_for(VkReceiver)

@@ -1,12 +1,11 @@
 import json
 import aiohttp
 import asyncio
-from typing import Optional, List
+from typing import Optional, AsyncIterator
 
 import aiogram
 
-from bottex2.handler import Handler
-from bottex2.messages import Media
+from bottex2.handler import Handler, Params
 from bottex2.chat import Chat, Keyboard
 from bottex2.receiver import Receiver
 from bottex2 import users
@@ -50,7 +49,7 @@ class TgReceiver(Receiver):
             config = json.load(f)
         self.bot = aiogram.Bot(config['token'])
 
-    async def listen(self):
+    async def listen(self) -> AsyncIterator[Params]:
         offset = None
         while True:
             try:
@@ -62,9 +61,9 @@ class TgReceiver(Receiver):
                 for update in updates:
                     raw = update['message']
                     chat = TgChat(self.bot, raw['chat']['id'])
-                    yield {'text': raw['text'],
-                           'chat': chat,
-                           'raw': raw}
+                    yield Params(text=raw['text'],
+                                 chat=chat,
+                                 raw=raw)
 
 
 @users.middleware_for(TgReceiver)

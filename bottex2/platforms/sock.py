@@ -25,7 +25,7 @@ class SockChat(Chat):
 
 
 class SockReciever(Receiver):
-    def __init__(self, host='127.0.0.1', port=8888):
+    def __init__(self, host='127.0.0.1', port='8888'):
         super().__init__()
         self._host = host
         self._port = port
@@ -47,8 +47,6 @@ class SockReciever(Receiver):
         asyncio.create_task(server.serve_forever())
         while True:
             event, writer = await self._queue.get()
-            yield {
-                'text': event,
-                'chat': SockChat(writer),
-                'raw': event
-            }
+            yield Params(text=event,
+                         chat=SockChat(writer),
+                         raw=event)
