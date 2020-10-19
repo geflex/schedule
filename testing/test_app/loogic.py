@@ -2,7 +2,6 @@ from bottex2.router import Router, any_cond
 from bottex2.chat import Keyboard, Button
 from bottex2.users import state_cond
 
-
 kb = Keyboard([
     [Button('1'), Button('2'), Button('3')],
     [Button('4'), Button('5'), Button('6')],
@@ -42,3 +41,7 @@ async def send_settings(chat, user, **params):
         f'state: {user.state}',
     ])
     await chat.send_message(text)
+
+
+def bug(**params):
+    raise RuntimeError('bug!')
