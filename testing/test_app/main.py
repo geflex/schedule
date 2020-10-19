@@ -11,7 +11,6 @@ from bottex2.databases.mongodb import MongoUser
 from bottex2.bottex import Bottex
 
 from testing.test_app.router import router
-from testing.test_app.bench import bench
 
 
 bottex = Bottex(
