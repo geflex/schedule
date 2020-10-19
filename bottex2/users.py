@@ -1,4 +1,5 @@
 from abc import abstractmethod, ABC
+from typing import Type
 
 from bottex2.router import Condition
 from bottex2.bottex import MiddlewareAggregator
@@ -64,19 +65,17 @@ class TempUser(AbstractUser):
 
 class UserMiddleware(MiddlewareAggregator):
     async def __call__(self, **params):
-        user = await _user_class.get(None, 'guest')
+        user = await user_model.get(None, 'guest')
         await self.handler(user=user, **params)
 
 
-_user_class = TempUser
-get = _user_class.get
+user_model: Type[AbstractUser] = TempUser
 middleware_for = UserMiddleware.deferred_add
 
 
-def set_user_class(cls):
-    global _user_class, get
-    _user_class = cls
-    get = cls.get
+def set_user_model(cls):
+    global user_model
+    user_class = cls
 
 
 def state_cond(st: str) -> Condition:

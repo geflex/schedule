@@ -71,6 +71,6 @@ class TgReceiver(Receiver):
 def tg_user_middleware(handler: Handler):
     async def middleware(raw: dict, **params):
         uid = raw['from']['id']
-        user = await users.get('tg', uid)
+        user = await users.user_model.get('tg', uid)
         await handler(user=user, raw=raw, **params)
     return middleware
