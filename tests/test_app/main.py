@@ -35,18 +35,16 @@ def setup_user_model():
     MongoUser.set_collection(mongo.schedule_test.users)
 
 
-def main():
-    async def coro():
-        await asyncio.gather(
-            bench(py_reseiver, 1E5),
-            receiver.serve_async(),
-        )
+async def main():
     receiver.add_middleware(UserMiddleware)
-    loop = asyncio.get_event_loop()
-    loop.run_until_complete(coro())
+    await asyncio.gather(
+        bench(py_reseiver, 1E5),
+        receiver.serve_async(),
+    )
 
 
 if __name__ == '__main__':
     setup_user_model()
     logging.basicConfig(level=logging.INFO)
-    main()
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(main())
