@@ -10,7 +10,7 @@ from bottex2.users import UserMiddleware, set_user_model
 from bottex2.databases.mongodb import MongoUser
 from bottex2.bottex import Bottex
 
-from testing.test_app.router import router
+from testing.test_app.loogic import router
 
 
 bottex = Bottex(
