@@ -2,6 +2,7 @@ import asyncio
 import warnings
 from typing import Type, Set, Iterable, Tuple, AsyncIterator, List
 
+from bottex2 import tools
 from bottex2.handler import Params, HandlerError, Handler
 from bottex2.middlewares import Middleware, MiddlewareContainer
 from bottex2.receiver import Receiver
@@ -110,4 +111,4 @@ class Bottex(Receiver):
         async for params in self.listen():
             handler = params['__handler__']
             coro = handler(**params)
-            asyncio.create_task(coro)
+            tools.create_task(coro)
