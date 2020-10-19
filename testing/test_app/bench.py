@@ -1,42 +1,68 @@
 import sys; sys.path.extend(['D:\\Documents\\Code\\Python\\schedule'])
 
+import tracemalloc
 import asyncio
 import time
-from typing import Union
+from typing import Union, List
 
 from bottex2.platforms.py import PyMessage, PyReceiver
+from bottex2 import tools
 
+from testing.test_app.loogic import bug
 from testing.test_app.main import bottex, setup_user_model
 
 
-async def bench(receiver: PyReceiver, repeats: Union[int, float] = 1E5):
-    repeats = int(repeats)
-    back_queue = asyncio.Queue()
-    while True:
-        message = PyMessage('message text', back_queue)
+def rps(rpc, t):
+    """repeats per second"""
+    if t == 0:
+        return float('inf')
+    return 60 * rpc / t / 1000
+
+
+async def bench(receiver: PyReceiver,
+                cycles: int,
+                repeats_per_cycle: Union[int, float] = 1E5):
+    repeats_per_cycle = int(repeats_per_cycle)
+    snapshots = []
+    queue = asyncio.Queue()
+    for i in range(cycles):
+        message = PyMessage('message text', queue)
         start = time.time()
-        for _ in range(repeats):
-            await receiver.recv(message)
-            while not back_queue.empty():
-                response = await back_queue.get()
+        for _ in range(repeats_per_cycle):
+            receiver.recv_nowait(message)
+            while not queue.empty():
+                response = await queue.get()
+                queue.task_done()
         total = time.time() - start
-        rps = 60 * repeats / total / 1000
-        print(rps)
-        # await asyncio.sleep(0.5)
+        print(rps(repeats_per_cycle, total))
+        snap = tracemalloc.take_snapshot()
+        snapshots.append(snap)
+
+    # noinspection PyUnboundLocalVariable
+    statistics(snapshots)
 
 
 py_receiver = PyReceiver()
+py_receiver.set_handler(bug)
 
 
-async def main():
+def main(cycles, repeats):
+    setup_user_model()
+    tracemalloc.start()
     bottex.add_receiver(py_receiver)
-    await asyncio.gather(
-        bench(py_receiver, 1E5),
-        bottex.serve_async(),
+    tools.run_async(
+        bench(py_receiver, cycles, repeats),
+        py_receiver.serve_async(),
     )
 
 
+def statistics(snapshots: List[tracemalloc.Snapshot]):
+    for prev_snap, snap in zip(snapshots, snapshots[1:]):
+        stats = snap.compare_to(prev_snap, 'lineno')
+        print()
+        for stat in stats[:5]:
+            print(stat)
+
+
 if __name__ == '__main__':
-    setup_user_model()
-    loop = asyncio.get_event_loop()
-    loop.run_until_complete(main())
+    main(10, 1e2)

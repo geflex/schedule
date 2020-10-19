@@ -23,6 +23,7 @@ class PyChat(Chat):
 
     async def send_message(self, text: Optional[str] = None, kb: Optional[Keyboard] = None):
         await self._callback_queue.put(PyMessage(text, self._recv_queue))
+        self._recv_queue.task_done()
 
 
 class PyReceiver(Receiver):
