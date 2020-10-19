@@ -1,6 +1,6 @@
 import asyncio
 import warnings
-from typing import Type, Set, Iterable, Tuple, AsyncIterator, List, Collection
+from typing import Type, Set, Iterable, Tuple, AsyncIterator, List
 
 from bottex2.handler import Params, HandlerError, Handler
 from bottex2.middlewares import Middleware, MiddlewareContainer
@@ -22,7 +22,9 @@ class MiddlewareAggregator(Handler):
         return register
 
     @classmethod
-    def deferred_add_middleware(cls, container: Type[MiddlewareContainer], middleware: Middleware):
+    def deferred_add_middleware(cls,
+                                container: Type[MiddlewareContainer],
+                                middleware: Middleware):
         cls.specific_middlewares.add((middleware, container))
 
     @classmethod
@@ -47,7 +49,8 @@ class MiddlewareAggregator(Handler):
             else:
                 middleware = cls.get_middleware(type(container))
                 if middleware is cls:
-                    warnings.warn(f'No specific middleware registered for {type(container).__name__}')
+                    warnings.warn(f'No specific middleware registered for '
+                                  f'{type(container).__name__}')
             container.add_middleware(middleware)
 
     def __init__(self, handler: Handler):
@@ -78,7 +81,7 @@ class Bottex(Receiver):
             try:
                 await __receiver__._handler(**params)
                 return
-            except HandlerError:  # Maybe NoHandlerError?
+            except HandlerError:  # !!! Maybe NoHandlerError?
                 pass
         await self._handler(**params)
 
