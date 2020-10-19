@@ -1,10 +1,12 @@
+import sys; sys.path.extend(['D:\\Documents\\Code\\Python\\schedule'])
+
 import asyncio
 import time
 from typing import Union
 
 from bottex2.platforms.py import PyMessage, PyReceiver
 
-from test.test_app.main import bottex, setup_user_model
+from testing.test_app.main import bottex, setup_user_model
 
 
 async def bench(receiver: PyReceiver, repeats: Union[int, float] = 1E5):

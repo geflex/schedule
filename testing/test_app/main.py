@@ -1,6 +1,4 @@
-import asyncio
 import sys; sys.path.extend(['D:\\Documents\\Code\\Python\\schedule'])
-import logging
 
 import motor.motor_asyncio
 
@@ -12,8 +10,8 @@ from bottex2.users import UserMiddleware, set_user_model
 from bottex2.databases.mongodb import MongoUser
 from bottex2.bottex import Bottex
 
-from test.test_app.router import router
-from test.test_app.bench import bench
+from testing.test_app.router import router
+from testing.test_app.bench import bench
 
 
 bottex = Bottex(
