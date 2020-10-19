@@ -48,7 +48,7 @@ class Receiver(MiddlewareContainer, ABC):
         async for params in self.listen():
             handler = self._wrapped_handler
             coro = handler(**params)
-            asyncio.create_task(coro)
+            tools.create_task(coro)
 
     def serve_forever(self):
         """The blocking version of `serve_async`"""

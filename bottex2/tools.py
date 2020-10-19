@@ -40,11 +40,7 @@ def merge_async_iterators(aiters):
         for t in tasks:
             t.cancel()
 
-    tasks_ = []
-    for a in aiters:
-        task = asyncio.create_task(iterate(a))
-        task.add_done_callback(raise_exc_as_done)
-        tasks_.append(task)
+    tasks_ = [create_task(iterate(aiter)) for aiter in aiters]
     return merged(tasks_)
 
 
@@ -58,6 +54,11 @@ def raise_exc_as_done(task):
     exc = task.exception()
     if exc:
         raise exc
+
+
+def create_task(coro):
+    task = asyncio.create_task(coro)
+    task.add_done_callback(raise_exc_as_done)
 
 
 async def gather(*coros):
