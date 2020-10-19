@@ -50,6 +50,21 @@ def have_kwargs_parameter(function):
     return any(p.kind == p.VAR_KEYWORD for p in sig.parameters.values())
 
 
+def loop_exception_handler(loop, context):
+    raise context['exception']
+
+
+async def gather(*coros):
+    await asyncio.gather(*coros)
+
+
 def run_pending_tasks(loop):
     pending = asyncio.Task.all_tasks()
     loop.run_until_complete(asyncio.gather(*pending))
+
+
+def run_async(*coros):
+    loop = asyncio.get_event_loop()
+    loop.set_exception_handler(loop_exception_handler)
+    loop.run_until_complete(gather(*coros))
+    run_pending_tasks(loop)

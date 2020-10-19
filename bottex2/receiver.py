@@ -52,6 +52,4 @@ class Receiver(MiddlewareContainer, ABC):
 
     def serve_forever(self):
         """The blocking version of `serve_async`"""
-        loop = asyncio.get_event_loop()
-        loop.run_until_complete(self.serve_async())
-        tools.run_pending_tasks(loop)
+        tools.run_async(self.serve_async())
