@@ -8,7 +8,7 @@ from typing import Union, List
 from bottex2.platforms.py import PyMessage, PyReceiver
 from bottex2 import tools
 
-from testing.test_app.loogic import bug
+from testing.test_app.logic import bug
 from testing.test_app.main import bottex, setup_user_model
 
 

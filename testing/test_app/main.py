@@ -10,7 +10,7 @@ from bottex2.users import UserMiddleware, set_user_model
 from bottex2.databases.mongodb import MongoUser
 from bottex2.bottex import Bottex
 
-from testing.test_app.loogic import router
+from testing.test_app import logic
 
 
 bottex = Bottex(
@@ -18,7 +18,7 @@ bottex = Bottex(
     VkReceiver('auth_data/vk.json'),
     SockReciever(port='8888'),
 )
-bottex.set_handler(router)
+bottex.set_handler(logic.bug)
 
 
 def setup_user_model():
