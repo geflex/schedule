@@ -7,37 +7,48 @@ from bottex2.handler import Params
 from bottex2.receiver import Receiver
 
 
-class AsyncChat(Chat):
+def utf_bytes(s):
+    return bytes(s, 'utf-8')
+
+
+class SockChat(Chat):
     async def send_message(self,
                            text: Optional[str] = None,
                            kb: Optional[Keyboard] = None):
-        self._writer.write(bytes(text))
+        sep, sym = '\n\r', '| '
+        text = sym + text.replace('\n', sep+sym) + sep
+        b = utf_bytes(text)
+        self._writer.write(b)
 
     def __init__(self, writer: asyncio.StreamWriter):
         self._writer = writer
 
 
-class AsyncRecv(Receiver):
+class SockReciever(Receiver):
     def __init__(self, host='127.0.0.1', port=8888):
         super().__init__()
         self._host = host
         self._port = port
+        self._queue = asyncio.Queue()
 
-    async def listen(self) -> AsyncIterator[Params]:
-        queue = asyncio.Queue()
-        async def _callback(reader: asyncio.StreamReader,
-                            writer_: asyncio.StreamWriter):
+    async def _callback(self,
+                        reader: asyncio.StreamReader,
+                        writer: asyncio.StreamWriter):
+        while True:
             data = await reader.readline()
             try:
                 data = json.loads(data)
             except json.JSONDecodeError:
                 pass
-            queue.put_nowait((writer_, data))
+            self._queue.put_nowait((writer, data))
 
+    async def listen(self) -> AsyncIterator[Params]:
+        server = await asyncio.start_server(self._callback, self._host, self._port)
+        asyncio.create_task(server.serve_forever())
         while True:
-            writer, event = await queue.get()
+            event, writer = await self._queue.get()
             yield {
                 'text': event,
-                'chat': AsyncChat(writer),
+                'chat': SockChat(writer),
                 'raw': event
             }
