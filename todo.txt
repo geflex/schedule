@@ -1,10 +1,8 @@
-replace mongoengine by pymotor
 caching?
 i18n
 add_locales l10n
 fix models
 notifications
-db filling mechanism
 
 schedule by student lastname
 scedule by group

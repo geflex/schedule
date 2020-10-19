@@ -76,6 +76,11 @@ class Bottex(Receiver):
         super().add_middleware(aggregator)
         aggregator.add_to_all(self._receivers, only_default=(not add_specific))
 
+    def add_receiver(self, receiver: Receiver):
+        self._receivers.add(receiver)
+        for middleware in self.middlewares:
+            middleware.add_to_all([receiver], only_default=False)
+
     async def handle(self, __receiver__, **params):
         if __receiver__._handler is not None:
             try:
