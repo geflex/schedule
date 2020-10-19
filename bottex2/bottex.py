@@ -72,9 +72,9 @@ class Bottex(Receiver):
         super().__init__()
         self._receivers = set(receivers)  # type: Set[Receiver]
 
-    def add_middleware(self, aggregator: Type[MiddlewareAggregator], *, add_specific=True):
+    def add_middleware(self, aggregator: Type[MiddlewareAggregator]):
         super().add_middleware(aggregator)
-        aggregator.add_to_all(self._receivers, only_default=(not add_specific))
+        aggregator.add_to_all(self._receivers, only_default=False)
 
     def add_receiver(self, receiver: Receiver):
         self._receivers.add(receiver)
