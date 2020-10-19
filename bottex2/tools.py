@@ -7,27 +7,6 @@ def merge_async_iterators(aiters):
     https://stackoverflow.com/questions/55299564/join-multiple-async-generators-in-python
     """
     queue = asyncio.Queue(1)
-    count = len(aiters)
-
-    async def drain(aiter):
-        nonlocal count
-        async for item in aiter:
-            await queue.put(item)
-        count -= 1
-
-    async def merged():
-        while count:
-            yield await queue.get()
-
-    tasks = [asyncio.create_task(drain(aiter)) for aiter in aiters]
-    return merged()
-
-
-def merge_async_iterators2(aiters):
-    """
-    https://stackoverflow.com/questions/55299564/join-multiple-async-generators-in-python
-    """
-    queue = asyncio.Queue(1)
     run_count = len(aiters)
     cancelling = False
 

@@ -5,7 +5,7 @@ from typing import Type, Set, Iterable, Tuple, AsyncIterator, List
 from bottex2.handler import Params, HandlerError, Handler
 from bottex2.middlewares import Middleware, MiddlewareContainer
 from bottex2.receiver import Receiver
-from bottex2.tools import merge_async_iterators2
+from bottex2.tools import merge_async_iterators
 
 
 class MiddlewareAggregator(Handler):
@@ -102,7 +102,7 @@ class Bottex(Receiver):
                 yield params
 
         aiters = [_wrapper(rcvr) for rcvr in self._receivers]
-        async for message in merge_async_iterators2(aiters):
+        async for message in merge_async_iterators(aiters):
             yield message
 
     async def serve_async(self):
