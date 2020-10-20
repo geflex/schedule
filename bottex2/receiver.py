@@ -5,10 +5,9 @@ from typing import AsyncIterator, List, Type
 from bottex2 import aiotools
 from bottex2.chat import ChatMiddleware, AbstractChat
 from bottex2.handler import Handler, Params, HandlerMiddleware
-from bottex2.middlewares import Middlewarable
 
 
-class Receiver(Middlewarable, ABC):
+class Receiver(ABC):
     _handler: Handler = None
     _wrapped_handler: Handler = None
 

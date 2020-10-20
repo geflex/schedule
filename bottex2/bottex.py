@@ -3,40 +3,40 @@ from typing import Type, Set, Iterable, Tuple, List, AsyncIterator
 
 from bottex2 import aiotools
 from bottex2.handler import Params, HandlerError, Handler, HandlerMiddleware
-from bottex2.middlewares import AbstractMiddleware, Middlewarable
+from bottex2.middlewares import AbstractMiddleware
 from bottex2.receiver import Receiver
 from bottex2.aiotools import merge_async_iterators
 
 
 class BottexMiddleware:
-    middlewares_owners: Set[Tuple[AbstractMiddleware, Type[Middlewarable]]]
+    middlewares_receivers: Set[Tuple[AbstractMiddleware, Type[Receiver]]]
 
     def __init_subclass__(cls, **kwargs):
-        cls.middlewares_owners = set()
+        cls.middlewares_receivers = set()
 
     @classmethod
-    def submiddleware(cls, owner: Type[Middlewarable]):
+    def submiddleware(cls, receiver: Type[Receiver]):
         def register(middleware: AbstractMiddleware):
-            cls.submiddleware_add(owner, middleware)
+            cls.submiddleware_add(receiver, middleware)
             return middleware
         return register
 
     @classmethod
     def submiddleware_add(cls,
-                          owner: Type[Middlewarable],
+                          receiver: Type[Receiver],
                           middleware: AbstractMiddleware):
-        cls.middlewares_owners.add((middleware, owner))
+        cls.middlewares_receivers.add((middleware, receiver))
 
     @classmethod
-    def get_middleware(cls, owner: Type[Middlewarable]) -> AbstractMiddleware:
-        for m, c in cls.middlewares_owners:
-            if owner is c:
+    def get_middleware(cls, receiver: Type[Receiver]) -> AbstractMiddleware:
+        for m, c in cls.middlewares_receivers:
+            if receiver is c:
                 return m
         return cls
 
     @classmethod
-    def get_owner(cls, middleware: AbstractMiddleware) -> Type[Middlewarable]:
-        for m, c in cls.middlewares_owners:
+    def get_receiver(cls, middleware: AbstractMiddleware) -> Type[Receiver]:
+        for m, c in cls.middlewares_receivers:
             if middleware is m:
                 return c
         raise KeyError
@@ -44,8 +44,8 @@ class BottexMiddleware:
 
 class BottexHandlerMiddleware(BottexMiddleware, HandlerMiddleware):
     @classmethod
-    def add_to_all(cls, owners: Iterable[Middlewarable], *, only_default=False):
-        for container in owners:
+    def add_to_all(cls, receivers: Iterable[Receiver], *, only_default=False):
+        for container in receivers:
             if only_default:
                 middleware = cls
             else:
