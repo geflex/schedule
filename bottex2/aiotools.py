@@ -59,8 +59,8 @@ def raise_exc_as_done(task: asyncio.Task):
         raise exc
 
 
-def create_task(coro, raise_exc=True):
-    task = asyncio.create_task(coro)
+def create_task(coro, *, name=None, raise_exc=True):
+    task = asyncio.create_task(coro, name=name)
     if raise_exc:
         task.add_done_callback(raise_exc_as_done)
 

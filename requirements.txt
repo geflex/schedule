@@ -8,6 +8,4 @@ motor
 xlrd
 # retrying
 # lazy-property
-# sqlalchemy
-# psycopg2  # (for postrgres)
 # Babel
