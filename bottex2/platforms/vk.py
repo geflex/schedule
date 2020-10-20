@@ -77,7 +77,7 @@ class VkReceiver(Receiver):
 
 @users.middleware_for(VkReceiver)
 class VkUserMiddleware(HandlerMiddleware):
-    async def middleware(self, raw: dict, **params):
+    async def __call__(self, raw: dict, **params):
         uid = raw['object']['message']['from_id']
         user = await users.user_model.get('vk', uid)
         await self.handler(user=user, raw=raw, **params)
