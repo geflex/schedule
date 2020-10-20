@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from abc import ABC
 from typing import List, Callable, TypeVar
-import functools
+
 
 Interface = TypeVar('Interface')
 AbstractMiddleware = Callable[[Interface], Interface]
@@ -26,6 +26,3 @@ class Middlewarable(ABC):
         """Adds middleware to an owner"""
         check_middleware(middleware)
         self.middlewares.append(middleware)
-
-    def _wrap_into_middlewares(self, handler: Interface) -> Interface:
-        return functools.reduce(lambda h, md: md(h), self.middlewares, handler)

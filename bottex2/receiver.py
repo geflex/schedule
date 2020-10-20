@@ -1,9 +1,10 @@
 import warnings
 from abc import ABC, abstractmethod
-from typing import AsyncIterator
+from typing import AsyncIterator, List, Type
 
 from bottex2 import aiotools
-from bottex2.handler import Handler, Params
+from bottex2.chat import ChatMiddleware, AbstractChat
+from bottex2.handler import Handler, Params, HandlerMiddleware
 from bottex2.middlewares import Middlewarable, AbstractMiddleware
 
 
@@ -11,13 +12,28 @@ class Receiver(Middlewarable, ABC):
     _handler: Handler = None
     _wrapped_handler: Handler = None
 
+    def __init__(self):
+        super().__init__()
+        self.handler_middlewares = []  # type: List[Type[HandlerMiddleware]]
+        self.chat_middlewares = []  # type: List[Type[ChatMiddleware]]
+
+    def wrap_chat(self, chat: AbstractChat):
+        for middleware in self.chat_middlewares:
+            chat = middleware(chat)
+        return chat
+
+    def wrap_handler(self, handler: Handler):
+        for middleware in self.handler_middlewares:
+            handler = middleware(handler)
+        return handler
+
     def set_handler(self, handler: Handler) -> Handler:
         """
         Sets handler for this reseiver
         Can be used as a decorator
         """
         self._handler = handler
-        self._wrapped_handler = self._wrap_into_middlewares(handler)
+        self._wrapped_handler = self.wrap_handler(handler)
         return handler
 
     def add_middleware(self, middleware: AbstractMiddleware):

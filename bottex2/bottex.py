@@ -85,7 +85,7 @@ class Bottex(Receiver):
         await self._handler(**params)
 
     async def wrap_receiver(self, receiver: Receiver) -> AsyncIterator[ReceiverParams]:
-        handler = receiver._wrap_into_middlewares(self.handle)
+        handler = receiver.wrap_handler(self.handle)
         async for params in receiver.listen():
             params = params.copy()
             params['__receiver__'] = receiver
