@@ -1,7 +1,8 @@
 import warnings
-from typing import Type, Set, Iterable, Tuple, List, AsyncIterator
+from typing import Type, Set, Tuple, List, AsyncIterator
 
 from bottex2 import aiotools
+from bottex2.chat import ChatMiddleware
 from bottex2.handler import Params, HandlerError, Handler, HandlerMiddleware
 from bottex2.middlewares import AbstractMiddleware
 from bottex2.receiver import Receiver
@@ -43,17 +44,11 @@ class BottexMiddleware:
 
 
 class BottexHandlerMiddleware(BottexMiddleware, HandlerMiddleware):
-    @classmethod
-    def add_to_all(cls, receivers: Iterable[Receiver], *, only_default=False):
-        for container in receivers:
-            if only_default:
-                middleware = cls
-            else:
-                middleware = cls.get_middleware(type(container))
-                if middleware is cls:
-                    warnings.warn(f'No specific middleware registered for '
-                                  f'{type(container).__name__}')
-            container.add_handler_middleware(middleware)
+    pass
+
+
+class BottexChatMiddleware(BottexMiddleware, ChatMiddleware):
+    pass
 
 
 class ReceiverParams(Params):
@@ -68,14 +63,40 @@ class Bottex(Receiver):
         super().__init__()
         self._receivers = set(receivers)  # type: Set[Receiver]
 
-    def add_handler_middleware(self, aggregator: Type[BottexHandlerMiddleware]):
-        super().add_handler_middleware(aggregator)
-        aggregator.add_to_all(self._receivers, only_default=False)
+    def _add_handler_middleware(self,
+                                receiver: Receiver,
+                                middleware: Type[BottexHandlerMiddleware]):
+        submiddleware = middleware.get_middleware(type(receiver))
+        if submiddleware is middleware:
+            warnings.warn(f'No handler middleware specified for '
+                          f'{type(receiver).__name__}')
+        receiver.add_handler_middleware(submiddleware)
+
+    def _add_chat_middleware(self,
+                             receiver: Receiver,
+                             middleware: Type[BottexChatMiddleware]):
+        submiddleware = middleware.get_middleware(type(receiver))
+        if submiddleware is middleware:
+            warnings.warn(f'No chat middleware specified for '
+                          f'{type(receiver).__name__}')
+        receiver.add_chat_middleware(submiddleware)
+
+    def add_handler_middleware(self, middleware: Type[BottexHandlerMiddleware]):
+        super().add_handler_middleware(middleware)
+        for receiver in self._receivers:
+            self._add_handler_middleware(receiver, middleware)
+
+    def add_chat_middleware(self, middleware: Type[BottexChatMiddleware]):
+        super().add_chat_middleware(middleware)
+        for receiver in self._receivers:
+            self._add_chat_middleware(receiver, middleware)
 
     def add_receiver(self, receiver: Receiver):
         self._receivers.add(receiver)
-        for middleware in self.middlewares:
-            middleware.add_to_all([receiver], only_default=False)
+        for middleware in self.handler_middlewares:
+            self._add_handler_middleware(receiver, middleware)
+        for middleware in self.chat_middlewares:
+            self._add_chat_middleware(receiver, middleware)
 
     async def handle(self, __receiver__, **params):
         if __receiver__._handler is not None:
