@@ -16,14 +16,6 @@ class Params(dict):
 
 Handler = Callable[..., Awaitable]
 
-# class Handler(Protocol):
-#     async def __call__(self,
-#                        text: str,
-#                        chat: Chat,
-#                        raw: Dict[str, Any],
-#                        **params: Any) -> Awaitable:
-#         pass
-
 
 class HandlerError(Exception):
     pass
