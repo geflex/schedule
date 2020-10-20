@@ -34,4 +34,4 @@ def check_handler(handler: Handler):
         raise TypeError('Handler must be callable')
     sig = inspect.signature(handler)
     if not tools.have_kwargs_parameter(handler):
-        raise warnings.warn('Handler must have a **kwargs parameter')
+        warnings.warn('Handler must have a **kwargs parameter')
