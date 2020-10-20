@@ -75,7 +75,7 @@ middleware_for = UserMiddleware.deferred_add
 
 def set_user_model(cls):
     global user_model
-    user_class = cls
+    user_model = cls
 
 
 def state_cond(st: str) -> Condition:
