@@ -1,16 +1,13 @@
 aiovk
-aioviber
+# aioviber
 aiogram
 aiohttp
-vk-api
 pymongo
 mongoengine
 motor
-# retrying
 xlrd
-xlutils
-requests
-lazy-property
-sqlalchemy
+# retrying
+# lazy-property
+# sqlalchemy
 # psycopg2  # (for postrgres)
-Babel
+# Babel
