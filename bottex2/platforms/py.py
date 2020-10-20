@@ -5,8 +5,7 @@ from dataclasses import dataclass
 from typing import AsyncIterator, Optional
 
 from bottex2 import users
-from bottex2.handler import Params
-from bottex2.middlewares import HandlerMiddleware
+from bottex2.handler import Params, HandlerMiddleware
 from bottex2.receiver import Receiver
 from bottex2.chat import Chat, Keyboard
 

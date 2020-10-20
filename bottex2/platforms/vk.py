@@ -9,9 +9,8 @@ from aiovk import API
 from aiovk.sessions import BaseSession, TokenSession
 from aiovk.longpoll import BotsLongPoll
 
-from bottex2.handler import Params
+from bottex2.handler import Params, HandlerMiddleware
 from bottex2.chat import Chat, Keyboard
-from bottex2.middlewares import HandlerMiddleware
 from bottex2.receiver import Receiver
 from bottex2 import users
 

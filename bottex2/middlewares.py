@@ -4,19 +4,8 @@ from abc import ABC
 from typing import List, Callable, TypeVar
 import functools
 
-from bottex2.handler import Handler
-
-
 Interface = TypeVar('Interface')
 Middleware = Callable[[Interface], Interface]
-
-
-class HandlerMiddleware(Handler):
-    def __init__(self, handler: Handler):
-        self.handler = handler
-
-    async def __call__(self, **params):
-        await self.handler(**params)
 
 
 def check_middleware(middleware: Middleware):

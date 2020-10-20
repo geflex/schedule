@@ -2,8 +2,8 @@ import warnings
 from typing import Type, Set, Iterable, Tuple, AsyncIterator, List
 
 from bottex2 import aiotools
-from bottex2.handler import Params, HandlerError, Handler
-from bottex2.middlewares import Middleware, MiddlewareContainer, HandlerMiddleware
+from bottex2.handler import Params, HandlerError, Handler, HandlerMiddleware
+from bottex2.middlewares import Middleware, MiddlewareContainer
 from bottex2.receiver import Receiver
 from bottex2.aiotools import merge_async_iterators
 
@@ -52,9 +52,6 @@ class MiddlewareAggregator(HandlerMiddleware):
                     warnings.warn(f'No specific middleware registered for '
                                   f'{type(container).__name__}')
             container.add_middleware(middleware)
-
-    async def __call__(self, **params):
-        await self.handler(**params)
 
 
 class ReceiverParams(Params):
