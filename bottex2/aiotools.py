@@ -74,4 +74,3 @@ def run_pending_tasks(loop):
 def run_async(*coros):
     loop = asyncio.get_event_loop()
     loop.run_until_complete(gather(*coros))
-    run_pending_tasks(loop)

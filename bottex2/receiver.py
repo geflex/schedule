@@ -3,7 +3,7 @@ import warnings
 from abc import ABC, abstractmethod
 from typing import AsyncIterator
 
-from bottex2 import tools
+from bottex2 import aiotools
 from bottex2.handler import Handler, Params
 from bottex2.middlewares import MiddlewareContainer, Middleware
 
@@ -48,8 +48,8 @@ class Receiver(MiddlewareContainer, ABC):
         async for params in self.listen():
             handler = self._wrapped_handler
             coro = handler(**params)
-            tools.create_task(coro)
+            aiotools.create_task(coro)
 
     def serve_forever(self):
         """The blocking version of `serve_async`"""
-        tools.run_async(self.serve_async())
+        aiotools.run_async(self.serve_async())

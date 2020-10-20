@@ -6,7 +6,7 @@ import time
 from typing import Union, List
 
 from bottex2.platforms.py import PyMessage, PyReceiver
-from bottex2 import tools
+from bottex2 import aiotools
 
 from testing.test_app.logic import bug
 from testing.test_app.main import bottex, setup_user_model
@@ -50,7 +50,7 @@ def main(cycles, repeats):
     setup_user_model()
     tracemalloc.start()
     bottex.add_receiver(py_receiver)
-    tools.run_async(
+    aiotools.run_async(
         bench(py_receiver, cycles, repeats),
         py_receiver.serve_async(),
     )

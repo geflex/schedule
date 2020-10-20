@@ -2,11 +2,11 @@ import asyncio
 import warnings
 from typing import Type, Set, Iterable, Tuple, AsyncIterator, List
 
-from bottex2 import tools
+from bottex2 import aiotools
 from bottex2.handler import Params, HandlerError, Handler
 from bottex2.middlewares import Middleware, MiddlewareContainer
 from bottex2.receiver import Receiver
-from bottex2.tools import merge_async_iterators
+from bottex2.aiotools import merge_async_iterators
 
 
 class MiddlewareAggregator(Handler):
@@ -111,4 +111,4 @@ class Bottex(Receiver):
         async for params in self.listen():
             handler = params['__handler__']
             coro = handler(**params)
-            tools.create_task(coro)
+            aiotools.create_task(coro)

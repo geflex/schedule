@@ -18,7 +18,7 @@ bottex = Bottex(
     VkReceiver('auth_data/vk.json'),
     SockReciever(port='8888'),
 )
-bottex.set_handler(logic.bug)
+bottex.set_handler(logic.router)
 
 
 def setup_user_model():
