@@ -5,64 +5,71 @@ import asyncio
 import time
 from typing import Union, List
 
-from bottex2.platforms.py import PyMessage, PyReceiver
+from bottex2.platforms.py import PyMessage, PyReceiver, PyUserMiddleware
 from bottex2 import aiotools
 
 from testing.test_app import logic
-from testing.test_app.main import bottex, setup_user_model
+from testing.test_app.main import setup_user_model
 
 
-def rps(rpc, t):
-    """repeats per second"""
+def rps(repeats, t):
+    """
+    Repeats per second.
+
+    :param repeats: repeats per cycle
+    :param t: cycle lenght in ms
+    """
     if t == 0:
-        return float('inf')
-    return 60 * rpc / t / 1000
-
-
-async def bench(receiver: PyReceiver,
-                cycles: int,
-                repeats_per_cycle: Union[int, float] = 1E5):
-    repeats_per_cycle = int(repeats_per_cycle)
-    snapshots = []
-    queue = asyncio.Queue()
-    for i in range(cycles):
-        message = PyMessage('message text', queue)
-        start = time.time()
-        for _ in range(repeats_per_cycle):
-            receiver.recv_nowait(message)
-            while not queue.empty():
-                response = await queue.get()
-                queue.task_done()
-        total = time.time() - start
-        print(rps(repeats_per_cycle, total))
-        snap = tracemalloc.take_snapshot()
-        snapshots.append(snap)
-
-    # noinspection PyUnboundLocalVariable
-    statistics(snapshots)
+        return 0.0
+    return 60 * repeats / t / 1000
 
 
 py_receiver = PyReceiver()
 py_receiver.set_handler(logic.router)
 
 
-def main(cycles, repeats):
-    setup_user_model()
-    tracemalloc.start()
-    bottex.add_receiver(py_receiver)
-    aiotools.run_async(
-        bench(py_receiver, cycles, repeats),
-        py_receiver.serve_async(),
-    )
+class Benchmark:
+    def __init__(self,
+                 receiver: PyReceiver,
+                 repeats: Union[int, float] = 1E5):
+        self.repeats = int(repeats)
+        self.receiver = receiver
+        self.queue = asyncio.Queue()  # type: asyncio.Queue[PyMessage]
+        self.snapshots = []  # type: List[tracemalloc.Snapshot]
+        self._last_id = 0
 
+    async def send(self, text):
+        self.receiver.recv_nowait(PyMessage(text, self.queue, self._last_id))
+        self._last_id += 1
 
-def statistics(snapshots: List[tracemalloc.Snapshot]):
-    for prev_snap, snap in zip(snapshots, snapshots[1:]):
-        stats = snap.compare_to(prev_snap, 'lineno')
-        print()
-        for stat in stats[:5]:
-            print(stat)
+    async def serve(self):
+        # ids = set()
+        t = time.time()
+        # while len(ids) != self.repeats:
+        while True:
+            response = await self.queue.get()
+            # ids.add(response.response_id)
+        # print(rps(self.repeats, time.time() - t))
+
+    async def bench(self):
+        for _ in range(self.repeats):
+            await self.send('text')
+            snap = tracemalloc.take_snapshot()
+            self.snapshots.append(snap)
+
+    def statistics(self):
+        for prev_snap, snap in zip(self.snapshots, self.snapshots[1:]):
+            stats = snap.compare_to(prev_snap, 'lineno')
+            print()
+            for stat in stats[:5]:
+                print(stat)
 
 
 if __name__ == '__main__':
-    main(10, 1e5)
+    setup_user_model()
+    tracemalloc.start()
+    benchmark = Benchmark(py_receiver, 1e3)
+    py_receiver.add_middleware(PyUserMiddleware)
+    aiotools.run_async(py_receiver.serve_async(),
+                       benchmark.serve(),
+                       benchmark.bench())
