@@ -1,13 +1,14 @@
 from __future__ import annotations
 
 from abc import ABC
-from typing import List, Callable
+from typing import List, Callable, TypeVar
 import functools
 
 from bottex2.handler import Handler
 
 
-Middleware = Callable[[Handler], Handler]
+Interface = TypeVar('Interface')
+Middleware = Callable[[Interface], Interface]
 
 
 class HandlerMiddleware(Handler):
@@ -37,5 +38,5 @@ class MiddlewareContainer(ABC):
         check_middleware(middleware)
         self.middlewares.append(middleware)
 
-    def _wrap_into_middlewares(self, handler: Handler) -> Handler:
+    def _wrap_into_middlewares(self, handler: Interface) -> Interface:
         return functools.reduce(lambda h, md: md(h), self.middlewares, handler)
