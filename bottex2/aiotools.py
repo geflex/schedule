@@ -50,7 +50,7 @@ def have_kwargs_parameter(function):
     return any(p.kind == p.VAR_KEYWORD for p in sig.parameters.values())
 
 
-def raise_exc_as_done(task: asyncio.Task):
+def raise_exc_callback(task: asyncio.Task):
     exc = task.exception()
     if exc:
         # !!! Fix this
@@ -59,10 +59,10 @@ def raise_exc_as_done(task: asyncio.Task):
         raise exc
 
 
-def create_task(coro, *, name=None, raise_exc=True):
+def create_task(coro, *, name=None, done_callback=raise_exc_callback):
     task = asyncio.create_task(coro, name=name)
-    if raise_exc:
-        task.add_done_callback(raise_exc_as_done)
+    if done_callback is not None:
+        task.add_done_callback(done_callback)
 
 
 def run_pending_tasks(loop):
