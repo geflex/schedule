@@ -66,12 +66,12 @@ def create_task(coro, *, name=None, raise_exc=True):
 
 
 def run_pending_tasks(loop):
-    pending = asyncio.Task.all_tasks()
+    pending = asyncio.all_tasks()
     loop.run_until_complete(asyncio.gather(*pending))
 
 
 def cancel_pending_tasks():
-    tasks = asyncio.Task.all_tasks()
+    tasks = asyncio.all_tasks()
     for task in tasks:
         task.cancel()
 
