@@ -8,14 +8,14 @@ from bottex2.receiver import Receiver
 from bottex2.aiotools import merge_async_iterators
 
 
-class MiddlewareAggregator(HandlerMiddleware):
+class BottexHandlerMiddleware(HandlerMiddleware):
     specific_middlewares: Set[Tuple[Middleware, Type[MiddlewareContainer]]]
 
     def __init_subclass__(cls, **kwargs):
         cls.specific_middlewares = set()
 
     @classmethod
-    def deferred_add(cls, container: Type[MiddlewareContainer]):
+    def submiddleware(cls, container: Type[MiddlewareContainer]):
         def register(middleware: Middleware):
             cls.deferred_add_middleware(container, middleware)
             return middleware
@@ -60,13 +60,13 @@ class ReceiverParams(Params):
 
 
 class Bottex(Receiver):
-    middlewares: List[MiddlewareAggregator]
+    middlewares: List[BottexHandlerMiddleware]
 
     def __init__(self, *receivers: Receiver):
         super().__init__()
         self._receivers = set(receivers)  # type: Set[Receiver]
 
-    def add_middleware(self, aggregator: Type[MiddlewareAggregator]):
+    def add_middleware(self, aggregator: Type[BottexHandlerMiddleware]):
         super().add_middleware(aggregator)
         aggregator.add_to_all(self._receivers, only_default=False)
 

@@ -6,7 +6,7 @@ from bottex2.platforms.tg import TgReceiver
 from bottex2.platforms.vk import VkReceiver
 from bottex2.platforms.sock import SockReciever
 
-from bottex2.users import UserMiddleware, set_user_model
+from bottex2.users import UserBottexHandlerMiddleware, set_user_model
 from bottex2.databases.mongodb import MongoUser
 from bottex2.bottex import Bottex
 
@@ -25,7 +25,7 @@ def setup_user_model():
     set_user_model(MongoUser)
     mongo = motor.motor_asyncio.AsyncIOMotorClient('localhost', 27017)
     MongoUser.set_collection(mongo.schedule_test.users)
-    bottex.add_middleware(UserMiddleware)
+    bottex.add_middleware(UserBottexHandlerMiddleware)
 
 
 if __name__ == '__main__':

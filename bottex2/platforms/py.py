@@ -47,7 +47,7 @@ class PyReceiver(Receiver):
                          raw=message)
 
 
-@users.UserMiddleware.deferred_add(PyReceiver)
+@users.UserBottexHandlerMiddleware.submiddleware(PyReceiver)
 class PyUserMiddleware(HandlerMiddleware):
     async def __call__(self, raw: PyMessage, **params):
         user = await users.user_model.get('py', 'default')

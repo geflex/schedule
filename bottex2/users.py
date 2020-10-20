@@ -2,7 +2,7 @@ from abc import abstractmethod, ABC
 from typing import Type
 
 from bottex2.router import Condition
-from bottex2.bottex import MiddlewareAggregator
+from bottex2.bottex import BottexHandlerMiddleware
 
 
 class AbstractUser(ABC):
@@ -63,7 +63,7 @@ class TempUser(AbstractUser):
         return self._platform
 
 
-class UserMiddleware(MiddlewareAggregator):
+class UserBottexHandlerMiddleware(BottexHandlerMiddleware):
     async def __call__(self, **params):
         user = await user_model.get(None, 'guest')
         await self.handler(user=user, **params)

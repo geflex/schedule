@@ -75,7 +75,7 @@ class VkReceiver(Receiver):
                                  raw=event)
 
 
-@users.UserMiddleware.middleware_for(VkReceiver)
+@users.UserBottexHandlerMiddleware.middleware_for(VkReceiver)
 class VkUserMiddleware(HandlerMiddleware):
     async def __call__(self, raw: dict, **params):
         uid = raw['object']['message']['from_id']
