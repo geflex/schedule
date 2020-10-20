@@ -8,7 +8,7 @@ from typing import Union, List
 from bottex2.platforms.py import PyMessage, PyReceiver
 from bottex2 import aiotools
 
-from testing.test_app.logic import bug
+from testing.test_app import logic
 from testing.test_app.main import bottex, setup_user_model
 
 
@@ -43,7 +43,7 @@ async def bench(receiver: PyReceiver,
 
 
 py_receiver = PyReceiver()
-py_receiver.set_handler(bug)
+py_receiver.set_handler(logic.router)
 
 
 def main(cycles, repeats):
@@ -65,4 +65,4 @@ def statistics(snapshots: List[tracemalloc.Snapshot]):
 
 
 if __name__ == '__main__':
-    main(10, 1e2)
+    main(10, 1e5)

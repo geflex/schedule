@@ -1,4 +1,4 @@
-from bottex2.router import Router, any_cond
+from bottex2.router import Router, any_cond, text_cond
 from bottex2.chat import Keyboard, Button
 from bottex2.users import state_cond
 
@@ -27,6 +27,11 @@ async def set_state(chat, user, **params):
     await chat.send_message(f'hi, user {user.uid}', kb=kb)
 
 
+@router.register(text_cond('bug'))
+def bug(**params):
+    raise RuntimeError('bug!')
+
+
 @router.register(any_cond([state_cond(s) for s in states]))
 async def switch(chat, user, **params):
     await user.update(state=states[user.state])
@@ -41,7 +46,3 @@ async def send_settings(chat, user, **params):
         f'state: {user.state}',
     ])
     await chat.send_message(text)
-
-
-def bug(**params):
-    raise RuntimeError('bug!')
