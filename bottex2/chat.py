@@ -1,8 +1,6 @@
 from abc import ABC, abstractmethod
 from typing import Optional, List
 
-from bottex2.messages import Media
-
 
 class Button:
     def __init__(self, label: str, color: Optional[str] = None):
@@ -37,11 +35,16 @@ class Keyboard(ABC):
 
 
 class Chat(ABC):
-    def _prepare_kb(self, kb):
-        pass
-
     @abstractmethod
     async def send_message(self,
                            text: Optional[str] = None,
                            kb: Optional[Keyboard] = None):
         pass
+
+
+class ChatMiddleware(Chat):
+    def __init__(self, chat: Chat):
+        self.chat = chat
+
+    async def send_message(self, text: Optional[str] = None, kb: Optional[Keyboard] = None):
+        await self.chat.send_message(text=text, kb=kb)
