@@ -5,9 +5,9 @@ from typing import Optional, AsyncIterator
 
 import aiogram
 
-from bottex2.handler import Handler, Params
+from bottex2.handler import Params
 from bottex2.chat import Chat, Keyboard
-from bottex2.middlewares import ClsMiddleware
+from bottex2.middlewares import HandlerMiddleware
 from bottex2.receiver import Receiver
 from bottex2 import users
 
@@ -68,7 +68,7 @@ class TgReceiver(Receiver):
 
 
 @users.middleware_for(TgReceiver)
-class TgUserMiddleware(ClsMiddleware):
+class TgUserMiddleware(HandlerMiddleware):
     async def __call__(self, raw: dict, **params):
         uid = raw['from']['id']
         user = await users.user_model.get('tg', uid)

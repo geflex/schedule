@@ -3,12 +3,12 @@ from typing import Type, Set, Iterable, Tuple, AsyncIterator, List
 
 from bottex2 import aiotools
 from bottex2.handler import Params, HandlerError, Handler
-from bottex2.middlewares import Middleware, MiddlewareContainer, ClsMiddleware
+from bottex2.middlewares import Middleware, MiddlewareContainer, HandlerMiddleware
 from bottex2.receiver import Receiver
 from bottex2.aiotools import merge_async_iterators
 
 
-class MiddlewareAggregator(ClsMiddleware):
+class MiddlewareAggregator(HandlerMiddleware):
     specific_middlewares: Set[Tuple[Middleware, Type[MiddlewareContainer]]]
 
     def __init_subclass__(cls, **kwargs):

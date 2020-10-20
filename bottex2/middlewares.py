@@ -10,7 +10,7 @@ from bottex2.handler import Handler
 Middleware = Callable[[Handler], Handler]
 
 
-class ClsMiddleware(Handler):
+class HandlerMiddleware(Handler):
     def __init__(self, handler: Handler):
         self.handler = handler
 

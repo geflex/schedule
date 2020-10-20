@@ -9,9 +9,9 @@ from aiovk import API
 from aiovk.sessions import BaseSession, TokenSession
 from aiovk.longpoll import BotsLongPoll
 
-from bottex2.handler import Handler, Params
+from bottex2.handler import Params
 from bottex2.chat import Chat, Keyboard
-from bottex2.middlewares import ClsMiddleware
+from bottex2.middlewares import HandlerMiddleware
 from bottex2.receiver import Receiver
 from bottex2 import users
 
@@ -77,7 +77,7 @@ class VkReceiver(Receiver):
 
 
 @users.middleware_for(VkReceiver)
-class VkUserMiddleware(ClsMiddleware):
+class VkUserMiddleware(HandlerMiddleware):
     async def middleware(self, raw: dict, **params):
         uid = raw['object']['message']['from_id']
         user = await users.user_model.get('vk', uid)
