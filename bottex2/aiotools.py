@@ -44,12 +44,6 @@ def merge_async_iterators(aiters: Collection[AsyncGenerator]):
     return merged(tasks_)
 
 
-def have_kwargs_parameter(function):
-    """Checks whenever the function accepts **kwargs parameter"""
-    sig = inspect.signature(function)
-    return any(p.kind == p.VAR_KEYWORD for p in sig.parameters.values())
-
-
 def raise_exc_callback(task: asyncio.Task):
     exc = task.exception()
     if exc:
