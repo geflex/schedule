@@ -66,7 +66,7 @@ class TgReceiver(Receiver):
                                  raw=raw)
 
 
-@users.middleware_for(TgReceiver)
+@users.UserMiddleware.deferred_add(TgReceiver)
 class TgUserMiddleware(HandlerMiddleware):
     async def __call__(self, raw: dict, **params):
         uid = raw['from']['id']

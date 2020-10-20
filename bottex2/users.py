@@ -70,7 +70,6 @@ class UserMiddleware(MiddlewareAggregator):
 
 
 user_model: Type[AbstractUser] = TempUser
-middleware_for = UserMiddleware.deferred_add
 
 
 def set_user_model(cls):

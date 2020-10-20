@@ -11,9 +11,6 @@ class Receiver(MiddlewareContainer, ABC):
     _handler: Handler = None
     _wrapped_handler: Handler = None
 
-    def __init__(self):
-        super().__init__()
-
     def set_handler(self, handler: Handler) -> Handler:
         """
         Sets handler for this reseiver
