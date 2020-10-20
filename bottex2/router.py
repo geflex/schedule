@@ -1,7 +1,7 @@
 import re
 from typing import Optional, MutableMapping, Callable, Union, Pattern, Iterator
 
-from bottex2 import aiotools
+from bottex2 import tools
 from bottex2.handler import Handler, check_handler, HandlerError
 
 
@@ -83,5 +83,5 @@ def any_cond(conditions: Iterator[Condition]) -> Condition:
 def check_condition(condition: Condition):
     if not callable(condition):
         raise TypeError('`Condition` must be callable')
-    if not aiotools.have_kwargs_parameter(condition):
+    if not tools.have_kwargs_parameter(condition):
         raise ValueError('`Condition` must have a **kwargs parameter')

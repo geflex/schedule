@@ -1,7 +1,7 @@
 import inspect
 from typing import Awaitable, TypedDict, Any, Callable
 
-from bottex2 import aiotools
+from bottex2 import tools
 from bottex2.chat import Chat
 
 
@@ -30,5 +30,5 @@ def check_handler(handler: Handler):
     if not callable(handler):
         raise TypeError('`Handler` must be callable')
     sig = inspect.signature(handler)
-    if not aiotools.have_kwargs_parameter(handler):
+    if not tools.have_kwargs_parameter(handler):
         raise ValueError('`Handler` must have a **kwargs parameter')
