@@ -53,7 +53,8 @@ def have_kwargs_parameter(function):
 def raise_exc_as_done(task: asyncio.Task):
     exc = task.exception()
     if exc:
-        cancel_running_tasks()
+        # !!! Fix this
+        cancel_pending_tasks()
         asyncio.get_event_loop().stop()
         raise exc
 
@@ -64,21 +65,18 @@ def create_task(coro, raise_exc=True):
         task.add_done_callback(raise_exc_as_done)
 
 
-async def gather(*coros):
-    await asyncio.gather(*coros)
-
-
 def run_pending_tasks(loop):
     pending = asyncio.Task.all_tasks()
     loop.run_until_complete(asyncio.gather(*pending))
 
 
-def cancel_running_tasks():
+def cancel_pending_tasks():
     tasks = asyncio.Task.all_tasks()
     for task in tasks:
         task.cancel()
 
 
-def run_async(*coros):
+def run_async(*coros, debug=False):
     loop = asyncio.get_event_loop()
-    loop.run_until_complete(gather(*coros))
+    loop.set_debug(debug)
+    loop.run_until_complete(asyncio.gather(*coros))
