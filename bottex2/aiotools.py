@@ -63,6 +63,7 @@ def create_task(coro: Awaitable, *, name=None, done_callback=raise_exc_callback)
     task = asyncio.create_task(coro, name=name)
     if done_callback is not None:
         task.add_done_callback(done_callback)
+    return task
 
 
 def run_pending_tasks(loop: asyncio.AbstractEventLoop):
