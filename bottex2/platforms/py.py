@@ -15,21 +15,23 @@ from bottex2.chat import Chat, Keyboard
 class PyMessage:
     text: str
     queue: asyncio.Queue[PyMessage]
+    response_id: int = None
 
 
 class PyChat(Chat):
-    def __init__(self, chat_queue, recv_queue):
-        self._callback_queue = chat_queue  # type: asyncio.Queue[PyMessage]
+    def __init__(self, callback_queue, recv_queue, message_id):
+        self._callback_queue = callback_queue  # type: asyncio.Queue[PyMessage]
         self._recv_queue = recv_queue  # type: asyncio.Queue[PyMessage]
+        self._message_id = message_id
 
     async def send_message(self, text: Optional[str] = None, kb: Optional[Keyboard] = None):
-        await self._callback_queue.put(PyMessage(text, self._recv_queue))
-        self._recv_queue.task_done()
+        await self._callback_queue.put(PyMessage(text, self._recv_queue, self._message_id))
 
 
 class PyReceiver(Receiver):
     def __init__(self):
         super().__init__()
+        self._last_id = 0
         self._queue = asyncio.Queue()  # type: asyncio.Queue[PyMessage]
 
     async def recv(self, obj: PyMessage):
@@ -40,10 +42,10 @@ class PyReceiver(Receiver):
 
     async def listen(self) -> AsyncIterator[Params]:
         while True:
-            obj = await self._queue.get()
-            yield Params(text=obj.text,
-                         chat=PyChat(obj.queue, self._queue),
-                         raw=obj)
+            message = await self._queue.get()
+            yield Params(text=message.text,
+                         chat=PyChat(message.queue, self._queue, message.response_id),
+                         raw=message)
 
 
 @users.middleware_for(PyReceiver)
