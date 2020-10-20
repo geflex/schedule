@@ -1,4 +1,5 @@
 import inspect
+import warnings
 from typing import Awaitable, Any, Callable
 
 from bottex2 import tools
@@ -30,7 +31,7 @@ class HandlerError(Exception):
 
 def check_handler(handler: Handler):
     if not callable(handler):
-        raise TypeError('`Handler` must be callable')
+        raise TypeError('Handler must be callable')
     sig = inspect.signature(handler)
     if not tools.have_kwargs_parameter(handler):
-        raise ValueError('`Handler` must have a **kwargs parameter')
+        raise warnings.warn('Handler must have a **kwargs parameter')

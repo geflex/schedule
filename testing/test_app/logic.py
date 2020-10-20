@@ -28,7 +28,7 @@ async def set_state(chat, user, **params):
 
 
 @router.register(text_cond('bug'))
-def bug(**params):
+def bug(request):
     raise RuntimeError('bug!')
 
 
