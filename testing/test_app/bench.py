@@ -69,7 +69,7 @@ if __name__ == '__main__':
     setup_user_model()
     tracemalloc.start()
     benchmark = Benchmark(py_receiver, 1e3)
-    py_receiver.add_middleware(PyUserHandlerMiddleware)
+    py_receiver.add_handler_middleware(PyUserHandlerMiddleware)
     aiotools.run_async(py_receiver.serve_async(),
                        benchmark.serve(),
                        benchmark.bench())

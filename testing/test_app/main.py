@@ -25,7 +25,7 @@ def setup_user_model():
     set_user_model(MongoUser)
     mongo = motor.motor_asyncio.AsyncIOMotorClient('localhost', 27017)
     MongoUser.set_collection(mongo.schedule_test.users)
-    bottex.add_middleware(UserBottexHandlerMiddleware)
+    bottex.add_handler_middleware(UserBottexHandlerMiddleware)
 
 
 if __name__ == '__main__':

@@ -1,8 +1,6 @@
 from abc import ABC, abstractmethod
 from typing import Optional, List
 
-from bottex2.middlewares import Middlewarable
-
 
 class Button:
     def __init__(self, label: str, color: Optional[str] = None):
@@ -44,7 +42,7 @@ class AbstractChat(ABC):
         pass
 
 
-class Chat(AbstractChat, Middlewarable, ABC):
+class Chat(AbstractChat, ABC):
     pass
 
 

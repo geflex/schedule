@@ -62,7 +62,7 @@ class TgReceiver(Receiver):
                     raw = update['message']
                     chat = TgChat(self.bot, raw['chat']['id'])
                     yield Params(text=raw['text'],
-                                 chat=chat,
+                                 chat=self.wrap_chat(chat),
                                  raw=raw)
 
 

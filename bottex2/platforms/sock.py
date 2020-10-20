@@ -48,6 +48,7 @@ class SockReciever(Receiver):
         aiotools.create_task(server.serve_forever())
         while True:
             event, writer = await self._queue.get()
+            chat = SockChat(writer)
             yield Params(text=event,
-                         chat=SockChat(writer),
+                         chat=self.wrap_chat(chat),
                          raw=event)

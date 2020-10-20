@@ -5,7 +5,7 @@ from typing import AsyncIterator, List, Type
 from bottex2 import aiotools
 from bottex2.chat import ChatMiddleware, AbstractChat
 from bottex2.handler import Handler, Params, HandlerMiddleware
-from bottex2.middlewares import Middlewarable, AbstractMiddleware
+from bottex2.middlewares import Middlewarable
 
 
 class Receiver(Middlewarable, ABC):
@@ -17,10 +17,17 @@ class Receiver(Middlewarable, ABC):
         self.handler_middlewares = []  # type: List[Type[HandlerMiddleware]]
         self.chat_middlewares = []  # type: List[Type[ChatMiddleware]]
 
+    def add_chat_middleware(self, middleware: Type[ChatMiddleware]):
+        self.chat_middlewares.append(middleware)
+
     def wrap_chat(self, chat: AbstractChat):
         for middleware in self.chat_middlewares:
             chat = middleware(chat)
         return chat
+
+    def add_handler_middleware(self, middleware: Type[HandlerMiddleware]):
+        self.handler_middlewares.append(middleware)
+        self._wrapped_handler = middleware(self._wrapped_handler)
 
     def wrap_handler(self, handler: Handler):
         for middleware in self.handler_middlewares:
@@ -35,10 +42,6 @@ class Receiver(Middlewarable, ABC):
         self._handler = handler
         self._wrapped_handler = self.wrap_handler(handler)
         return handler
-
-    def add_middleware(self, middleware: AbstractMiddleware):
-        super().add_middleware(middleware)
-        self._wrapped_handler = middleware(self._wrapped_handler)
 
     @abstractmethod
     async def listen(self) -> AsyncIterator[Params]:

@@ -8,7 +8,7 @@ from bottex2.receiver import Receiver
 from bottex2.aiotools import merge_async_iterators
 
 
-class BottexHandlerMiddleware(HandlerMiddleware):
+class BottexMiddleware:
     middlewares_owners: Set[Tuple[AbstractMiddleware, Type[Middlewarable]]]
 
     def __init_subclass__(cls, **kwargs):
@@ -41,6 +41,8 @@ class BottexHandlerMiddleware(HandlerMiddleware):
                 return c
         raise KeyError
 
+
+class BottexHandlerMiddleware(BottexMiddleware, HandlerMiddleware):
     @classmethod
     def add_to_all(cls, owners: Iterable[Middlewarable], *, only_default=False):
         for container in owners:
@@ -51,7 +53,7 @@ class BottexHandlerMiddleware(HandlerMiddleware):
                 if middleware is cls:
                     warnings.warn(f'No specific middleware registered for '
                                   f'{type(container).__name__}')
-            container.add_middleware(middleware)
+            container.add_handler_middleware(middleware)
 
 
 class ReceiverParams(Params):
@@ -66,8 +68,8 @@ class Bottex(Receiver):
         super().__init__()
         self._receivers = set(receivers)  # type: Set[Receiver]
 
-    def add_middleware(self, aggregator: Type[BottexHandlerMiddleware]):
-        super().add_middleware(aggregator)
+    def add_handler_middleware(self, aggregator: Type[BottexHandlerMiddleware]):
+        super().add_handler_middleware(aggregator)
         aggregator.add_to_all(self._receivers, only_default=False)
 
     def add_receiver(self, receiver: Receiver):

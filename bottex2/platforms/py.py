@@ -42,8 +42,9 @@ class PyReceiver(Receiver):
     async def listen(self) -> AsyncIterator[Params]:
         while True:
             message = await self._queue.get()
+            chat = PyChat(message.queue, self._queue, message.response_id)
             yield Params(text=message.text,
-                         chat=PyChat(message.queue, self._queue, message.response_id),
+                         chat=self.wrap_chat(chat),
                          raw=message)
 
 

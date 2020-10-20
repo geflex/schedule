@@ -71,7 +71,7 @@ class VkReceiver(Receiver):
                     message = event['object']['message']
                     chat = VkChat(self.session, message['peer_id'])
                     yield Params(text=message['text'],
-                                 chat=chat,
+                                 chat=self.wrap_chat(chat),
                                  raw=event)
 
 
