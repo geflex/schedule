@@ -3,46 +3,46 @@ from typing import Type, Set, Iterable, Tuple, List, AsyncIterator
 
 from bottex2 import aiotools
 from bottex2.handler import Params, HandlerError, Handler, HandlerMiddleware
-from bottex2.middlewares import Middleware, MiddlewareContainer
+from bottex2.middlewares import AbstractMiddleware, Middlewarable
 from bottex2.receiver import Receiver
 from bottex2.aiotools import merge_async_iterators
 
 
 class BottexHandlerMiddleware(HandlerMiddleware):
-    specific_middlewares: Set[Tuple[Middleware, Type[MiddlewareContainer]]]
+    specific_middlewares: Set[Tuple[AbstractMiddleware, Type[Middlewarable]]]
 
     def __init_subclass__(cls, **kwargs):
         cls.specific_middlewares = set()
 
     @classmethod
-    def submiddleware(cls, container: Type[MiddlewareContainer]):
-        def register(middleware: Middleware):
+    def submiddleware(cls, container: Type[Middlewarable]):
+        def register(middleware: AbstractMiddleware):
             cls.deferred_add_middleware(container, middleware)
             return middleware
         return register
 
     @classmethod
     def deferred_add_middleware(cls,
-                                container: Type[MiddlewareContainer],
-                                middleware: Middleware):
+                                container: Type[Middlewarable],
+                                middleware: AbstractMiddleware):
         cls.specific_middlewares.add((middleware, container))
 
     @classmethod
-    def get_middleware(cls, container: Type[MiddlewareContainer]) -> Middleware:
+    def get_middleware(cls, container: Type[Middlewarable]) -> AbstractMiddleware:
         for m, c in cls.specific_middlewares:
             if container is c:
                 return m
         return cls
 
     @classmethod
-    def get_container(cls, middleware: Middleware) -> Type[MiddlewareContainer]:
+    def get_container(cls, middleware: AbstractMiddleware) -> Type[Middlewarable]:
         for m, c in cls.specific_middlewares:
             if middleware is m:
                 return c
         raise KeyError
 
     @classmethod
-    def add_to_all(cls, containers: Iterable[MiddlewareContainer], *, only_default=False):
+    def add_to_all(cls, containers: Iterable[Middlewarable], *, only_default=False):
         for container in containers:
             if only_default:
                 middleware = cls

@@ -67,7 +67,7 @@ class TgReceiver(Receiver):
 
 
 @users.UserBottexHandlerMiddleware.submiddleware(TgReceiver)
-class TgUserMiddleware(HandlerMiddleware):
+class TgUserHandlerMiddleware(HandlerMiddleware):
     async def __call__(self, raw: dict, **params):
         uid = raw['from']['id']
         user = await users.user_model.get('tg', uid)

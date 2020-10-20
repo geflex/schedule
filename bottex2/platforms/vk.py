@@ -76,7 +76,7 @@ class VkReceiver(Receiver):
 
 
 @users.UserBottexHandlerMiddleware.submiddleware(VkReceiver)
-class VkUserMiddleware(HandlerMiddleware):
+class VkUserHandlerMiddleware(HandlerMiddleware):
     async def __call__(self, raw: dict, **params):
         uid = raw['object']['message']['from_id']
         user = await users.user_model.get('vk', uid)

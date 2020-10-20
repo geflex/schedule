@@ -5,7 +5,7 @@ import asyncio
 import time
 from typing import Union, List
 
-from bottex2.platforms.py import PyMessage, PyReceiver, PyUserMiddleware
+from bottex2.platforms.py import PyMessage, PyReceiver, PyUserHandlerMiddleware
 from bottex2 import aiotools
 
 from testing.test_app import logic
@@ -69,7 +69,7 @@ if __name__ == '__main__':
     setup_user_model()
     tracemalloc.start()
     benchmark = Benchmark(py_receiver, 1e3)
-    py_receiver.add_middleware(PyUserMiddleware)
+    py_receiver.add_middleware(PyUserHandlerMiddleware)
     aiotools.run_async(py_receiver.serve_async(),
                        benchmark.serve(),
                        benchmark.bench())

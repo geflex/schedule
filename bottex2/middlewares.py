@@ -5,24 +5,24 @@ from typing import List, Callable, TypeVar
 import functools
 
 Interface = TypeVar('Interface')
-Middleware = Callable[[Interface], Interface]
+AbstractMiddleware = Callable[[Interface], Interface]
 
 
-def check_middleware(middleware: Middleware):
+def check_middleware(middleware: AbstractMiddleware):
     if not callable(middleware):
         raise TypeError('middleware must be callable')
 
 
-class MiddlewareContainer(ABC):
+class Middlewarable(ABC):
     """
     This class provides interface and functionality for
-    classes that contain and use `Middleware` interface
+    classes that contain and use `AbstractMiddleware` interface
     """
 
     def __init__(self):
-        self.middlewares = []  # type: List[Middleware]
+        self.middlewares = []  # type: List[AbstractMiddleware]
 
-    def add_middleware(self, middleware: Middleware):
+    def add_middleware(self, middleware: AbstractMiddleware):
         """Adds middleware to a container"""
         check_middleware(middleware)
         self.middlewares.append(middleware)

@@ -4,10 +4,10 @@ from typing import AsyncIterator
 
 from bottex2 import aiotools
 from bottex2.handler import Handler, Params
-from bottex2.middlewares import MiddlewareContainer, Middleware
+from bottex2.middlewares import Middlewarable, AbstractMiddleware
 
 
-class Receiver(MiddlewareContainer, ABC):
+class Receiver(Middlewarable, ABC):
     _handler: Handler = None
     _wrapped_handler: Handler = None
 
@@ -20,7 +20,7 @@ class Receiver(MiddlewareContainer, ABC):
         self._wrapped_handler = self._wrap_into_middlewares(handler)
         return handler
 
-    def add_middleware(self, middleware: Middleware):
+    def add_middleware(self, middleware: AbstractMiddleware):
         super().add_middleware(middleware)
         self._wrapped_handler = middleware(self._wrapped_handler)
 
