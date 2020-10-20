@@ -7,6 +7,7 @@ import aiogram
 
 from bottex2.handler import Handler, Params
 from bottex2.chat import Chat, Keyboard
+from bottex2.middlewares import ClsMiddleware
 from bottex2.receiver import Receiver
 from bottex2 import users
 
@@ -67,9 +68,8 @@ class TgReceiver(Receiver):
 
 
 @users.middleware_for(TgReceiver)
-def tg_user_middleware(handler: Handler):
-    async def middleware(raw: dict, **params):
+class TgUserMiddleware(ClsMiddleware):
+    async def __call__(self, raw: dict, **params):
         uid = raw['from']['id']
         user = await users.user_model.get('tg', uid)
-        await handler(user=user, raw=raw, **params)
-    return middleware
+        await self.handler(user=user, raw=raw, **params)

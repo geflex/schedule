@@ -6,6 +6,7 @@ from typing import AsyncIterator, Optional
 
 from bottex2 import users
 from bottex2.handler import Params
+from bottex2.middlewares import ClsMiddleware
 from bottex2.receiver import Receiver
 from bottex2.chat import Chat, Keyboard
 
@@ -46,8 +47,7 @@ class PyReceiver(Receiver):
 
 
 @users.middleware_for(PyReceiver)
-def sock_user_middleware(handler):
-    async def middleware(raw: PyMessage, **params):
+class PyUserMiddleware(ClsMiddleware):
+    async def __call__(self, raw: PyMessage, **params):
         user = await users.user_model.get('py', 'default')
-        await handler(user=user, raw=raw, **params)
-    return middleware
+        await self.handler(user=user, raw=raw, **params)
