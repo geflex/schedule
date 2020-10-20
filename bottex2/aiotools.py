@@ -50,9 +50,11 @@ def have_kwargs_parameter(function):
     return any(p.kind == p.VAR_KEYWORD for p in sig.parameters.values())
 
 
-def raise_exc_as_done(task):
+def raise_exc_as_done(task: asyncio.Task):
     exc = task.exception()
     if exc:
+        cancel_running_tasks()
+        asyncio.get_event_loop().stop()
         raise exc
 
 
@@ -69,6 +71,12 @@ async def gather(*coros):
 def run_pending_tasks(loop):
     pending = asyncio.Task.all_tasks()
     loop.run_until_complete(asyncio.gather(*pending))
+
+
+def cancel_running_tasks():
+    tasks = asyncio.Task.all_tasks()
+    for task in tasks:
+        task.cancel()
 
 
 def run_async(*coros):
