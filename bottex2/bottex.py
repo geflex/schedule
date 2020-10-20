@@ -91,18 +91,16 @@ class Bottex(Receiver):
                 pass
         await self._handler(**params)
 
-    async def listen(self) -> AsyncIterator[ReceiverParams]:
-        async def _wrapper(receiver: Receiver) -> AsyncIterator[ReceiverParams]:
-            handler = receiver._wrap_into_middlewares(self.handle)
-            async for params in receiver.listen():
-                params = params.copy()
-                # noinspection PyTypeChecker
-                params['__receiver__'] = receiver
-                # noinspection PyTypeChecker
-                params['__handler__'] = handler
-                yield params
+    async def wrap_receiver(self, receiver: Receiver) -> AsyncIterator[ReceiverParams]:
+        handler = receiver._wrap_into_middlewares(self.handle)
+        async for params in receiver.listen():
+            params = params.copy()
+            params['__receiver__'] = receiver
+            params['__handler__'] = handler
+            yield params
 
-        aiters = [_wrapper(rcvr) for rcvr in self._receivers]
+    async def listen(self) -> AsyncIterator[ReceiverParams]:
+        aiters = [self.wrap_receiver(rcvr) for rcvr in self._receivers]
         async for message in merge_async_iterators(aiters):
             yield message
 
