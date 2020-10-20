@@ -1,4 +1,3 @@
-import asyncio
 import warnings
 from typing import Type, Set, Iterable, Tuple, AsyncIterator, List
 

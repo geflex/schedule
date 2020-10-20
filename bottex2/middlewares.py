@@ -10,6 +10,14 @@ from bottex2.handler import Handler
 Middleware = Callable[[Handler], Handler]
 
 
+class CMiddleware:
+    def __init__(self, handler):
+        self.handler = handler
+
+    async def __call__(self, **params):
+        await self.handler(**params)
+
+
 def check_middleware(middleware: Middleware):
     if not callable(middleware):
         raise TypeError('middleware must be callable')
