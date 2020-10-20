@@ -9,41 +9,41 @@ from bottex2.aiotools import merge_async_iterators
 
 
 class BottexHandlerMiddleware(HandlerMiddleware):
-    specific_middlewares: Set[Tuple[AbstractMiddleware, Type[Middlewarable]]]
+    middlewares_owners: Set[Tuple[AbstractMiddleware, Type[Middlewarable]]]
 
     def __init_subclass__(cls, **kwargs):
-        cls.specific_middlewares = set()
+        cls.middlewares_owners = set()
 
     @classmethod
-    def submiddleware(cls, container: Type[Middlewarable]):
+    def submiddleware(cls, owner: Type[Middlewarable]):
         def register(middleware: AbstractMiddleware):
-            cls.deferred_add_middleware(container, middleware)
+            cls.submiddleware_add(owner, middleware)
             return middleware
         return register
 
     @classmethod
-    def deferred_add_middleware(cls,
-                                container: Type[Middlewarable],
-                                middleware: AbstractMiddleware):
-        cls.specific_middlewares.add((middleware, container))
+    def submiddleware_add(cls,
+                          owner: Type[Middlewarable],
+                          middleware: AbstractMiddleware):
+        cls.middlewares_owners.add((middleware, owner))
 
     @classmethod
-    def get_middleware(cls, container: Type[Middlewarable]) -> AbstractMiddleware:
-        for m, c in cls.specific_middlewares:
-            if container is c:
+    def get_middleware(cls, owner: Type[Middlewarable]) -> AbstractMiddleware:
+        for m, c in cls.middlewares_owners:
+            if owner is c:
                 return m
         return cls
 
     @classmethod
-    def get_container(cls, middleware: AbstractMiddleware) -> Type[Middlewarable]:
-        for m, c in cls.specific_middlewares:
+    def get_owner(cls, middleware: AbstractMiddleware) -> Type[Middlewarable]:
+        for m, c in cls.middlewares_owners:
             if middleware is m:
                 return c
         raise KeyError
 
     @classmethod
-    def add_to_all(cls, containers: Iterable[Middlewarable], *, only_default=False):
-        for container in containers:
+    def add_to_all(cls, owners: Iterable[Middlewarable], *, only_default=False):
+        for container in owners:
             if only_default:
                 middleware = cls
             else:

@@ -3,11 +3,11 @@ import warnings
 from typing import Awaitable, Any, Callable
 
 from bottex2 import tools
-from bottex2.chat import Chat
+from bottex2.chat import AbstractChat
 
 
 class Params(dict):
-    def __init__(self, *, text: str, chat: Chat, raw: Any):
+    def __init__(self, *, text: str, chat: AbstractChat, raw: Any):
         super().__init__(text=text, chat=chat, raw=raw)
 
     def __getattr__(self, attr):

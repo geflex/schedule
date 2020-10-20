@@ -23,7 +23,7 @@ class Middlewarable(ABC):
         self.middlewares = []  # type: List[AbstractMiddleware]
 
     def add_middleware(self, middleware: AbstractMiddleware):
-        """Adds middleware to a container"""
+        """Adds middleware to an owner"""
         check_middleware(middleware)
         self.middlewares.append(middleware)
 
