@@ -1,5 +1,5 @@
 import warnings
-from typing import Type, Set, Iterable, Tuple, List, AsyncGenerator
+from typing import Type, Set, Iterable, Tuple, List, AsyncIterator
 
 from bottex2 import aiotools
 from bottex2.handler import Params, HandlerError, Handler, HandlerMiddleware
@@ -84,7 +84,7 @@ class Bottex(Receiver):
                 pass
         await self._handler(**params)
 
-    async def wrap_receiver(self, receiver: Receiver) -> AsyncGenerator[ReceiverParams]:
+    async def wrap_receiver(self, receiver: Receiver) -> AsyncIterator[ReceiverParams]:
         handler = receiver._wrap_into_middlewares(self.handle)
         async for params in receiver.listen():
             params = params.copy()
@@ -92,7 +92,7 @@ class Bottex(Receiver):
             params['__handler__'] = handler
             yield params
 
-    async def listen(self) -> AsyncGenerator[ReceiverParams]:
+    async def listen(self) -> AsyncIterator[ReceiverParams]:
         aiters = [self.wrap_receiver(rcvr) for rcvr in self._receivers]
         async for message in merge_async_iterators(aiters):
             yield message

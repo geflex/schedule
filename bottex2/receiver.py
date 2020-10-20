@@ -1,6 +1,6 @@
 import warnings
 from abc import ABC, abstractmethod
-from typing import AsyncGenerator
+from typing import AsyncIterator
 
 from bottex2 import aiotools
 from bottex2.handler import Handler, Params
@@ -28,7 +28,7 @@ class Receiver(MiddlewareContainer, ABC):
         self._wrapped_handler = middleware(self._wrapped_handler)
 
     @abstractmethod
-    async def listen(self) -> AsyncGenerator[Params]:
+    async def listen(self) -> AsyncIterator[Params]:
         """Recieves and yields events"""
         yield
 

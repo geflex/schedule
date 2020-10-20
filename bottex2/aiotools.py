@@ -1,8 +1,8 @@
 import asyncio
-from typing import Collection, AsyncGenerator, Awaitable
+from typing import Collection, AsyncIterator, Awaitable
 
 
-def merge_async_iterators(aiters: Collection[AsyncGenerator]):
+def merge_async_iterators(aiters: Collection[AsyncIterator]):
     """
     https://stackoverflow.com/questions/55299564/join-multiple-async-generators-in-python
     """
@@ -10,7 +10,7 @@ def merge_async_iterators(aiters: Collection[AsyncGenerator]):
     run_count = len(aiters)
     cancelling = False
 
-    async def iterate(aiter: AsyncGenerator):
+    async def iterate(aiter: AsyncIterator):
         nonlocal run_count
         try:
             async for item in aiter:
