@@ -1,8 +1,8 @@
 import asyncio
-import inspect
+from typing import Collection, AsyncGenerator, Awaitable
 
 
-def merge_async_iterators(aiters):
+def merge_async_iterators(aiters: Collection[AsyncGenerator]):
     """
     https://stackoverflow.com/questions/55299564/join-multiple-async-generators-in-python
     """
@@ -10,7 +10,7 @@ def merge_async_iterators(aiters):
     run_count = len(aiters)
     cancelling = False
 
-    async def iterate(aiter):
+    async def iterate(aiter: AsyncGenerator):
         nonlocal run_count
         try:
             async for item in aiter:
@@ -23,7 +23,7 @@ def merge_async_iterators(aiters):
         finally:
             run_count -= 1
 
-    async def merged(tasks):
+    async def merged(tasks: Collection[asyncio.Task]):
         try:
             while run_count:
                 raised, next_item = await queue.get()
@@ -34,7 +34,7 @@ def merge_async_iterators(aiters):
         finally:
             cancel_tasks(tasks)
 
-    def cancel_tasks(tasks):
+    def cancel_tasks(tasks: Collection[asyncio.Task]):
         nonlocal cancelling
         cancelling = True
         for t in tasks:
@@ -59,13 +59,13 @@ def raise_exc_callback(task: asyncio.Task):
         raise exc
 
 
-def create_task(coro, *, name=None, done_callback=raise_exc_callback):
+def create_task(coro: Awaitable, *, name=None, done_callback=raise_exc_callback):
     task = asyncio.create_task(coro, name=name)
     if done_callback is not None:
         task.add_done_callback(done_callback)
 
 
-def run_pending_tasks(loop):
+def run_pending_tasks(loop: asyncio.AbstractEventLoop):
     pending = asyncio.all_tasks()
     loop.run_until_complete(asyncio.gather(*pending))
 
@@ -76,7 +76,7 @@ def cancel_pending_tasks():
         task.cancel()
 
 
-def run_async(*coros, debug=False):
+def run_async(*coros: Awaitable, debug=False):
     loop = asyncio.get_event_loop()
     loop.set_debug(debug)
     loop.run_until_complete(asyncio.gather(*coros))
