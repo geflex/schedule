@@ -8,7 +8,7 @@ class Formatter:
     splitter = '\n' + '='*28 + '\n'
 
     def str_lesson(self, lesson: Lesson):
-        return f'{lesson.time} {lesson.auditory} к{lesson.building}\n{lesson.name}'
+        return f'{lesson.time} {lesson.auditories} к{lesson.building}\n{lesson.name}'
 
     def format_day(self, db_objects):
         lessons = []

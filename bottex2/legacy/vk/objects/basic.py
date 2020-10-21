@@ -1,7 +1,7 @@
 from datetime import datetime as dt
 
 from bottex2.legacy.dict_schema import DictSchema, Attr, Array
-from drivers.vk_objects.media import parse_media
+from bottex2.legacy.vk.objects import parse_media
 
 
 class Geo(DictSchema):

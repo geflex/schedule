@@ -1,17 +1,3 @@
-import asyncio
-import sys
-from random import randint
-
-import aiohttp
-from vk_api.keyboard import VkKeyboard as VkApiKeyboard, VkKeyboardColor as VkColor
-
-from aiovk import TokenSession, API
-from aiovk.longpoll import BotsLongPoll
-
-import bottex2.router
-
-from drivers.vk_objects.events import VkEvents, parse_event
-
 vk_empty_text = '\u200b'
 
 
@@ -50,15 +36,3 @@ class VkKeyboard:
             self.add_line()
         self.pop_line()
         return self.get_str()
-
-
-class VkDriver:
-    async def send_text(self, message, peer_id):
-        if not bottex2.router.text:
-            bottex2.router.text = '...'
-        keyboard = self.create_kb(message.buttons)
-        await self.api.messages.send_text(random_id=randint(0, sys.maxsize),
-                                          user_id=peer_id,
-                                          message=bottex2.router.text,
-                                          # attachment=attachments,
-                                          keyboard=keyboard)

@@ -1,42 +1,38 @@
-from enum import Enum, IntFlag, auto
+import logging
+from enum import Enum, IntFlag
 
 from mongoengine import *
 
-import bottex
-from bottex.models.mongodriver import EnumField, TimeField
-from bottex.models import UserModel, NotificationsModel
-from bottex.utils.enums import StrEnum
 
-
-class Lang(StrEnum):
+class Lang(Enum):
     ru = 'ru'
     en = 'en'
     be = 'be'
 
 
 class Rights(IntFlag):
-    view = auto()
-    edit = auto()
-    notifying = auto()
+    view = 1
+    edit = 2
+    notifying = 3
 
 
-class Department(StrEnum):
-    atf = auto()
-    fgde = auto()
-    msf = auto()
-    mtf = auto()
-    fmmp = auto()
-    ef = auto()
-    fitr = auto()
-    ftug = auto()
-    ipf = auto()
-    fes = auto()
-    af = auto()
-    sf = auto()
-    psf = auto()
-    ftk = auto()
-    vtf = auto()
-    mido = auto()
+class Department(Enum):
+    atf = 'atf'
+    fgde = 'fgde'
+    msf = 'msf'
+    mtf = 'mtf'
+    fmmp = 'fmmp'
+    ef = 'ef'
+    fitr = 'fitr'
+    ftug = 'ftug'
+    ipf = 'ipf'
+    fes = 'fes'
+    af = 'af'
+    sf = 'sf'
+    psf = 'psf'
+    ftk = 'ftk'
+    vtf = 'vtf'
+    mido = 'mido'
 
 
 class Weekday(Enum):
@@ -57,7 +53,7 @@ class PType(Enum):
 connect(db='schedule_test')
 
 
-class Notifications(NotificationsModel, DynamicEmbeddedDocument):
+class Notifications(DynamicEmbeddedDocument):
     allowed = BooleanField()
     time = TimeField()
 
@@ -84,7 +80,7 @@ class User(UserModel, DynamicDocument):
     def __repr__(self):
         return f'{self.__class__.__name__}({self.site!r}, {self.uid})'
 
-    logger = bottex.utils.logging.get_logger('_user_class')
+    logger = logging.getLogger('_user_class')
 
     @classmethod
     def get_or_add(cls, site, uid):
@@ -108,21 +104,3 @@ class Lesson(DynamicDocument):
     teachers = ListField(StringField())
     building = StringField()
     auditories = ListField(StringField())
-
-
-class Groups(DynamicDocument):
-    meta = {'collection': 'groups'}
-
-    name = StringField()
-    department = EnumField(Department)
-    course = IntField()
-    speciality = StringField()
-
-
-class Teachers(DynamicDocument):
-    meta = {'collection': 'teachers'}
-
-    firstname = StringField()
-    lastname = StringField()
-    middlename = StringField()
-    department = StringField()

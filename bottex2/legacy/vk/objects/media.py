@@ -1,6 +1,6 @@
 import warnings
+from enum import Enum
 
-from bottex.utils.enums import LowerEnum, auto
 from bottex2.legacy.dict_schema import DictSchema, Attr
 
 
@@ -38,18 +38,18 @@ class Audio(DictSchema):
     no_search = Attr()
 
 
-class MediaTypes(LowerEnum):
-    audio = auto()
-    photo = auto()
-    video = auto()
-    document = auto()
-    link = auto()
-    market = auto()
-    market_album = auto()
-    wall = auto()
-    wall_reply = auto()
-    sticker = auto()
-    gift = auto()
+class MediaTypes(Enum):
+    audio = 'audio'
+    photo = 'photo'
+    video = 'video'
+    document = 'document'
+    link = 'link'
+    market = 'market'
+    market_album = 'market_album'
+    wall = 'wall'
+    wall_reply = 'wall_reply'
+    sticker = 'sticker'
+    gift = 'gift'
 
 
 media_parsers = {
@@ -60,8 +60,7 @@ media_parsers = {
 
 def parse_media(request: dict):
     media_name = request['type']
-    media = request[media_name]
-    media_type = MediaTypes[media_name]
+    media_type = request[media_name]
     try:
         media_parser = media_parsers[media_type]
     except KeyError:
