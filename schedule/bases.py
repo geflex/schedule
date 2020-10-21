@@ -1,9 +1,5 @@
 import datetime
 
-from bottex.views.links import ButtonLink
-from bottex.apis import Text
-from bottex.apis.keyboard import Color
-from bottex.utils.i18n import gettext as _
 from bottex2.legacy import regexp as re
 
 group_fmt = re.compile(r'\d{8}')
@@ -18,19 +14,19 @@ def str_time(t):
 
 class BackButton(ButtonLink):
     def __init__(self, callback, *, next_line=True):
-        super().__init__(_('Назад'), callback, Text(_('Переходим назад')), color=Color.WHITE, next_line=next_line)
+        super().__init__('Назад', callback, 'Переходим назад', color=Color.WHITE, next_line=next_line)
 
 
 class CancelButton(ButtonLink):
     def __init__(self, callback, *, next_line=True):
-        super().__init__(_('Отмена'), callback, Text(_('Отменяем')), color=Color.RED, next_line=next_line)
+        super().__init__('Отмена', callback, 'Отменяем', color=Color.RED, next_line=next_line)
 
 
 class NotChangeButton(ButtonLink):
     def __init__(self, callback, *, next_line=True):
-        super().__init__(_('Не менять'), callback, Text(_('Не меняем')), color=Color.WHITE, next_line=next_line)
+        super().__init__('Не менять', callback, 'Не меняем', color=Color.WHITE, next_line=next_line)
 
 
 class PassButton(ButtonLink):
     def __init__(self, callback, *, next_line=True):
-        super().__init__(_('Пропустить'), callback, Text(_('Пропускаем')), color=Color.WHITE, next_line=next_line)
+        super().__init__('Пропустить', callback, 'Пропускаем', color=Color.WHITE, next_line=next_line)
