@@ -28,8 +28,8 @@ def setup_user_model():
 
 def set_middlewares():
     bottex.add_handler_middleware(users.UserBottexHandlerMiddleware)
-    bottex.add_handler_middleware(loggers.LoggingBottexHandlerMiddleware)
-    bottex.add_chat_middleware(loggers.LoggingBottexChatMiddleware)
+    bottex.add_handler_middleware(loggers.BottexLoggingHandlerMiddleware)
+    bottex.add_chat_middleware(loggers.BottexLoggingChatMiddleware)
 
 
 if __name__ == '__main__':
