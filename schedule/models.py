@@ -1,7 +1,7 @@
-import logging
 from enum import Enum, IntFlag
+from typing import List
 
-from mongoengine import *
+from bottex2.databases.mongodb import MongoUser
 
 
 class Lang(Enum):
@@ -50,57 +50,31 @@ class PType(Enum):
     teacher = 1
 
 
-connect(db='schedule_test')
+class Notifications:
+    allowed: bool
+    time: 'time'
 
 
-class Notifications(DynamicEmbeddedDocument):
-    allowed = BooleanField()
-    time = TimeField()
+class User(MongoUser):
+    locale: str
+    notifications: Notifications
+    state: str
+    view_args: dict
+    rights: Rights
+
+    ptype = PType
+    name = str  # for teacher
+    group: str  # only for student
+    subgroup = str  # only for student
 
 
-class User(UserModel, DynamicDocument):
-    meta = {'collection': 'users'}
-
-    site = StringField()
-    uid = StringField()
-    locale = EnumField(Lang, default=Lang.ru)
-    notifications = EmbeddedDocumentField(
-        Notifications,
-        default=Notifications(allowed=False, time=None)
-    )
-    last_view = StringField(default='')
-    view_args = DictField()
-    rights = IntField(default=Rights.view)
-
-    ptype = EnumField(PType, default=PType.student)
-    name = StringField()  # for teacher
-    group = StringField()  # only for student
-    subgroup = StringField()  # only for student
-
-    def __repr__(self):
-        return f'{self.__class__.__name__}({self.site!r}, {self.uid})'
-
-    logger = logging.getLogger('_user_class')
-
-    @classmethod
-    def get_or_add(cls, site, uid):
-        user = cls.objects(site=site, uid=uid).first()
-        if user is None:
-            user = cls(site=site, uid=uid)
-            user.save()
-            cls.logger.debug(f'new user registered: {user}')
-        return user
-
-
-class Lesson(DynamicDocument):
-    meta = {'collection': 'lessons'}
-
-    group = StringField()
-    weeknum = IntField()
-    weekday = IntField()
-    subgroup = IntField()
-    time = StringField()
-    name = StringField()
-    teachers = ListField(StringField())
-    building = StringField()
-    auditories = ListField(StringField())
+class Lesson:
+    group: str
+    weeknum: int
+    weekday: int
+    subgroup: int
+    time: str
+    name: str
+    teachers: List[str]
+    building: str
+    auditories: List[str]

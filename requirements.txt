@@ -3,7 +3,6 @@ aiovk
 aiogram
 aiohttp
 pymongo
-mongoengine
 motor
 xlrd
 # retrying
