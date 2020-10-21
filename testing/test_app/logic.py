@@ -7,7 +7,7 @@ kb = Keyboard([
     [Button('1'), Button('2'), Button('3')],
     [Button('4'), Button('5'), Button('6')],
     [Button('7'), Button('8'), Button('9')],
-    [Button('*'), Button('0'), Button('#')],
+    [Button('send'), Button('stop')],
 ])
 
 
@@ -29,23 +29,23 @@ async def set_state(r: Request):
     await r.chat.send_message(f'hi, user {r.user.uid}', kb=kb)
 
 
-@router.register(text_cond('bug'))
+@router.register(text_cond('stop'))
 @request_handler
 async def bug(request: Request):
-    raise RuntimeError('bug!')
+    raise RuntimeError('stopped from user')
 
 
-@router.register(text_cond('lol'))
+@router.register(text_cond('send'))
 @request_handler
 async def bug(request: Request):
-    await request.chat.send_message('lol')
+    await request.chat.send_message('lol', kb)
 
 
 @router.register(any_cond([state_cond(s) for s in states]))
 @request_handler
 async def switch(r: Request):
     await r.user.update(state=states[r.user.state])
-    await r.chat.send_message(f'switched')
+    await r.chat.send_message(f'switched', kb)
     await send_settings(r)
 
 
@@ -54,4 +54,4 @@ async def send_settings(r: Request):
         f'id: {r.user.uid}',
         f'state: {r.user.state}',
     ])
-    await r.chat.send_message(text)
+    await r.chat.send_message(text, kb)
