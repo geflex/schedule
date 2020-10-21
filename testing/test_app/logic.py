@@ -3,6 +3,7 @@ from bottex2.router import Router, any_cond, text_cond
 from bottex2.chat import Keyboard, Button
 from bottex2.middlewares.users import state_cond
 
+
 kb = Keyboard([
     [Button('1'), Button('2'), Button('3')],
     [Button('4'), Button('5'), Button('6')],
@@ -18,30 +19,16 @@ states = {
 }
 
 
-router = Router()
-
-
-@router.set_default
 @request_handler
-async def set_state(r: Request):
-    state = next(iter(states))
-    await r.user.update(state=state)
-    await r.chat.send_message(f'hi, user {r.user.uid}', kb=kb)
-
-
-@router.register(text_cond('stop'))
-@request_handler
-async def bug(request: Request):
+async def stop(request: Request):
     raise RuntimeError('stopped from user')
 
 
-@router.register(text_cond('send'))
 @request_handler
-async def bug(request: Request):
+async def send(request: Request):
     await request.chat.send_message('lol', kb)
 
 
-@router.register(any_cond([state_cond(s) for s in states]))
 @request_handler
 async def switch(r: Request):
     await r.user.update(state=states[r.user.state])
@@ -55,3 +42,18 @@ async def send_settings(r: Request):
         f'state: {r.user.state}',
     ])
     await r.chat.send_message(text, kb)
+
+
+router = Router({
+    text_cond('send'): send,
+    text_cond('stop'): stop,
+    any_cond([state_cond(s) for s in states]): switch,
+})
+
+
+@router.set_default
+@request_handler
+async def set_state(r: Request):
+    state = next(iter(states))
+    await r.user.update(state=state)
+    await r.chat.send_message(f'hi, user {r.user.uid}', kb=kb)
