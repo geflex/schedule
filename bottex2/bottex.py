@@ -54,33 +54,30 @@ class Bottex(Receiver):
         super().__init__()
         self._receivers = set(receivers)  # type: Set[Receiver]
 
-    def _add_handler_middleware(self,
-                                receiver: Receiver,
-                                middleware: Type[BottexHandlerMiddleware]):
+    def _get_submiddleware(self, receiver: Receiver, middleware: Type[BottexMiddleware]):
         submiddleware = middleware.get_middleware(type(receiver))
         if submiddleware is middleware:
             warnings.warn(f'No {middleware.__name__} specified for '
                           f'{type(receiver).__name__}')
-        receiver.add_handler_middleware(submiddleware)
-
-    def _add_chat_middleware(self,
-                             receiver: Receiver,
-                             middleware: Type[BottexChatMiddleware]):
-        submiddleware = middleware.get_middleware(type(receiver))
-        if submiddleware is middleware:
-            warnings.warn(f'No {middleware.__name__} specified for '
-                          f'{type(receiver).__name__}')
-        receiver.add_chat_middleware(submiddleware)
+        return submiddleware
 
     def add_handler_middleware(self, middleware: Type[BottexHandlerMiddleware]):
         super().add_handler_middleware(middleware)
         for receiver in self._receivers:
-            self._add_handler_middleware(receiver, middleware)
+            submiddleware = self._get_submiddleware(receiver, middleware)
+            receiver.add_handler_middleware(submiddleware)
 
     def add_chat_middleware(self, middleware: Type[BottexChatMiddleware]):
         super().add_chat_middleware(middleware)
         for receiver in self._receivers:
-            self._add_chat_middleware(receiver, middleware)
+            submiddleware = self._get_submiddleware(receiver, middleware)
+            receiver.add_chat_middleware(submiddleware)
+
+    def add_middleware(self, middleware: Type[BottexMiddleware]):
+        if issubclass(middleware, BottexHandlerMiddleware):
+            self.add_handler_middleware(middleware)
+        if issubclass(middleware, BottexChatMiddleware):
+            self.add_chat_middleware(middleware)
 
     def add_receiver(self, receiver: Receiver):
         self._receivers.add(receiver)
