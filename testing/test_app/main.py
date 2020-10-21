@@ -27,13 +27,13 @@ def setup_user_model():
 
 
 def set_middlewares():
-    bottex.add_handler_middleware(users.UserBottexHandlerMiddleware)
-    bottex.add_handler_middleware(loggers.BottexLoggingHandlerMiddleware)
-    bottex.add_chat_middleware(loggers.BottexLoggingChatMiddleware)
+    bottex.add_middleware(users.UserBottexHandlerMiddleware)
+    bottex.add_middleware(loggers.BottexLoggingHandlerMiddleware)
+    bottex.add_middleware(loggers.BottexLoggingChatMiddleware)
 
 
 if __name__ == '__main__':
+    logging.basicConfig(level=logging.INFO)
     setup_user_model()
     set_middlewares()
-    logging.basicConfig(level=logging.INFO)
     bottex.serve_forever()
