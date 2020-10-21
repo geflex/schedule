@@ -13,35 +13,27 @@ Condition = Callable[..., bool]
 
 
 class Router(Handler):
-    def __init__(self):
+    def __init__(self, routes: MutableMapping[Condition, Handler] = None):
         super().__init__()
         self.default = None  # type: Optional[Handler]
-        self._handlers = {}  # type: MutableMapping[Condition, Handler]
-
-    def __repr__(self):
-        return f'{self.__class__.__name__}(default={self.default}, {self._handlers})'
+        self.routes = routes or {}
 
     def set_default(self, handler: Handler) -> Handler:
         check_handler(handler)
         self.default = handler
         return handler
 
-    def get(self, condition: Condition) -> 'Router':
-        check_condition(condition)
-        # noinspection PyTypeChecker
-        return self._handlers.setdefault(condition, Router())
-
     def register(self, *conditions: Optional[Condition]):
-        """It's too hard to explain correctly what this method does"""
+        """Decorator to register handler for described conditions"""
         router = self
         for condition in conditions:
-            router = router.get(condition)
+            router = router.routes[condition]
         return router.set_default
 
     def find_handler(self, **params) -> Handler:
-        """Searches and returns handler matching registered conditions."""
+        """Searches and returns handler matching registered conditions"""
         handler = self.default
-        for cond, h in self._handlers.items():
+        for cond, h in self.routes.items():
             if cond(**params):
                 handler = h
                 break
@@ -52,6 +44,9 @@ class Router(Handler):
     async def __call__(self, **params):
         handler = self.find_handler(**params)
         await handler(**params)
+
+    def __repr__(self):
+        return f'{self.__class__.__name__}(default={self.default}, {self.routes})'
 
 
 def text_cond(s: str) -> Condition:
