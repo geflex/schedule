@@ -86,7 +86,7 @@ class BaseArea:
         self.parse()
 
     @classmethod
-    def init_from(cls, area: 'BaseArea'):
+    def init_from(cls, area: 'BaseArea') -> 'BaseArea':
         """Инициализирует объект класса, копируя основные свойства area"""
         obj = cls(area.start, area.end, area._cells)
         obj._text = area._text
@@ -203,7 +203,7 @@ class LessonArea(BaseArea):
         self._doc_id = collection.insert_one(doc)
 
     def parse(self):
-        self.name = None  # строка, которая останется после парсинга
+        self.name = None  # строка, которая останется после удаления совпадений
         self.groups = []  # номера групп
         self.subgroup = None  # номер подгруппы
         self.weekday = None  # день недели
@@ -350,26 +350,26 @@ class SheetParser(BaseSheetParser):
         self._curr_time = None
         self._curr_group = None
 
-    def _is_day(self, area):
-        return bottex2.router.text in WEEKDAYS
+    def _is_day(self, area: BaseArea):
+        return area.text in WEEKDAYS
 
-    def _is_time(self, area):
-        return re_fulltime.fullmatch(bottex2.router.text)
+    def _is_time(self, area: BaseArea):
+        return re_fulltime.fullmatch(area.text)
 
-    def _is_group(self, area):
-        return self._curr_header.end.y == area.end.y and re_group.match(bottex2.router.text)
+    def _is_group(self, area: BaseArea):
+        return self._curr_header.end.y == area.end.y and re_group.match(area.text)
 
-    def _is_title(self, area):
-        return self._curr_header.start.y == area.start.y and not re_group.match(bottex2.router.text)
+    def _is_title(self, area: BaseArea):
+        return self._curr_header.start.y == area.start.y and not re_group.match(area.text)
 
     def _set_lesson_group(self, lesson):
         """Добавляет все блоки групп, пересекающиеся с lesson по оси x"""
-        for group in self._group_areas:
-            if group.xintersects(lesson):
-                self._curr_group = group
-                lesson.groups.append(bottex2.router.text)
+        for group_area in self._group_areas:
+            if group_area.xintersects(lesson):
+                self._curr_group = group_area
+                lesson.groups.append(group_area.text)
 
-    def _set_lesson_subgroup(self, lesson):
+    def _set_lesson_subgroup(self, lesson: LessonArea):
         """Устанавливает номер подгруппы объекта lesson"""
         # если ни одна группа не определена, то и _curr_group, соответственно, тоже
         if lesson.groups:
@@ -382,18 +382,21 @@ class SheetParser(BaseSheetParser):
                 elif lesson.end.x == self._curr_group.end.x:
                     lesson.subgroup = 2
 
-    def _set_lesson_weekday(self, lesson):
+    def _set_lesson_weekday(self, lesson: LessonArea):
         """Устанавливает номер дня недели объекта lesson"""
         if self._curr_weekday:
-            wd = bottex2.router.text
+            wd = lesson.text
             lesson.weekday = WEEKDAYS.index(wd)
 
-    def _set_lesson_time(self, lesson):
-        """Устанавливает время начала занятия объекта lesson, если оно не было определено в тексте"""
+    def _set_lesson_time(self, lesson: LessonArea):
+        """
+        Устанавливает время начала занятия объекта lesson,
+        если оно не было определено в тексте
+        """
         if self._curr_time and not lesson.time:
             lesson.time = self._curr_time.tstart
 
-    def _set_lesson_weeknum(self, lesson):
+    def _set_lesson_weeknum(self, lesson: LessonArea):
         """Устанавливает номер недели объекта lesson"""
         if self._curr_time:
             if lesson.ylen() < self._curr_time.ylen():
@@ -425,7 +428,7 @@ class SheetParser(BaseSheetParser):
                     self._curr_time = area
 
                 else:
-                    lesson = LessonArea.init_from(area)  # создаем Lesson
+                    lesson = LessonArea.init_from(area)
                     # устанавливаем атрибуты, зависящие от положения ячейки
                     self._set_lesson_group(lesson)
                     self._set_lesson_weekday(lesson)
@@ -436,7 +439,7 @@ class SheetParser(BaseSheetParser):
 
 
 def bntu_books():
-    root = 'C:\\Users\\Lenovo\\PycharmProjects\\schedule\\data'  # папка с документами
+    root = '.\\schedule\\data'  # папка с документами
     paths = [  # Пути к документам
         '1krs_2sem_19-20.xls',
         '2krs_2sem_19-20.xls',
