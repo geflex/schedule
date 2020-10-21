@@ -22,10 +22,11 @@ router = Router()
 
 
 @router.set_default
-async def set_state(chat, user, **params):
+@request_handler
+async def set_state(r: Request):
     state = next(iter(states))
-    await user.update(state=state)
-    await chat.send_message(f'hi, user {user.uid}', kb=kb)
+    await r.user.update(state=state)
+    await r.chat.send_message(f'hi, user {r.user.uid}', kb=kb)
 
 
 @router.register(text_cond('bug'))
@@ -41,15 +42,16 @@ async def bug(request: Request):
 
 
 @router.register(any_cond([state_cond(s) for s in states]))
-async def switch(chat, user, **params):
-    await user.update(state=states[user.state])
-    await chat.send_message(f'switched')
-    await send_settings(chat=chat, user=user, **params)
+@request_handler
+async def switch(r: Request):
+    await r.user.update(state=states[r.user.state])
+    await r.chat.send_message(f'switched')
+    await send_settings(r)
 
 
-async def send_settings(chat, user, **params):
+async def send_settings(r: Request):
     text = '\n'.join([
-        f'id: {user.uid}',
-        f'state: {user.state}',
+        f'id: {r.user.uid}',
+        f'state: {r.user.state}',
     ])
-    await chat.send_message(text)
+    await r.chat.send_message(text)
