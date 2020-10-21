@@ -1,7 +1,8 @@
-from datetime import timedelta
+from datetime import timedelta, date
+from typing import List, Tuple
 
 from date_utils import Date
-from models import Lesson, PType
+from models import User, Lesson, PType
 
 
 class Formatter:
@@ -10,32 +11,28 @@ class Formatter:
     def str_lesson(self, lesson: Lesson):
         return f'{lesson.time} {lesson.auditories} к{lesson.building}\n{lesson.name}'
 
-    def format_day(self, db_objects):
+    def format_day(self, db_objects) -> str:
         lessons = []
         for lesson in db_objects:
             s = self.str_lesson(lesson)
             lessons.append(s)
         if not lessons:
-            return _('Занятий нет')
+            return 'Занятий нет'
         return self.splitter.join(lessons)
 
-    def format_week(self, db_objects):
+    def format_week(self, db_objects) -> List[str]:
         days = {}
         for lesson in db_objects:
             day = days.setdefault(lesson.weekday.name, [])
             day.append(lesson)
-        resp = Message()
+        response = []
         for day, lessons in days.items():
             day_str = f'> > > {day}{self.splitter}{self.format_day(lessons)}'
-            resp.append(Text(day_str))
-        return resp
+            response.append(day_str)
+        return response
 
 
-def _today():
-    return Date.today()
-
-
-def _course_start(dt):
+def course_start(dt: date) -> Date:
     year = dt.year if dt.month >= 9 else dt.year - 1
     first_sept = Date(year, 9, 1)
     if first_sept.weekday() == 6:
@@ -43,64 +40,49 @@ def _course_start(dt):
     return Date(year, 9, 1)
 
 
-def _weeknum(dt) -> int:
-    delta = dt - _course_start(dt)
+def get_week_num(dt: date) -> int:
+    delta = dt - course_start(dt)
     total_weeks = delta // timedelta(weeks=1)
     return total_weeks % 2 + 1
 
 
-def _weekday(dt):
-    return dt.weekday()
-
-
-def _week_range(dt):
+def get_week_range(dt: date) -> Tuple[date, date]:
     day_num = dt.weekday()
-    monday = dt - timedelta(days=day_num)
-    return monday, monday + timedelta(days=6)
+    monday_date = dt - timedelta(days=day_num)
+    next_monday_date = monday_date + timedelta(days=6)
+    return monday_date, next_monday_date
 
 
 def get_day_lessons(dt, **kwargs):
-    result = Lesson.objects(weekday=_weekday(dt),
-                            weeknum__in=[None, _weeknum(_today())],
+    result = Lesson.objects(weekday=dt.weekday(),
+                            weeknum__in=[None, get_week_num(Date.today())],
                             **kwargs)
     return result  # .order_by('time')
 
 
-def _day(dt, request):
-    if request.user.ptype == PType.student:
-        group, subgroup = request.user.group, request.user.subgroup
-        objects = get_day_lessons(dt, group=str(group),
-                                  subgroup__in=[None, subgroup])
-    else:
-        lastname = request.user.name
-        objects = get_day_lessons(dt, teacher=lastname)
-    result = Formatter().format_day(objects)
-
-
-def today_schedule(request):
-    return _day(_today(), request)
-
-
-def tomorrow_schedule(request):
-    dt = Date.today().days_incr(1)
-    return _day(dt, request)
-
-
-def get_week_lessons(weeknum, **kwargs):
-    result = Lesson.objects(weeknum__in=[None, weeknum], **kwargs)
+def get_week_lessons(week_num, **kwargs):
+    result = Lesson.objects(weeknum__in=[None, week_num], **kwargs)
     return result
 
 
-def _week(weeknum, request):
-    user = request.user
-
+def day_lessons_str(dt, user: User):
     if user.ptype == PType.student:
         group, subgroup = user.group, user.subgroup
-        objects = get_week_lessons(weeknum,
+        objects = get_day_lessons(dt, group=str(group),
+                                  subgroup__in=[None, subgroup])
+    else:
+        lastname = user.name
+        objects = get_day_lessons(dt, teacher=lastname)
+    return Formatter().format_day(objects)
+
+
+def week_lessons_str(week_num: int, user: User):
+    if user.ptype == PType.student:
+        group, subgroup = user.group, user.subgroup
+        objects = get_week_lessons(week_num,
                                    group=str(group),
                                    subgroup__in=[None, subgroup])
     else:
         teacher = user.name
-        objects = get_week_lessons(weeknum, teacher=teacher)
-    result = Formatter().format_week(objects)
-    return result
+        objects = get_week_lessons(week_num, teacher=teacher)
+    return Formatter().format_week(objects)
