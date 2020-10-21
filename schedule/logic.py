@@ -59,7 +59,7 @@ def _week_range(dt):
     return monday, monday + timedelta(days=6)
 
 
-def _db_day(dt, **kwargs):
+def get_day_lessons(dt, **kwargs):
     result = Lesson.objects(weekday=_weekday(dt),
                             weeknum__in=[None, _weeknum(_today())],
                             **kwargs)
@@ -69,13 +69,12 @@ def _db_day(dt, **kwargs):
 def _day(dt, request):
     if request.user.ptype == PType.student:
         group, subgroup = request.user.group, request.user.subgroup
-        objects = _db_day(dt, group=str(group),
-                          subgroup__in=[None, subgroup])
+        objects = get_day_lessons(dt, group=str(group),
+                                  subgroup__in=[None, subgroup])
     else:
         lastname = request.user.name
-        objects = _db_day(dt, teacher=lastname)
+        objects = get_day_lessons(dt, teacher=lastname)
     result = Formatter().format_day(objects)
-    return Text(result)
 
 
 def today_schedule(request):
@@ -83,38 +82,25 @@ def today_schedule(request):
 
 
 def tomorrow_schedule(request):
-    dt = _today().days_incr(1)
+    dt = Date.today().days_incr(1)
     return _day(dt, request)
 
 
-def _db_week(weeknum, **kwargs):
+def get_week_lessons(weeknum, **kwargs):
     result = Lesson.objects(weeknum__in=[None, weeknum], **kwargs)
     return result
 
 
 def _week(weeknum, request):
-    if request.user.ptype == PType.student:
-        group, subgroup = request.user.group, request.user.subgroup
-        objects = _db_week(weeknum,
-                           group=str(group),
-                           subgroup__in=[None, subgroup])
+    user = request.user
+
+    if user.ptype == PType.student:
+        group, subgroup = user.group, user.subgroup
+        objects = get_week_lessons(weeknum,
+                                   group=str(group),
+                                   subgroup__in=[None, subgroup])
     else:
-        teacher = request.user.name
-        objects = _db_week(weeknum, teacher=teacher)
+        teacher = user.name
+        objects = get_week_lessons(weeknum, teacher=teacher)
     result = Formatter().format_week(objects)
     return result
-
-
-def curr_week(request):
-    weeknum = _weeknum(_today())
-    return _week(weeknum, request)
-
-
-def next_week(request):
-    weeknum = _weeknum(_today()) + 1
-    return _week(weeknum, request)
-
-
-def week_num(request):
-    n = _weeknum(_today())
-    return Text(_(f'{n} неделя'))

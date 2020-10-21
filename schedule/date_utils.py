@@ -2,7 +2,7 @@ from datetime import time, date, timedelta
 
 
 class Time:
-    def __init__(self, t):
+    def __init__(self, t: time):
         self.time = t
 
     def str(self):

@@ -1,15 +1,16 @@
 from bottex.apis import Text, Color, Button
 
 import tests_.test_app.router
-from bottex.views import View, ButtonLink, InputLink, ReLink, viewclasses, AddLink
+from bottex.views import View, ButtonLink, InputLink, ReLink
 from bottex.utils.i18n import gettext as _
 from bottex.utils.functional import return_none
 
 
-from models import Lang, PType, Department, Groups
+from models import Lang, PType
 from bases import BackButton, NotChangeButton, group_fmt, time_fmt
 
-from logic import schedule, profile_settings
+from logic import profile_settings
+import logic
 
 
 def bool2onoff(value):
@@ -36,12 +37,12 @@ class MainView(BaseView):
     __viewname__ = 'main'
 
     links = [
-        ButtonLink(_('Сегодня'), schedule.today_schedule),
-        ButtonLink(_('Завтра'), schedule.tomorrow_schedule, next_line=False),
-        ButtonLink(_('Неделя'), schedule.curr_week),
-        ButtonLink(_('След. неделя'), schedule.next_week, next_line=False),
+        ButtonLink(_('Сегодня'), logic.today_schedule),
+        ButtonLink(_('Завтра'), logic.tomorrow_schedule, next_line=False),
+        ButtonLink(_('Неделя'), logic.curr_week),
+        ButtonLink(_('След. неделя'), logic.next_week, next_line=False),
 
-        ButtonLink(_('Какая неделя'), schedule.week_num),
+        ButtonLink(_('Какая неделя'), logic.week_num),
         ButtonLink(_('Настройки'), tests_.test_app.router.router.switch),
     ]
 
