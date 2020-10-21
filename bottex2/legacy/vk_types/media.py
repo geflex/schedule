@@ -1,10 +1,10 @@
 import warnings
 from enum import Enum
 
-from bottex2.legacy.dict_schema import DictSchema, Attr
+from bottex2.legacy.dict_parser import DictParser, Attr
 
 
-class Photo(DictSchema):
+class Photo(DictParser):
     """
     api version from 5.77
     https://vk.com/dev/objects/photo
@@ -20,7 +20,7 @@ class Photo(DictSchema):
     height = Attr()
 
 
-class Audio(DictSchema):
+class Audio(DictParser):
     """
     api version from 5.0
     https://vk.com/dev/objects/audio

@@ -1,18 +1,18 @@
 import warnings
 
-from bottex2.legacy.dict_schema import DictSchema, Attr
+from bottex2.legacy.dict_parser import DictParser, Attr
 
 from .basic import Message
 
 
-class ClientInfo(DictSchema):
+class ClientInfo(DictParser):
     button_actions = Attr()
     keyboard = Attr()
     inline_keyboard = Attr()
     lang_id = Attr()
 
 
-class MessageEvent(DictSchema):
+class MessageEvent(DictParser):
     message: Message = Attr()
     client_info: ClientInfo = Attr()
 

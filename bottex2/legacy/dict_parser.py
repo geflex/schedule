@@ -8,7 +8,7 @@ def dummy(value):
 noparser = dummy
 
 
-class DictSchema:
+class DictParser:
     __attrs__: List
 
     def __init__(self, obj: dict):

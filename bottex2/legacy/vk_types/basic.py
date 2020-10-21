@@ -1,16 +1,16 @@
 from datetime import datetime as dt
 
-from bottex2.legacy.dict_schema import DictSchema, Attr, Array
+from bottex2.legacy.dict_parser import DictParser, Attr, Array
 from bottex2.legacy.vk.objects import parse_media
 
 
-class Geo(DictSchema):
+class Geo(DictParser):
     type = Attr()
     coordinates = Attr()
     place = Attr()
 
 
-class Message(DictSchema):
+class Message(DictParser):
     """
     api version >= 5.80
     https://vk.com/dev/objects/message
