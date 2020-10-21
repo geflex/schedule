@@ -36,7 +36,6 @@ def bug(request):
 async def switch(chat, user, **params):
     await user.update(state=states[user.state])
     await chat.send_message(f'switched')
-    # await asyncio.sleep(2)
     await send_settings(chat=chat, user=user, **params)
 
 

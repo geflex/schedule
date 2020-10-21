@@ -1,3 +1,4 @@
+import logging
 import sys; sys.path.extend(['D:\\Documents\\Code\\Python\\schedule'])
 
 import motor.motor_asyncio
@@ -6,7 +7,7 @@ from bottex2.platforms.tg import TgReceiver
 from bottex2.platforms.vk import VkReceiver
 from bottex2.platforms.sock import SockReciever
 
-from bottex2.users import UserBottexHandlerMiddleware, set_user_model
+from bottex2 import users, loggers
 from bottex2.databases.mongodb import MongoUser
 from bottex2.bottex import Bottex
 
@@ -22,13 +23,19 @@ bottex.set_handler(logic.router)
 
 
 def setup_user_model():
-    set_user_model(MongoUser)
+    users.set_user_model(MongoUser)
     mongo = motor.motor_asyncio.AsyncIOMotorClient('localhost', 27017)
     MongoUser.set_collection(mongo.schedule_test.users)
-    bottex.add_handler_middleware(UserBottexHandlerMiddleware)
+
+
+def set_middlewares():
+    bottex.add_handler_middleware(users.UserBottexHandlerMiddleware)
+    bottex.add_handler_middleware(loggers.LoggingBottexHandlerMiddleware)
+    bottex.add_chat_middleware(loggers.LoggingBottexChatMiddleware)
 
 
 if __name__ == '__main__':
     setup_user_model()
-    # logging.basicConfig(level=logging.INFO)
+    set_middlewares()
+    logging.basicConfig(level=logging.INFO)
     bottex.serve_forever()
