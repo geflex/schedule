@@ -1,4 +1,4 @@
-import warnings
+import logging
 from functools import partial
 from typing import Type, Set, List, AsyncIterator, Dict, Optional
 
@@ -57,7 +57,7 @@ class Bottex(Receiver):
     def _get_submiddleware(self, receiver: Receiver, middleware: Type[BottexMiddleware]):
         submiddleware = middleware.get_middleware(type(receiver))
         if submiddleware is middleware:
-            warnings.warn(f'No {middleware.__name__} specified for '
+            logging.debug(f'No {middleware.__name__} specified for '
                           f'{type(receiver).__name__}')
         return submiddleware
 
@@ -82,9 +82,9 @@ class Bottex(Receiver):
     def add_receiver(self, receiver: Receiver):
         self._receivers.add(receiver)
         for middleware in self.handler_middlewares:
-            self._add_handler_middleware(receiver, middleware)
+            self.add_handler_middleware(receiver, middleware)
         for middleware in self.chat_middlewares:
-            self._add_chat_middleware(receiver, middleware)
+            self.add_chat_middleware(receiver, middleware)
 
     async def handle(self, __receiver__, **params):
         if __receiver__._handler is not None:
