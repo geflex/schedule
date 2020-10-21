@@ -1,3 +1,4 @@
+from bottex2.handler import request_handler, Request
 from bottex2.router import Router, any_cond, text_cond
 from bottex2.chat import Keyboard, Button
 from bottex2.middlewares.users import state_cond
@@ -28,8 +29,15 @@ async def set_state(chat, user, **params):
 
 
 @router.register(text_cond('bug'))
-def bug(request):
+@request_handler
+async def bug(request: Request):
     raise RuntimeError('bug!')
+
+
+@router.register(text_cond('lol'))
+@request_handler
+async def bug(request: Request):
+    await request.chat.send_message('lol')
 
 
 @router.register(any_cond([state_cond(s) for s in states]))

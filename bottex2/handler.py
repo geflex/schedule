@@ -7,8 +7,12 @@ from bottex2.chat import AbstractChat
 
 
 class Params(dict):
-    def __init__(self, *, text: str, chat: AbstractChat, raw: Any):
-        super().__init__(text=text, chat=chat, raw=raw)
+    text: str
+    chat: AbstractChat
+    raw: Any
+
+    def __init__(self, *, text: str, chat: AbstractChat, raw: Any, **params):
+        super().__init__(text=text, chat=chat, raw=raw, **params)
 
     def __getattr__(self, attr):
         return self[attr]
@@ -35,3 +39,17 @@ class HandlerMiddleware(Handler):
 
     async def __call__(self, **params):
         await self.handler(**params)
+
+
+class Request(Params):
+    pass
+
+
+RequestHandler = Callable[[Request], Awaitable]
+
+
+def request_handler(handler: RequestHandler) -> Handler:
+    async def wrapper(**params):
+        request = Request(**params)
+        await handler(request)
+    return wrapper
