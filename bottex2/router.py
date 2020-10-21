@@ -13,9 +13,11 @@ Condition = Callable[..., bool]
 
 
 class Router(Handler):
-    def __init__(self, routes: MutableMapping[Condition, Handler] = None):
+    def __init__(self,
+                 routes: MutableMapping[Condition, Handler] = None,
+                 default: Optional[Handler] = None):
         super().__init__()
-        self.default = None  # type: Optional[Handler]
+        self.default = default
         self.routes = routes or {}
 
     def set_default(self, handler: Handler) -> Handler:

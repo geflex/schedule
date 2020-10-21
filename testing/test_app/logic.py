@@ -44,16 +44,15 @@ async def send_settings(r: Request):
     await r.chat.send_message(text, kb)
 
 
-router = Router({
-    text_cond('send'): send,
-    text_cond('stop'): stop,
-    any_cond([state_cond(s) for s in states]): switch,
-})
-
-
-@router.set_default
 @request_handler
 async def set_state(r: Request):
     state = next(iter(states))
     await r.user.update(state=state)
     await r.chat.send_message(f'hi, user {r.user.uid}', kb=kb)
+
+
+router = Router({
+    text_cond('send'): send,
+    text_cond('stop'): stop,
+    any_cond([state_cond(s) for s in states]): switch,
+}, default=set_state)
