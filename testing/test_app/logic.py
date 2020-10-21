@@ -1,6 +1,6 @@
 from bottex2.router import Router, any_cond, text_cond
 from bottex2.chat import Keyboard, Button
-from bottex2.users import state_cond
+from bottex2.middlewares.users import state_cond
 
 kb = Keyboard([
     [Button('1'), Button('2'), Button('3')],

@@ -1,8 +1,8 @@
 import logging
 from typing import Optional
 
-from .bottex import BottexHandlerMiddleware, BottexChatMiddleware
-from .chat import Keyboard
+from bottex2.bottex import BottexHandlerMiddleware, BottexChatMiddleware
+from bottex2.chat import Keyboard
 
 
 class LoggingBottexHandlerMiddleware(BottexHandlerMiddleware):

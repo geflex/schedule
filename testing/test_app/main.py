@@ -1,13 +1,12 @@
-import logging
 import sys; sys.path.extend(['D:\\Documents\\Code\\Python\\schedule'])
+import logging
 
 import motor.motor_asyncio
 
 from bottex2.platforms.tg import TgReceiver
 from bottex2.platforms.vk import VkReceiver
-from bottex2.platforms.sock import SockReciever
 
-from bottex2 import users, loggers
+from bottex2.middlewares import loggers, users
 from bottex2.databases.mongodb import MongoUser
 from bottex2.bottex import Bottex
 
@@ -17,7 +16,6 @@ from testing.test_app import logic
 bottex = Bottex(
     TgReceiver('auth_data/tg.json'),
     VkReceiver('auth_data/vk.json'),
-    SockReciever(port='8888'),
 )
 bottex.set_handler(logic.router)
 

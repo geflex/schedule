@@ -12,7 +12,7 @@ from aiovk.longpoll import BotsLongPoll
 from bottex2.handler import Params, HandlerMiddleware
 from bottex2.chat import Chat, Keyboard
 from bottex2.receiver import Receiver
-from bottex2 import users
+from bottex2.middlewares import users
 
 
 class VkChat(Chat):

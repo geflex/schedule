@@ -2,7 +2,7 @@ from typing import Optional
 
 import motor.motor_asyncio
 
-from bottex2.users import AbstractUser
+from bottex2.middlewares.users import AbstractUser
 
 
 class MongoUser(AbstractUser):

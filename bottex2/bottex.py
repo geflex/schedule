@@ -5,7 +5,7 @@ from typing import Type, Set, List, AsyncIterator, Dict, Optional
 from bottex2 import aiotools
 from bottex2.chat import ChatMiddleware
 from bottex2.handler import Params, HandlerError, Handler, HandlerMiddleware
-from bottex2.middlewares import AbstractMiddleware
+from bottex2.middlewares.middlewares import AbstractMiddleware
 from bottex2.receiver import Receiver
 from bottex2.aiotools import merge_async_iterators
 
@@ -59,7 +59,7 @@ class Bottex(Receiver):
                                 middleware: Type[BottexHandlerMiddleware]):
         submiddleware = middleware.get_middleware(type(receiver))
         if submiddleware is middleware:
-            warnings.warn(f'No HandlerMiddleware specified for '
+            warnings.warn(f'No {middleware.__name__} specified for '
                           f'{type(receiver).__name__}')
         receiver.add_handler_middleware(submiddleware)
 
@@ -68,7 +68,7 @@ class Bottex(Receiver):
                              middleware: Type[BottexChatMiddleware]):
         submiddleware = middleware.get_middleware(type(receiver))
         if submiddleware is middleware:
-            warnings.warn(f'No ChatMiddleware specified for '
+            warnings.warn(f'No {middleware.__name__} specified for '
                           f'{type(receiver).__name__}')
         receiver.add_chat_middleware(submiddleware)
 
