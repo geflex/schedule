@@ -1,10 +1,9 @@
 aiovk
-# aioviber
 aiogram
-aiohttp
-pymongo
+aiohttp  # installs with aio*
+pymongo  # installs with motor
+sqlalchemy
 motor
 xlrd
 # retrying
-# lazy-property
 # Babel
