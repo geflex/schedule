@@ -1,6 +1,7 @@
-/venv/
+/venvs/
 /.idea/
 /data/
 /testing/test_app/auth_data/
+/schedule/auth_data/
 bottex.svg
 RUN.BAT
