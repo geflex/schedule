@@ -52,12 +52,10 @@ class VkChat(Chat):
 
 
 class VkReceiver(Receiver):
-    def __init__(self, config_filename):
+    def __init__(self, token: str, group_id: str):
         super().__init__()
-        with open(config_filename) as f:
-            config = json.load(f)
-        self.session = TokenSession(access_token=config['token'])
-        self._longpoll = BotsLongPoll(self.session, mode=0, group_id=config['group_id'])
+        self.session = TokenSession(access_token=token)
+        self._longpoll = BotsLongPoll(self.session, mode=0, group_id=group_id)
 
     async def listen(self) -> AsyncIterator[Request]:
         while True:

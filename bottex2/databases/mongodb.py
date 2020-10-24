@@ -6,11 +6,12 @@ from bottex2.middlewares.users import AbstractUser
 
 
 class MongoUser(AbstractUser):
+    __tablename__: Optional[str] = None
     _collection: Optional[motor.motor_asyncio.AsyncIOMotorCollection] = None
 
     @classmethod
-    def set_collection(cls, collection: motor.motor_asyncio.AsyncIOMotorCollection):
-        cls._collection = collection
+    def set_db(cls, db: motor.motor_asyncio.AsyncIOMotorDatabase):
+        cls._collection = db[cls.__tablename__]
 
     @classmethod
     async def get(cls, platform, uid):

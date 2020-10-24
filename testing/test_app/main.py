@@ -1,7 +1,8 @@
 import sys; sys.path.extend(['D:\\Documents\\Code\\Python\\schedule'])
 import logging
+import json
 
-import motor.motor_asyncio
+from motor.motor_asyncio import AsyncIOMotorClient
 
 from bottex2.platforms.tg import TgReceiver
 from bottex2.platforms.vk import VkReceiver
@@ -13,17 +14,21 @@ from bottex2.bottex import Bottex
 from testing.test_app import logic
 
 
+tg_data = json.load(open('schedule/auth_data/tg.json'))
+vk_data = json.load(open('schedule/auth_data/vk.json'))
+
+
 bottex = Bottex(
-    TgReceiver('auth_data/tg.json'),
-    VkReceiver('auth_data/vk.json'),
+    TgReceiver(tg_data['token']),
+    VkReceiver(vk_data['token'], vk_data['group_id']),
 )
 bottex.set_handler(logic.router)
 
 
 def setup_user_model():
+    mongo = AsyncIOMotorClient('localhost', 27017)
+    MongoUser.set_db(mongo['schedule_test'])
     users.set_user_model(MongoUser)
-    mongo = motor.motor_asyncio.AsyncIOMotorClient('localhost', 27017)
-    MongoUser.set_collection(mongo.schedule_test.users)
 
 
 def set_middlewares():

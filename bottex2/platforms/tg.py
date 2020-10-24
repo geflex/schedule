@@ -43,11 +43,9 @@ class TgChat(Chat):
 
 
 class TgReceiver(Receiver):
-    def __init__(self, config_filename):
+    def __init__(self, token: str):
         super().__init__()
-        with open(config_filename) as f:
-            config = json.load(f)
-        self.bot = aiogram.Bot(config['token'])
+        self.bot = aiogram.Bot(token)
 
     async def listen(self) -> AsyncIterator[Request]:
         offset = None
