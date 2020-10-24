@@ -48,10 +48,10 @@ class SqlAalchemyUser(AbstractUser):
             user = _UserModel(uid=uid, platform=platform)
             user = cls.session.add(user)
             cls.session.commit()
-        return user
+        return cls(user)
 
-    async def update(self, state=None):
-        if state is not None:
-            self.user.state = state
-        self.session.add(self)
+    async def update(self, **kwargs):
+        for field, value in kwargs.items():
+            setattr(self.user, field, value)
+        self.session.add(self.user)
         self.session.commit()

@@ -12,7 +12,7 @@ class AbstractUser(ABC):
         pass
 
     @abstractmethod
-    async def update(self, state=None):
+    async def update(self, state=None, **params):
         pass
 
     @property
@@ -47,7 +47,7 @@ class TempUser(AbstractUser):
         self._uid = uid
         self._state = None
 
-    async def update(self, state=None):
+    async def update(self, state=None, **params):
         self._state = state
 
     @property
