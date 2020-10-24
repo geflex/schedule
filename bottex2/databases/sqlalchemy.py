@@ -14,6 +14,10 @@ def set_engine(engine):
     SqlAalchemyUser.session = Session()
 
 
+def create_tables(engine):
+    Base.metadata.create_all(engine)
+
+
 class _UserModel(Base):
     __tablename__ = 'users'
 
@@ -53,5 +57,4 @@ class SqlAalchemyUser(AbstractUser):
     async def update(self, **kwargs):
         for field, value in kwargs.items():
             setattr(self.user, field, value)
-        self.session.add(self.user)
         self.session.commit()

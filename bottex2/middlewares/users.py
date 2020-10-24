@@ -14,7 +14,7 @@ class AbstractUser(ABC):
         pass
 
     @abstractmethod
-    async def update(self, state=None, **kwargs):
+    async def update(self, **kwargs):
         pass
 
     @property
