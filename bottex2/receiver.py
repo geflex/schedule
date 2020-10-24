@@ -3,13 +3,13 @@ from typing import AsyncIterator, List, Type
 
 from bottex2 import aiotools
 from bottex2.chat import ChatMiddleware, AbstractChat
-from bottex2.handler import RequestHandler, HandlerMiddleware, Request
+from bottex2.handler import Handler, HandlerMiddleware, Request
 from bottex2.logging import logger
 
 
 class Receiver(ABC):
-    _handler: RequestHandler = None
-    _wrapped_handler: RequestHandler = None
+    _handler: Handler = None
+    _wrapped_handler: Handler = None
 
     def __init__(self):
         super().__init__()
@@ -28,12 +28,12 @@ class Receiver(ABC):
         self.handler_middlewares.append(middleware)
         self._wrapped_handler = middleware(self._wrapped_handler)
 
-    def wrap_handler(self, handler: RequestHandler):
+    def wrap_handler(self, handler: Handler):
         for middleware in self.handler_middlewares:
             handler = middleware(handler)
         return handler
 
-    def set_handler(self, handler: RequestHandler) -> RequestHandler:
+    def set_handler(self, handler: Handler) -> Handler:
         """
         Sets handler for this reseiver
         Can be used as a decorator

@@ -2,7 +2,7 @@ import re
 from typing import Optional, MutableMapping, Callable, Union, Pattern, Iterator
 
 from bottex2 import tools
-from bottex2.handler import RequestHandler, check_handler, HandlerError, Request
+from bottex2.handler import Handler, check_params_handler, HandlerError, Request
 from bottex2.logging import logger
 
 
@@ -13,18 +13,18 @@ class NoHandlerError(HandlerError):
 Condition = Callable[[Request], bool]
 
 
-class Router(RequestHandler):
+class Router(Handler):
     def __init__(self,
-                 routes: MutableMapping[Condition, RequestHandler] = None,
-                 default: Optional[RequestHandler] = None,
+                 routes: MutableMapping[Condition, Handler] = None,
+                 default: Optional[Handler] = None,
                  name: str = None):
         super().__init__()
         self.default = default
         self.routes = routes or {}
         self.__name__ = name
 
-    def set_default(self, handler: RequestHandler) -> RequestHandler:
-        check_handler(handler)
+    def set_default(self, handler: Handler) -> Handler:
+        check_params_handler(handler)
         self.default = handler
         return handler
 
@@ -35,7 +35,7 @@ class Router(RequestHandler):
             router = router.routes[condition]
         return router.set_default
 
-    def find_handler(self, request: Request) -> RequestHandler:
+    def find_handler(self, request: Request) -> Handler:
         """Searches and returns handler matching registered conditions"""
         handler = self.default
         for cond, h in self.routes.items():

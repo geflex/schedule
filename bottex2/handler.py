@@ -17,14 +17,14 @@ class Params(dict):
         return self[attr]
 
 
-Handler = Callable[..., Awaitable]
+ParamsHandler = Callable[..., Awaitable]
 
 
 class HandlerError(Exception):
     pass
 
 
-def check_handler(handler: Handler):
+def check_params_handler(handler: ParamsHandler):
     if not callable(handler):
         raise TypeError('Handler must be callable')
     sig = inspect.signature(handler)
@@ -36,23 +36,23 @@ class Request(Params):
         return Request(**self)
 
 
-RequestHandler = Callable[[Request], Awaitable]
+Handler = Callable[[Request], Awaitable]
 
 
-def request_handler(handler: RequestHandler) -> Handler:
+def request_handler(handler: Handler) -> ParamsHandler:
     """Back capability"""
     return handler
 
 
-def params_handler(handler: Handler) -> RequestHandler:
+def params_handler(handler: ParamsHandler) -> Handler:
     @functools.wraps(handler)
     async def wrapper(request):
         await handler(**request)
     return wrapper
 
 
-class HandlerMiddleware(RequestHandler):
-    def __init__(self, handler: RequestHandler):
+class HandlerMiddleware(Handler):
+    def __init__(self, handler: Handler):
         self.handler = handler
 
     async def __call__(self, request):

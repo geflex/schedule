@@ -4,7 +4,7 @@ from typing import Type, Set, List, AsyncIterator, Dict, Optional
 
 from bottex2 import aiotools
 from bottex2.chat import ChatMiddleware
-from bottex2.handler import HandlerError, RequestHandler, HandlerMiddleware, Request
+from bottex2.handler import HandlerError, Handler, HandlerMiddleware, Request
 from bottex2.middlewares.middlewares import AbstractMiddleware
 from bottex2.receiver import Receiver
 from bottex2.aiotools import merge_async_iterators
@@ -44,7 +44,7 @@ class BottexChatMiddleware(BottexMiddleware, ChatMiddleware):
 
 class ReceiverRequest(Request):
     __receiver__: Receiver
-    __handler__: RequestHandler
+    __handler__: Handler
 
 
 class Bottex(Receiver):
