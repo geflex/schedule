@@ -1,16 +1,5 @@
-from bottex.apis import Text, Color, Button
-
-import tests_.test_app.router
-from bottex.views import View, ButtonLink, InputLink, ReLink
-from bottex.utils.i18n import gettext as _
-from bottex.utils.functional import return_none
-
-
 from models import Lang, PType
 from bases import BackButton, NotChangeButton, group_fmt, time_fmt
-
-from logic import profile_settings
-import logic
 
 
 def bool2onoff(value):
@@ -24,26 +13,26 @@ def ifnot(val, res):
 
 
 class BaseView(View, isbase=True):
-    error = Text(_('ты что-то сломал'))
-    cannot_parse = Text(_('нипонял('))
+    error = 'ты что-то сломал'
+    cannot_parse = 'нипонял('
 
 
 class EndSetup(View, isbase=True):
-    success = Text(_('Ура! Всё настроили.\n'
-                     'Теперь ты можешь жмакать на кнопочки и смотреть расписание)'))
+    success = ('Ура! Всё настроили.\n'
+               'Теперь ты можешь жмакать на кнопочки и смотреть расписание)')
 
 
 class MainView(BaseView):
     __viewname__ = 'main'
 
     links = [
-        ButtonLink(_('Сегодня'), logic.today_schedule),
-        ButtonLink(_('Завтра'), logic.tomorrow_schedule, next_line=False),
-        ButtonLink(_('Неделя'), logic.curr_week),
-        ButtonLink(_('След. неделя'), logic.next_week, next_line=False),
+        ('Сегодня'),
+        ('Завтра', next_line=False),
+        ('Неделя'),
+        ('След. неделя', next_line=False),
 
-        ButtonLink(_('Какая неделя'), logic.week_num),
-        ButtonLink(_('Настройки'), tests_.test_app.router.router.switch),
+        ('Какая неделя'),
+        ('Настройки'),
     ]
 
 
@@ -135,8 +124,8 @@ class SettingsView(BaseView):
 
 class LanguageSettings(BaseView):
     __viewname__ = 'language_settings'
-    hello = Text(_('Выбери язык из списка ниже'))
-    success = Text(_('Язык установили'))
+    hello = 'Выбери язык из списка ниже'
+    success = 'Язык установили'
 
     links = []
     for lang in Lang:
@@ -150,12 +139,12 @@ class LanguageSettings(BaseView):
 
 class GroupSetter(BaseView):
     __viewname__ = 'group_setter'
-    hello = Text(_('Введи номер своей группы'))
-    cannot_parse = Text(_('Номер группы должен состоять из восьми цифр'))
-    success = Text(_('Группу установили'))
+    hello = 'Введи номер своей группы'
+    cannot_parse = 'Номер группы должен состоять из восьми цифр'
+    success = 'Группу установили'
 
     basic_input = ReLink(group_fmt, profile_settings.set_group, success, SettingsView.switch)
-    idontknow = Button(_('Не знаю номер группы('))
+    idontknow = Button('Не знаю номер группы(')
     links = [
         idontknow,
         NotChangeButton(SettingsView.switch),
@@ -194,21 +183,21 @@ class StartSubgroupSetter(SubgroupSetter, EndSetup):
 
 class TimeSetter(BaseView):
     __viewname__ = 'time_setter'
-    hello = Text(_('Введи время с клавиатуры или жмакни нужную кнопочку'))
-    success = Text(_('Время установили'))
-    cannot_parse = Text(_('С форматом проблемка('))
+    hello = _('Введи время с клавиатуры или жмакни нужную кнопочку')
+    success = _('Время установили')
+    cannot_parse = _('С форматом проблемка(')
     links = [
-        Button(_('10:00')),
-        Button(_('11:00'), next_line=False),
-        Button(_('12:00'), next_line=False),
+        Button('10:00'),
+        Button('11:00'), next_line=False),
+        Button('12:00'), next_line=False),
 
-        Button(_('14:00')),
-        Button(_('15:00'), next_line=False),
-        Button(_('16:00'), next_line=False),
+        Button('14:00'),
+        Button('15:00'), next_line=False),
+        Button('16:00'), next_line=False),
 
-        Button(_('18:00')),
-        Button(_('19:00'), next_line=False),
-        Button(_('20:00'), next_line=False),
+        Button('18:00'),
+        Button('19:00'), next_line=False),
+        Button('20:00'), next_line=False),
 
         NotChangeButton(SettingsView.switch),
 
@@ -218,8 +207,8 @@ class TimeSetter(BaseView):
 
 class NameSetter(BaseView):
     __viewname__ = 'name_setter'
-    hello = Text(_('Введи свою фамилию с клавиатуры'))
-    success = Text(_('Фамилию установили'))
+    hello = _('Введи свою фамилию с клавиатуры'))
+    success = _('Фамилию установили'))
     links = [
         NotChangeButton(SettingsView.switch),
         InputLink(profile_settings.set_fio, success, SettingsView.switch)
@@ -228,7 +217,7 @@ class NameSetter(BaseView):
 
 class StartNameSetter(NameSetter, EndSetup):
     __viewname__ = 'start_name_setter'
-    hello = Text(_('Теперь введи с клавиатуры свою фамилию'))
+    hello = _('Теперь введи с клавиатуры свою фамилию')
     success = EndSetup.success
     links = [
         InputLink(profile_settings.set_fio, success, MainView.switch)
@@ -237,8 +226,8 @@ class StartNameSetter(NameSetter, EndSetup):
 
 class StartProfileTypeSetter(BaseView):
     __viewname__ = 'start_profile_type_setter'
-    hello = Text(_('Выбери тип профиля'))
-    success = Text(_('Так, тип профиля установили'))
+    hello = _('Выбери тип профиля')
+    success = _('Так, тип профиля установили')
     links = [
         ButtonLink(_('Студент'), profile_settings.ptype_setter(PType.student), success, StartGroupSetter.switch),
         ButtonLink(_('Преподаватель'), profile_settings.ptype_setter(PType.teacher), success, StartNameSetter.switch),
@@ -247,8 +236,8 @@ class StartProfileTypeSetter(BaseView):
 
 class StartView(BaseView):
     __viewname__ = 'start'
-    success = Text(_('Привет! Чтобы все заработало, сначала нужно кое-что настроить '
-                     '(все это можно будет поменять позже в настройках)'))
+    success = _('Привет! Чтобы все заработало, сначала нужно кое-что настроить '
+                '(все это можно будет поменять позже в настройках)')
     links = [
         InputLink(return_none, success, StartProfileTypeSetter.switch),
     ]
