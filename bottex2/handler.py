@@ -39,11 +39,6 @@ class Request(Params):
 Handler = Callable[[Request], Awaitable]
 
 
-def request_handler(handler: Handler) -> ParamsHandler:
-    """Back capability"""
-    return handler
-
-
 def params_handler(handler: ParamsHandler) -> Handler:
     @functools.wraps(handler)
     async def wrapper(request):

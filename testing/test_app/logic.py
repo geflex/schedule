@@ -1,4 +1,4 @@
-from bottex2.handler import request_handler, Request
+from bottex2.handler import Request
 from bottex2.router import Router, any_cond, text_cond
 from bottex2.chat import Keyboard, Button
 from bottex2.middlewares.users import state_cond
@@ -19,17 +19,14 @@ states = {
 }
 
 
-@request_handler
 async def stop(request: Request):
     raise RuntimeError('stopped from user')
 
 
-@request_handler
 async def send(request: Request):
     await request.chat.send_message('lol', kb)
 
 
-@request_handler
 async def switch(r: Request):
     await r.user.update(state=states[r.user.state])
     await r.chat.send_message(f'switched', kb)
@@ -44,7 +41,6 @@ async def send_settings(r: Request):
     await r.chat.send_message(text, kb)
 
 
-@request_handler
 async def set_state(r: Request):
     state = next(iter(states))
     await r.user.update(state=state)

@@ -1,11 +1,10 @@
-from bottex2.handler import request_handler, Request
+from bottex2.handler import Request
 from bottex2.router import Router, text_cond
 from bottex2.middlewares.users import gen_conds
 from bottex2.chat import Keyboard, Button
 from schedule import models
 
 
-@request_handler
 async def init_user(r: Request):
     await r.user.update(state=ptype_input.__name__)
     await r.chat.send_message('Привет! Сначала нужно кое-что настроить '
@@ -14,21 +13,18 @@ async def init_user(r: Request):
     await r.chat.send_message('Сначала выбери тип профиля', kb=kb)
 
 
-@request_handler
 async def student_ptype_input(r: Request):
     await r.user.update(ptype=models.PType.student)
     await r.user.update(state=group_input.__name__)
     await r.chat.send_message('Окей, теперь введи номер своей группы')
 
 
-@request_handler
 async def teacher_ptype_input(r: Request):
     await r.user.update(ptype=models.PType.teacher)
     await r.user.update(state=fio_input.__name__)
     await r.chat.send_message('Хорошо, теперь введите свои ФИО')
 
 
-@request_handler
 async def profile_type_error(r: Request):
     await r.chat.send_message('Непонятный тип профиля(\nПопробуй еще разок')
 
@@ -39,19 +35,16 @@ ptype_input = Router({
 }, default=profile_type_error, name='ptype_input')
 
 
-@request_handler
 async def group_input(r: Request):
     await r.user.update(group=r.text, state=schedule.__name__)
     await r.chat.send_message('Ура, все настроили')
 
 
-@request_handler
 async def fio_input(r: Request):
     await r.user.update(fio=r.text, state=schedule.__name__)
     await r.chat.send_message('Ура, все настроили')
 
 
-@request_handler
 async def schedule_main(r: Request):
     await r.chat.send_message('упс пака')
     await r.user.update(state='')
