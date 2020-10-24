@@ -5,18 +5,6 @@ from typing import Awaitable, Any, Callable
 from bottex2.chat import AbstractChat
 
 
-class Params(dict):
-    text: str
-    chat: AbstractChat
-    raw: Any
-
-    def __init__(self, *, text: str, chat: AbstractChat, raw: Any, **params):
-        super().__init__(text=text, chat=chat, raw=raw, **params)
-
-    def __getattr__(self, attr):
-        return self[attr]
-
-
 ParamsHandler = Callable[..., Awaitable]
 
 
@@ -31,7 +19,17 @@ def check_params_handler(handler: ParamsHandler):
     # !!! Refactor this
 
 
-class Request(Params):
+class Request(dict):
+    text: str
+    chat: AbstractChat
+    raw: Any
+
+    def __init__(self, *, text: str, chat: AbstractChat, raw: Any, **params):
+        super().__init__(text=text, chat=chat, raw=raw, **params)
+
+    def __getattr__(self, attr):
+        return self[attr]
+
     def copy(self):
         return Request(**self)
 
