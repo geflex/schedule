@@ -1,4 +1,3 @@
-import warnings
 from enum import Enum
 
 from bottex2.legacy.dict_parser import DictParser, Attr
@@ -64,6 +63,5 @@ def parse_media(request: dict):
     try:
         media_parser = media_parsers[media_type]
     except KeyError:
-        warnings.warn(f'Parser for media type {media_name!r} does not exist')
         return media_type, media
     return media_type, media_parser(media)

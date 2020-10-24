@@ -1,10 +1,10 @@
-import warnings
 from abc import ABC, abstractmethod
 from typing import AsyncIterator, List, Type
 
 from bottex2 import aiotools
 from bottex2.chat import ChatMiddleware, AbstractChat
 from bottex2.handler import Handler, Params, HandlerMiddleware
+from bottex2.logging import logger
 
 
 class Receiver(ABC):
@@ -49,9 +49,9 @@ class Receiver(ABC):
 
     def _check(self):
         if self._handler is None:
-            warnings.warn('Attribute `_handler` was not set. '
-                          'You must call `set_handler` or override '
-                          '`_handler` in a subclass.')
+            logger.warning('Attribute `_handler` was not set. '
+                           'You must call `set_handler` or override '
+                           '`_handler` in a subclass.')
 
     async def serve_async(self):
         """

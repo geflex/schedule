@@ -1,9 +1,9 @@
 import inspect
-import warnings
 from typing import Awaitable, Any, Callable
 
 from bottex2 import tools
 from bottex2.chat import AbstractChat
+from bottex2.logging import logger
 
 
 class Params(dict):
@@ -30,7 +30,7 @@ def check_handler(handler: Handler):
         raise TypeError('Handler must be callable')
     sig = inspect.signature(handler)
     if not tools.have_kwargs_parameter(handler):
-        warnings.warn('Handler must have a **kwargs parameter')
+        logger.warning('Handler must have a **kwargs parameter')
 
 
 class HandlerMiddleware(Handler):

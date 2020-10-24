@@ -1,5 +1,3 @@
-import warnings
-
 from bottex2.legacy.dict_parser import DictParser, Attr
 
 from .basic import Message
@@ -30,6 +28,5 @@ def parse_event(request: dict):
     try:
         obj_parser = event_parsers[event_name]
     except KeyError:
-        warnings.warn(f'Parser for event {event_name!r} does not exist')
         return event_name, obj
     return event_name, obj_parser(obj)
