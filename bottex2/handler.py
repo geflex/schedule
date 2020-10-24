@@ -3,20 +3,11 @@ import inspect
 from typing import Awaitable, Any, Callable
 
 from bottex2.chat import AbstractChat
-
-
-ParamsHandler = Callable[..., Awaitable]
+from bottex2.logging import logger
 
 
 class HandlerError(Exception):
     pass
-
-
-def check_params_handler(handler: ParamsHandler):
-    if not callable(handler):
-        raise TypeError('Handler must be callable')
-    sig = inspect.signature(handler)
-    # !!! Refactor this
 
 
 class Request(dict):
@@ -37,11 +28,12 @@ class Request(dict):
 Handler = Callable[[Request], Awaitable]
 
 
-def params_handler(handler: ParamsHandler) -> Handler:
-    @functools.wraps(handler)
-    async def wrapper(request):
-        await handler(**request)
-    return wrapper
+def check_handler(handler: Handler):
+    if not callable(handler):
+        raise TypeError('Handler must be callable')
+    sig = inspect.signature(handler)
+    if len(sig.parameters) > 1:
+        logger.warning('Handler must accept only one argument')
 
 
 class HandlerMiddleware(Handler):
@@ -50,3 +42,13 @@ class HandlerMiddleware(Handler):
 
     async def __call__(self, request):
         await self.handler(request)
+
+
+ParamsHandler = Callable[..., Awaitable]
+
+
+def params_handler(handler: ParamsHandler) -> Handler:
+    @functools.wraps(handler)
+    async def wrapper(request):
+        await handler(**request)
+    return wrapper
