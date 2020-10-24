@@ -1,5 +1,6 @@
 from abc import abstractmethod, ABC
-from typing import Type
+from typing import Type, List
+from types import FunctionType
 
 from bottex2.router import Condition
 from bottex2.bottex import BottexHandlerMiddleware
@@ -81,3 +82,7 @@ def state_cond(st: str) -> Condition:
     def cond(user: AbstractUser, **params) -> bool:
         return user.state == st
     return cond
+
+
+def gen_conds(routes: List[FunctionType]):
+    return {state_cond(func.__name__): func for func in routes}
