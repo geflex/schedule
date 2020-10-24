@@ -1,20 +1,17 @@
 from bottex2.handler import request_handler, Request
 from bottex2.router import Router, text_cond
 from bottex2.middlewares.users import gen_conds
+from bottex2.chat import Keyboard, Button
 from schedule import models
 
 
 @request_handler
-async def init_user(request: Request):
-    await request.user.update(state=hello.__name__)
-    await request.chat.send_message('user was initialised')
-
-
-@request_handler
-async def hello(r: Request):
+async def init_user(r: Request):
     await r.user.update(state=ptype_input.__name__)
-    await r.chat.send_message('Привет! Чтобы все заработало, сначала нужно кое-что настроить '
+    await r.chat.send_message('Привет! Сначала нужно кое-что настроить '
                               '(все это можно будет поменять позже в настройках)')
+    kb = Keyboard([[Button('Студент'), Button('Препод')]])
+    await r.chat.send_message('Сначала выбери тип профиля', kb=kb)
 
 
 @request_handler
@@ -57,7 +54,7 @@ async def fio_input(r: Request):
 @request_handler
 async def schedule_main(r: Request):
     await r.chat.send_message('упс пака')
-    await r.user.update(state=None)
+    await r.user.update(state='')
 
 
 schedule = Router({}, default=schedule_main)
