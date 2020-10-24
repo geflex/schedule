@@ -2,6 +2,7 @@ from abc import abstractmethod, ABC
 from typing import Type, List
 from types import FunctionType
 
+from bottex2.handler import Request
 from bottex2.router import Condition
 from bottex2.bottex import BottexHandlerMiddleware
 
@@ -13,7 +14,7 @@ class AbstractUser(ABC):
         pass
 
     @abstractmethod
-    async def update(self, state=None, **params):
+    async def update(self, state=None, **kwargs):
         pass
 
     @property
@@ -48,7 +49,7 @@ class TempUser(AbstractUser):
         self._uid = uid
         self._state = None
 
-    async def update(self, state=None, **params):
+    async def update(self, state=None, **kwargs):
         self._state = state
 
     @property
@@ -65,9 +66,9 @@ class TempUser(AbstractUser):
 
 
 class UserBottexHandlerMiddleware(BottexHandlerMiddleware):
-    async def __call__(self, **params):
-        user = await user_model.get(None, 'guest')
-        await self.handler(user=user, **params)
+    async def __call__(self, request: Request):
+        request.user = await user_model.get(None, 'guest')
+        await self.handler(request)
 
 
 user_model: Type[AbstractUser] = TempUser
@@ -79,8 +80,8 @@ def set_user_model(cls):
 
 
 def state_cond(st: str) -> Condition:
-    def cond(user: AbstractUser, **params) -> bool:
-        return user.state == st
+    def cond(request: Request) -> bool:
+        return request.user.state == st
     return cond
 
 

@@ -5,7 +5,7 @@ from dataclasses import dataclass
 from typing import AsyncIterator, Optional
 
 from bottex2.middlewares import users
-from bottex2.handler import Params, HandlerMiddleware
+from bottex2.handler import HandlerMiddleware, Request
 from bottex2.receiver import Receiver
 from bottex2.chat import Chat, Keyboard
 
@@ -39,17 +39,17 @@ class PyReceiver(Receiver):
     def recv_nowait(self, obj: PyMessage):
         self._queue.put_nowait(obj)
 
-    async def listen(self) -> AsyncIterator[Params]:
+    async def listen(self) -> AsyncIterator[Request]:
         while True:
             message = await self._queue.get()
             chat = PyChat(message.queue, self._queue, message.response_id)
-            yield Params(text=message.text,
-                         chat=self.wrap_chat(chat),
-                         raw=message)
+            yield Request(text=message.text,
+                          chat=self.wrap_chat(chat),
+                          raw=message)
 
 
 @users.UserBottexHandlerMiddleware.submiddleware(PyReceiver)
 class PyUserHandlerMiddleware(HandlerMiddleware):
-    async def __call__(self, raw: PyMessage, **params):
-        user = await users.user_model.get('py', 'default')
-        await self.handler(user=user, raw=raw, **params)
+    async def __call__(self, request: Request):
+        request.user = await users.user_model.get('py', 'default')
+        await self.handler(request)

@@ -28,9 +28,9 @@ class MongoUser(AbstractUser):
     def __init__(self, obj):
         self._obj = obj
 
-    async def update(self, **params):
-        await self._collection.update_one(self._obj, {'$set': params})
-        self._obj.update(params)
+    async def update(self, **kwargs):
+        await self._collection.update_one(self._obj, {'$set': kwargs})
+        self._obj.update(kwargs)
 
     @property
     def platform(self):

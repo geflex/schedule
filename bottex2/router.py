@@ -2,27 +2,28 @@ import re
 from typing import Optional, MutableMapping, Callable, Union, Pattern, Iterator
 
 from bottex2 import tools
-from bottex2.handler import Handler, check_handler, HandlerError
+from bottex2.handler import RequestHandler, check_handler, HandlerError, Request
+from bottex2.logging import logger
 
 
 class NoHandlerError(HandlerError):
     pass
 
 
-Condition = Callable[..., bool]
+Condition = Callable[[Request], bool]
 
 
-class Router(Handler):
+class Router(RequestHandler):
     def __init__(self,
-                 routes: MutableMapping[Condition, Handler] = None,
-                 default: Optional[Handler] = None,
+                 routes: MutableMapping[Condition, RequestHandler] = None,
+                 default: Optional[RequestHandler] = None,
                  name: str = None):
         super().__init__()
         self.default = default
         self.routes = routes or {}
         self.__name__ = name
 
-    def set_default(self, handler: Handler) -> Handler:
+    def set_default(self, handler: RequestHandler) -> RequestHandler:
         check_handler(handler)
         self.default = handler
         return handler
@@ -34,48 +35,48 @@ class Router(Handler):
             router = router.routes[condition]
         return router.set_default
 
-    def find_handler(self, **params) -> Handler:
+    def find_handler(self, request: Request) -> RequestHandler:
         """Searches and returns handler matching registered conditions"""
         handler = self.default
         for cond, h in self.routes.items():
-            if cond(**params):
+            if cond(request):
                 handler = h
                 break
         if handler is None:
             raise NoHandlerError
         return handler
 
-    async def __call__(self, **params):
-        handler = self.find_handler(**params)
-        await handler(**params)
+    async def __call__(self, request: Request):
+        handler = self.find_handler(request)
+        await handler(request)
 
     def __repr__(self):
         return f'{self.__class__.__name__}(default={self.default}, {self.routes})'
 
 
 def text_cond(s: str) -> Condition:
-    def cond(text: str, **params) -> bool:
-        return text.lower() == s.lower()
+    def cond(request: Request) -> bool:
+        return request.text.lower() == s.lower()
     return cond
 
 
 def regexp_cond(exp: Union[str, Pattern]) -> Condition:
     exp = re.compile(exp)
-    def cond(text: str, **params) -> bool:
-        m = exp.match(text.lower(), re.I)
+    def cond(request: Request) -> bool:
+        m = exp.match(request.text.lower(), re.I)
         return bool(m)
     return cond
 
 
 def words_cond(*wds: str) -> Condition:
-    def cond(text: str, **params) -> bool:
-        return text.lower() in wds
+    def cond(request: Request) -> bool:
+        return request.text.lower() in wds
     return cond
 
 
 def any_cond(conditions: Iterator[Condition]) -> Condition:
-    def cond(**params):
-        return any(c(**params) for c in conditions)
+    def cond(request: Request):
+        return any(c(request) for c in conditions)
     return cond
 
 
@@ -83,4 +84,4 @@ def check_condition(condition: Condition):
     if not callable(condition):
         raise TypeError('`Condition` must be callable')
     if not tools.have_kwargs_parameter(condition):
-        raise ValueError('`Condition` must have a **kwargs parameter')
+        logger.warning('`Condition` must have a **kwargs parameter')

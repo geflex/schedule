@@ -4,7 +4,7 @@ import asyncio
 
 from bottex2 import aiotools
 from bottex2.chat import Chat, Keyboard
-from bottex2.handler import Params
+from bottex2.handler import Request
 from bottex2.receiver import Receiver
 
 
@@ -43,12 +43,12 @@ class SockReciever(Receiver):
                 pass
             self._queue.put_nowait((writer, data))
 
-    async def listen(self) -> AsyncIterator[Params]:
+    async def listen(self) -> AsyncIterator[Request]:
         server = await asyncio.start_server(self._callback, self._host, self._port)
         aiotools.create_task(server.serve_forever())
         while True:
             event, writer = await self._queue.get()
             chat = SockChat(writer)
-            yield Params(text=event,
-                         chat=self.wrap_chat(chat),
-                         raw=event)
+            yield Request(text=event,
+                          chat=self.wrap_chat(chat),
+                          raw=event)

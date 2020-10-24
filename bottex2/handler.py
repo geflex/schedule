@@ -1,9 +1,8 @@
+import functools
 import inspect
 from typing import Awaitable, Any, Callable
 
-from bottex2 import tools
 from bottex2.chat import AbstractChat
-from bottex2.logging import logger
 
 
 class Params(dict):
@@ -29,27 +28,32 @@ def check_handler(handler: Handler):
     if not callable(handler):
         raise TypeError('Handler must be callable')
     sig = inspect.signature(handler)
-    if not tools.have_kwargs_parameter(handler):
-        logger.warning('Handler must have a **kwargs parameter')
-
-
-class HandlerMiddleware(Handler):
-    def __init__(self, handler: Handler):
-        self.handler = handler
-
-    async def __call__(self, **params):
-        await self.handler(**params)
+    # !!! Refactor this
 
 
 class Request(Params):
-    pass
+    def copy(self):
+        return Request(**self)
 
 
 RequestHandler = Callable[[Request], Awaitable]
 
 
 def request_handler(handler: RequestHandler) -> Handler:
-    async def wrapper(**params):
-        request = Request(**params)
-        await handler(request)
+    """Back capability"""
+    return handler
+
+
+def params_handler(handler: Handler) -> RequestHandler:
+    @functools.wraps(handler)
+    async def wrapper(request):
+        await handler(**request)
     return wrapper
+
+
+class HandlerMiddleware(RequestHandler):
+    def __init__(self, handler: RequestHandler):
+        self.handler = handler
+
+    async def __call__(self, request):
+        await self.handler(request)

@@ -3,13 +3,13 @@ from typing import AsyncIterator, List, Type
 
 from bottex2 import aiotools
 from bottex2.chat import ChatMiddleware, AbstractChat
-from bottex2.handler import Handler, Params, HandlerMiddleware
+from bottex2.handler import RequestHandler, HandlerMiddleware, Request
 from bottex2.logging import logger
 
 
 class Receiver(ABC):
-    _handler: Handler = None
-    _wrapped_handler: Handler = None
+    _handler: RequestHandler = None
+    _wrapped_handler: RequestHandler = None
 
     def __init__(self):
         super().__init__()
@@ -28,12 +28,12 @@ class Receiver(ABC):
         self.handler_middlewares.append(middleware)
         self._wrapped_handler = middleware(self._wrapped_handler)
 
-    def wrap_handler(self, handler: Handler):
+    def wrap_handler(self, handler: RequestHandler):
         for middleware in self.handler_middlewares:
             handler = middleware(handler)
         return handler
 
-    def set_handler(self, handler: Handler) -> Handler:
+    def set_handler(self, handler: RequestHandler) -> RequestHandler:
         """
         Sets handler for this reseiver
         Can be used as a decorator
@@ -43,7 +43,7 @@ class Receiver(ABC):
         return handler
 
     @abstractmethod
-    async def listen(self) -> AsyncIterator[Params]:
+    async def listen(self) -> AsyncIterator[Request]:
         """Recieves and yields events"""
         yield
 
@@ -59,9 +59,9 @@ class Receiver(ABC):
         Also uses middlewares for process events.
         """
         self._check()
-        async for params in self.listen():
+        async for request in self.listen():
             handler = self._wrapped_handler
-            coro = handler(**params)
+            coro = handler(request)
             aiotools.create_task(coro)
 
     def serve_forever(self):

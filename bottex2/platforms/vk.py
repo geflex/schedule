@@ -9,7 +9,7 @@ from aiovk import API
 from aiovk.sessions import BaseSession, TokenSession
 from aiovk.longpoll import BotsLongPoll
 
-from bottex2.handler import Params, HandlerMiddleware
+from bottex2.handler import HandlerMiddleware, Request
 from bottex2.chat import Chat, Keyboard
 from bottex2.receiver import Receiver
 from bottex2.middlewares import users
@@ -59,7 +59,7 @@ class VkReceiver(Receiver):
         self.session = TokenSession(access_token=config['token'])
         self._longpoll = BotsLongPoll(self.session, mode=0, group_id=config['group_id'])
 
-    async def listen(self) -> AsyncIterator[Params]:
+    async def listen(self) -> AsyncIterator[Request]:
         while True:
             try:
                 response = await self._longpoll.wait(need_pts=True)
@@ -70,14 +70,14 @@ class VkReceiver(Receiver):
                 if event['type'] == 'message_new':
                     message = event['object']['message']
                     chat = VkChat(self.session, message['peer_id'])
-                    yield Params(text=message['text'],
-                                 chat=self.wrap_chat(chat),
-                                 raw=event)
+                    yield Request(text=message['text'],
+                                  chat=self.wrap_chat(chat),
+                                  raw=event)
 
 
 @users.UserBottexHandlerMiddleware.submiddleware(VkReceiver)
 class VkUserHandlerMiddleware(HandlerMiddleware):
-    async def __call__(self, raw: dict, **params):
-        uid = raw['object']['message']['from_id']
-        user = await users.user_model.get('vk', uid)
-        await self.handler(user=user, raw=raw, **params)
+    async def __call__(self, request: Request):
+        uid = request.raw['object']['message']['from_id']
+        request.user = await users.user_model.get('vk', uid)
+        await self.handler(request)

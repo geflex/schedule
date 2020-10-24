@@ -5,7 +5,7 @@ from typing import Optional, AsyncIterator
 
 import aiogram
 
-from bottex2.handler import Params, HandlerMiddleware
+from bottex2.handler import HandlerMiddleware, Request
 from bottex2.chat import Chat, Keyboard
 from bottex2.receiver import Receiver
 from bottex2.middlewares import users
@@ -49,7 +49,7 @@ class TgReceiver(Receiver):
             config = json.load(f)
         self.bot = aiogram.Bot(config['token'])
 
-    async def listen(self) -> AsyncIterator[Params]:
+    async def listen(self) -> AsyncIterator[Request]:
         offset = None
         while True:
             try:
@@ -61,14 +61,14 @@ class TgReceiver(Receiver):
                 for update in updates:
                     raw = update['message']
                     chat = TgChat(self.bot, raw['chat']['id'])
-                    yield Params(text=raw['text'],
-                                 chat=self.wrap_chat(chat),
-                                 raw=raw)
+                    yield Request(text=raw['text'],
+                                  chat=self.wrap_chat(chat),
+                                  raw=raw)
 
 
 @users.UserBottexHandlerMiddleware.submiddleware(TgReceiver)
 class TgUserHandlerMiddleware(HandlerMiddleware):
-    async def __call__(self, raw: dict, **params):
-        uid = raw['from']['id']
-        user = await users.user_model.get('tg', uid)
-        await self.handler(user=user, raw=raw, **params)
+    async def __call__(self, request: Request):
+        uid = request.raw['from']['id']
+        request.user = await users.user_model.get('tg', uid)
+        await self.handler(request)

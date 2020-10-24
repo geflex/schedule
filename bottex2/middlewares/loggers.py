@@ -6,9 +6,9 @@ from bottex2.chat import Keyboard
 
 
 class BottexLoggingHandlerMiddleware(BottexHandlerMiddleware):
-    async def __call__(self, text, **params):
-        logging.info(f'received {text!r}')
-        await self.handler(text=text, **params)
+    async def __call__(self, request):
+        logging.info(f'received {request.text!r}')
+        await self.handler(request)
 
 
 class BottexLoggingChatMiddleware(BottexChatMiddleware):

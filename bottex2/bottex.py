@@ -4,7 +4,7 @@ from typing import Type, Set, List, AsyncIterator, Dict, Optional
 
 from bottex2 import aiotools
 from bottex2.chat import ChatMiddleware
-from bottex2.handler import Params, HandlerError, Handler, HandlerMiddleware
+from bottex2.handler import HandlerError, RequestHandler, HandlerMiddleware, Request
 from bottex2.middlewares.middlewares import AbstractMiddleware
 from bottex2.receiver import Receiver
 from bottex2.aiotools import merge_async_iterators
@@ -42,9 +42,9 @@ class BottexChatMiddleware(BottexMiddleware, ChatMiddleware):
     pass
 
 
-class ReceiverParams(Params):
+class ReceiverRequest(Request):
     __receiver__: Receiver
-    __handler__: Handler
+    __handler__: RequestHandler
 
 
 class Bottex(Receiver):
@@ -86,31 +86,32 @@ class Bottex(Receiver):
         for middleware in self.chat_middlewares:
             self.add_chat_middleware(receiver, middleware)
 
-    async def handle(self, __receiver__, **params):
-        if __receiver__._handler is not None:
+    async def handle(self, request: Request):
+        handler = request.__receiver__._handler
+        if handler is not None:
             try:
-                await __receiver__._handler(**params)
+                await handler(request)
                 return
             except HandlerError:  # !!! Maybe NoHandlerError?
                 pass
-        await self._handler(**params)
+        await self._handler(request)
 
-    async def wrap_receiver(self, receiver: Receiver) -> AsyncIterator[ReceiverParams]:
+    async def wrap_receiver(self, receiver: Receiver) -> AsyncIterator[ReceiverRequest]:
         handler = receiver.wrap_handler(self.handle)
-        async for params in receiver.listen():
-            params = params.copy()
-            params['__receiver__'] = receiver
-            params['__handler__'] = handler
-            yield params
+        async for request in receiver.listen():
+            request = request.copy()
+            request.__receiver__ = receiver
+            request.__handler__ = handler
+            yield request
 
-    async def listen(self) -> AsyncIterator[ReceiverParams]:
+    async def listen(self) -> AsyncIterator[ReceiverRequest]:
         aiters = [self.wrap_receiver(rcvr) for rcvr in self._receivers]
         async for message in merge_async_iterators(aiters):
             yield message
 
     async def serve_async(self):
         self._check()
-        async for params in self.listen():
-            handler = params['__handler__']
-            coro = handler(**params)
+        async for request in self.listen():
+            handler = request.__handler__
+            coro = handler(request)
             aiotools.create_task(coro)
