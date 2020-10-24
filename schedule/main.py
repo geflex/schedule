@@ -12,12 +12,14 @@ from bottex2.databases.mongodb import MongoUser
 from bottex2.databases.sqlalchemy import SqlAalchemyUser, set_engine, Base
 from bottex2.bottex import Bottex
 
+from schedule import logic
+
 
 bottex = Bottex(
     TgReceiver('auth_data/tg.json'),
     VkReceiver('auth_data/vk.json'),
 )
-# bottex.set_handler(logic)
+bottex.set_handler(logic.main)
 
 
 def set_mongo_user_model():

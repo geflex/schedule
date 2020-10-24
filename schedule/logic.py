@@ -1,88 +1,71 @@
-from datetime import timedelta, date
-from typing import List, Tuple
-
-from date_utils import Date
-from models import User, Lesson, PType
-
-
-class Formatter:
-    splitter = '\n' + '='*28 + '\n'
-
-    def str_lesson(self, lesson: Lesson):
-        return f'{lesson.time} {lesson.auditories} к{lesson.building}\n{lesson.name}'
-
-    def format_day(self, db_objects) -> str:
-        lessons = []
-        for lesson in db_objects:
-            s = self.str_lesson(lesson)
-            lessons.append(s)
-        if not lessons:
-            return 'Занятий нет'
-        return self.splitter.join(lessons)
-
-    def format_week(self, db_objects) -> List[str]:
-        days = {}
-        for lesson in db_objects:
-            day = days.setdefault(lesson.weekday.name, [])
-            day.append(lesson)
-        response = []
-        for day, lessons in days.items():
-            day_str = f'> > > {day}{self.splitter}{self.format_day(lessons)}'
-            response.append(day_str)
-        return response
+from bottex2.handler import request_handler, Request
+from bottex2.router import Router, text_cond
+from bottex2.middlewares.users import gen_conds
+from schedule import models
 
 
-def course_start(dt: date) -> Date:
-    year = dt.year if dt.month >= 9 else dt.year - 1
-    first_sept = Date(year, 9, 1)
-    if first_sept.weekday() == 6:
-        return Date(year, 9, 2)
-    return Date(year, 9, 1)
+@request_handler
+async def init_user(request: Request):
+    await request.user.update(state=hello.__name__)
+    await request.chat.send_message('user was initialised')
 
 
-def get_week_num(dt: date) -> int:
-    delta = dt - course_start(dt)
-    total_weeks = delta // timedelta(weeks=1)
-    return total_weeks % 2 + 1
+@request_handler
+async def hello(r: Request):
+    await r.user.update(state=ptype_input.__name__)
+    await r.chat.send_message('Привет! Чтобы все заработало, сначала нужно кое-что настроить '
+                              '(все это можно будет поменять позже в настройках)')
 
 
-def get_week_range(dt: date) -> Tuple[date, date]:
-    day_num = dt.weekday()
-    monday_date = dt - timedelta(days=day_num)
-    next_monday_date = monday_date + timedelta(days=6)
-    return monday_date, next_monday_date
+@request_handler
+async def student_ptype_input(r: Request):
+    await r.user.update(ptype=models.PType.student)
+    await r.user.update(state=group_input.__name__)
+    await r.chat.send_message('Окей, теперь введи номер своей группы')
 
 
-def get_day_lessons(dt, **kwargs):
-    result = Lesson.objects(weekday=dt.weekday(),
-                            weeknum__in=[None, get_week_num(Date.today())],
-                            **kwargs)
-    return result  # .order_by('time')
+@request_handler
+async def teacher_ptype_input(r: Request):
+    await r.user.update(ptype=models.PType.teacher)
+    await r.user.update(state=fio_input.__name__)
+    await r.chat.send_message('Хорошо, теперь введите свои ФИО')
 
 
-def get_week_lessons(week_num, **kwargs):
-    result = Lesson.objects(weeknum__in=[None, week_num], **kwargs)
-    return result
+@request_handler
+async def profile_type_error(r: Request):
+    await r.chat.send_message('Непонятный тип профиля(\nПопробуй еще разок')
 
 
-def day_lessons_str(dt, user: User):
-    if user.ptype == PType.student:
-        group, subgroup = user.group, user.subgroup
-        objects = get_day_lessons(dt, group=str(group),
-                                  subgroup__in=[None, subgroup])
-    else:
-        lastname = user.name
-        objects = get_day_lessons(dt, teacher=lastname)
-    return Formatter().format_day(objects)
+ptype_input = Router({
+    text_cond('студент'): student_ptype_input,
+    text_cond('препод'): teacher_ptype_input,
+}, default=profile_type_error, name='ptype_input')
 
 
-def week_lessons_str(week_num: int, user: User):
-    if user.ptype == PType.student:
-        group, subgroup = user.group, user.subgroup
-        objects = get_week_lessons(week_num,
-                                   group=str(group),
-                                   subgroup__in=[None, subgroup])
-    else:
-        teacher = user.name
-        objects = get_week_lessons(week_num, teacher=teacher)
-    return Formatter().format_week(objects)
+@request_handler
+async def group_input(r: Request):
+    await r.user.update(group=r.text, state=schedule.__name__)
+    await r.chat.send_message('Ура, все настроили')
+
+
+@request_handler
+async def fio_input(r: Request):
+    await r.user.update(fio=r.text, state=schedule.__name__)
+    await r.chat.send_message('Ура, все настроили')
+
+
+@request_handler
+async def schedule_main(r: Request):
+    await r.chat.send_message('упс пака')
+    await r.user.update(state=None)
+
+
+schedule = Router({}, default=schedule_main)
+
+
+main = Router(gen_conds([
+        ptype_input,
+        group_input,
+        fio_input,
+        schedule,
+     ]), default=init_user)
