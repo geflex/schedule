@@ -47,10 +47,10 @@ async def fio_input(r: Request):
 
 async def schedule_main(r: Request):
     await r.chat.send_message('упс пака')
-    await r.user.update(state='')
+    await r.user.update(state=None)
 
 
-schedule = Router({}, default=schedule_main)
+schedule = Router({}, default=schedule_main, name='schedule')
 
 
 main = Router(gen_conds([

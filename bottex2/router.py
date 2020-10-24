@@ -21,7 +21,8 @@ class Router(Handler):
         super().__init__()
         self.default = default
         self.routes = routes or {}
-        self.__name__ = name
+        if name:
+            self.__name__ = name
 
     def set_default(self, handler: Handler) -> Handler:
         check_params_handler(handler)
