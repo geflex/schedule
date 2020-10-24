@@ -1,4 +1,3 @@
-import sys; sys.path.extend(['D:\\Documents\\Code\\Python\\schedule'])
 import logging
 
 import motor.motor_asyncio as motor_asyncio
@@ -16,8 +15,8 @@ from schedule import logic
 
 
 bottex = Bottex(
-    TgReceiver('auth_data/tg.json'),
-    VkReceiver('auth_data/vk.json'),
+    TgReceiver('schedule/auth_data/tg.json'),
+    VkReceiver('schedule/auth_data/vk.json'),
 )
 bottex.set_handler(logic.main)
 
@@ -30,7 +29,7 @@ def set_mongo_user_model():
 
 def set_sql_user_model():
     addr = 'geflex.mysql.pythonanywhere-services.com'
-    engine = create_engine('sqlite:///./foo.db')  # pool_recycle=280)
+    engine = create_engine('sqlite:///./schedule/foo.db')  # pool_recycle=280)
     sql.create_tables(engine)
     sql.set_engine(engine)
     users.set_user_model(sql.SqlAalchemyUser)
