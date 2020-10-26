@@ -2,6 +2,7 @@ import sys
 from random import randint
 import json
 import aiohttp
+from aiohttp import web
 from typing import Union, Optional, AsyncIterator
 import asyncio
 
@@ -10,12 +11,12 @@ from aiovk.sessions import BaseSession, TokenSession
 from aiovk.longpoll import BotsLongPoll
 
 from bottex2.handler import HandlerMiddleware, Request
-from bottex2.chat import Chat, Keyboard
+from bottex2.chat import AbstractChat, Keyboard
 from bottex2.receiver import Receiver
 from bottex2.middlewares import users
 
 
-class VkChat(Chat):
+class VkChat(AbstractChat):
     def __init__(self, session: BaseSession, peer_id: Union[int, str]):
         super().__init__()
         self._api = API(session)

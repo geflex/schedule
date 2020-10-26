@@ -42,10 +42,6 @@ class AbstractChat(ABC):
         pass
 
 
-class Chat(AbstractChat, ABC):
-    pass
-
-
 class ChatMiddleware(AbstractChat):
     def __init__(self, chat: AbstractChat):
         self.chat = chat

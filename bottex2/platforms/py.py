@@ -7,7 +7,7 @@ from typing import AsyncIterator, Optional
 from bottex2.middlewares import users
 from bottex2.handler import HandlerMiddleware, Request
 from bottex2.receiver import Receiver
-from bottex2.chat import Chat, Keyboard
+from bottex2.chat import AbstractChat, Keyboard
 
 
 @dataclass
@@ -17,7 +17,7 @@ class PyMessage:
     response_id: int = None
 
 
-class PyChat(Chat):
+class PyChat(AbstractChat):
     def __init__(self, callback_queue, recv_queue, message_id):
         self._callback_queue = callback_queue  # type: asyncio.Queue[PyMessage]
         self._recv_queue = recv_queue  # type: asyncio.Queue[PyMessage]

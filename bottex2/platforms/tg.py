@@ -1,4 +1,3 @@
-import json
 import aiohttp
 import asyncio
 from typing import Optional, AsyncIterator
@@ -6,12 +5,12 @@ from typing import Optional, AsyncIterator
 import aiogram
 
 from bottex2.handler import HandlerMiddleware, Request
-from bottex2.chat import Chat, Keyboard
+from bottex2.chat import AbstractChat, Keyboard
 from bottex2.receiver import Receiver
 from bottex2.middlewares import users
 
 
-class TgChat(Chat):
+class TgChat(AbstractChat):
     def __init__(self, bot: aiogram.Bot, chat_id):
         self.chat_id = chat_id
         self.bot = bot

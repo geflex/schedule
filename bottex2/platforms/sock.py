@@ -3,7 +3,7 @@ from typing import AsyncIterator, Optional
 import asyncio
 
 from bottex2 import aiotools
-from bottex2.chat import Chat, Keyboard
+from bottex2.chat import AbstractChat, Keyboard
 from bottex2.handler import Request
 from bottex2.receiver import Receiver
 
@@ -12,7 +12,7 @@ def utf_bytes(s):
     return bytes(s, 'utf-8')
 
 
-class SockChat(Chat):
+class SockChat(AbstractChat):
     async def send_message(self,
                            text: Optional[str] = None,
                            kb: Optional[Keyboard] = None):
