@@ -11,7 +11,7 @@ from bottex2.middlewares import loggers, users
 from bottex2.databases.mongodb import MongoUser
 from bottex2.bottex import Bottex
 
-from testing.test_app import logic
+from test_app import logic
 
 
 tg_data = json.load(open('schedule/auth_data/tg.json'))

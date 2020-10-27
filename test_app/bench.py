@@ -8,8 +8,8 @@ from typing import Union, List
 from bottex2.platforms.py import PyMessage, PyReceiver, PyUserHandlerMiddleware
 from bottex2 import aiotools
 
-from testing.test_app import logic
-from testing.test_app.main import setup_user_model
+from test_app import logic
+from test_app.main import setup_user_model
 
 
 def rps(repeats, t):
