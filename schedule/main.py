@@ -1,11 +1,8 @@
-import json
 import logging
 
 from motor.motor_asyncio import AsyncIOMotorClient
 from sqlalchemy import create_engine
 
-from bottex2.platforms.tg import TgReceiver
-from bottex2.platforms.vk import VkReceiver
 from bottex2.platforms.tg_webhook import TgWebHookReceiver
 
 from bottex2.middlewares import loggers, users
@@ -14,15 +11,10 @@ from bottex2.databases import sqlalchemy as sql
 from bottex2.bottex import Bottex
 
 from schedule import logic
-
-
-tg_data = json.load(open('schedule/auth_data/tg.json'))
-vk_data = json.load(open('schedule/auth_data/vk.json'))
+from test_app.main import tg_data
 
 
 bottex = Bottex(
-    # TgReceiver(tg_data['token']),
-    # VkReceiver(vk_data['token'], vk_data['group_id']),
     TgWebHookReceiver(tg_data['token'],
                       host='localhost',
                       port=3001,
@@ -40,7 +32,7 @@ def set_mongo_user_model():
 
 def set_sql_user_model():
     # addr = 'geflex.mysql.pythonanywhere-services.com'
-    engine = create_engine('sqlite:///./schedule/foo.db')  # pool_recycle=280)
+    engine = create_engine('sqlite:///./schedule/schedule.db')  # pool_recycle=280)
     sql.create_tables(engine)
     sql.set_engine(engine)
     users.set_user_model(sql.SqlAalchemyUser)
