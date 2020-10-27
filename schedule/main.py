@@ -6,6 +6,7 @@ from sqlalchemy import create_engine
 
 from bottex2.platforms.tg import TgReceiver
 from bottex2.platforms.vk import VkReceiver
+from bottex2.platforms.tg_webhook import TgWebHookReceiver
 
 from bottex2.middlewares import loggers, users
 from bottex2.databases.mongodb import MongoUser
@@ -20,14 +21,19 @@ vk_data = json.load(open('schedule/auth_data/vk.json'))
 
 
 bottex = Bottex(
-    TgReceiver(tg_data['token']),
-    VkReceiver(vk_data['token'], vk_data['group_id']),
+    # TgReceiver(tg_data['token']),
+    # VkReceiver(vk_data['token'], vk_data['group_id']),
+    TgWebHookReceiver(tg_data['token'],
+                      host='localhost',
+                      port=3001,
+                      path='/tg',
+                      sslfile='ssl/tg/vkapi.crt')
 )
 bottex.set_handler(logic.main)
 
 
 def set_mongo_user_model():
-    mongo = AsyncIOMotorClient('localhost', 27017)
+    mongo = AsyncIOMotorClient('127.0.0.1', 27017)
     MongoUser.set_db(mongo.schedule_test)
     users.set_user_model(MongoUser)
 
@@ -47,7 +53,7 @@ def set_middlewares():
 
 
 if __name__ == '__main__':
-    logging.basicConfig(level=logging.INFO)
+    logging.basicConfig(level=logging.DEBUG)
     set_sql_user_model()
     set_middlewares()
     bottex.serve_forever()

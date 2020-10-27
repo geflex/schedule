@@ -8,18 +8,13 @@ from bottex2.handler import Request
 from bottex2.receiver import Receiver
 
 
-def utf_bytes(s):
-    return bytes(s, 'utf-8')
-
-
 class SockChat(AbstractChat):
     async def send_message(self,
                            text: Optional[str] = None,
                            kb: Optional[Keyboard] = None):
         sep, sym = '\n\r', '| '
         text = sym + text.replace('\n', sep+sym) + sep
-        b = utf_bytes(text)
-        self._writer.write(b)
+        self._writer.write(text.encode())
 
     def __init__(self, writer: asyncio.StreamWriter):
         self._writer = writer
