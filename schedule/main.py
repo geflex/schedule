@@ -16,15 +16,17 @@ from schedule import logic
 from test_app.main import tg_config, vk_config
 
 
-bottex = Bottex(
-    TgReceiver(**tg_config),
-    VkReceiver(**vk_config),
-    TgWebHookReceiver(**tg_config,
-                      host='localhost',
-                      port=3001,
-                      sslfile='ssl/tg/vkapi.crt')
-)
-bottex.set_handler(logic.main)
+def get_bottex():
+    bottex = Bottex(
+        TgReceiver(**tg_config),
+        VkReceiver(**vk_config),
+        TgWebHookReceiver(**tg_config,
+                          host='localhost',
+                          port=3001,
+                          sslfile='ssl/tg/vkapi.crt')
+    )
+    bottex.set_handler(logic.main)
+    return bottex
 
 
 def set_mongo_user_model():
@@ -41,14 +43,19 @@ def set_sql_user_model():
     users.set_user_model(sql.SqlAalchemyUser)
 
 
-def set_middlewares():
+def set_middlewares(bottex):
     bottex.add_middleware(users.UserBottexHandlerMiddleware)
     bottex.add_middleware(loggers.BottexLoggingHandlerMiddleware)
     bottex.add_middleware(loggers.BottexLoggingChatMiddleware)
 
 
+def main():
+    set_sql_user_model()
+    bottex = get_bottex()
+    set_middlewares(bottex)
+    bottex.serve_forever()
+
+
 if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG)
-    set_sql_user_model()
-    set_middlewares()
-    bottex.serve_forever()
+    main()

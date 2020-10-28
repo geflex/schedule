@@ -18,27 +18,34 @@ tg_config = json.load(open('test_app/auth_data/tg.json'))
 vk_config = json.load(open('test_app/auth_data/vk.json'))
 
 
-bottex = Bottex(
-    TgReceiver(**tg_config),
-    VkReceiver(**vk_config),
-)
-bottex.set_handler(logic.router)
+def get_bottex():
+    bottex = Bottex(
+        TgReceiver(**tg_config),
+        VkReceiver(**vk_config),
+    )
+    bottex.set_handler(logic.router)
+    return bottex
 
 
-def setup_user_model():
+def set_mongo_user_model():
     mongo = AsyncIOMotorClient('localhost', 27017)
     MongoUser.set_db(mongo['schedule_test'])
     users.set_user_model(MongoUser)
 
 
-def set_middlewares():
+def set_middlewares(bottex):
     bottex.add_middleware(users.UserBottexHandlerMiddleware)
     bottex.add_middleware(loggers.BottexLoggingHandlerMiddleware)
     bottex.add_middleware(loggers.BottexLoggingChatMiddleware)
 
 
-if __name__ == '__main__':
-    logging.basicConfig(level=logging.INFO)
-    setup_user_model()
-    set_middlewares()
+def main():
+    set_mongo_user_model()
+    bottex = get_bottex()
+    set_middlewares(bottex)
     bottex.serve_forever()
+
+
+if __name__ == '__main__':
+    logging.basicConfig(level=logging.DEBUG)
+    main()
