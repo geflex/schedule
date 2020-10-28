@@ -1,8 +1,8 @@
-import logging
 from functools import partial
 from typing import Type, Set, List, AsyncIterator, Dict, Optional
 
 from bottex2 import aiotools
+from bottex2.logging import logger
 from bottex2.chat import ChatMiddleware
 from bottex2.handler import HandlerError, Handler, HandlerMiddleware, Request
 from bottex2.middlewares.middlewares import AbstractMiddleware
@@ -34,6 +34,7 @@ def specify_middleware(bottex_middleware: Type[BottexMiddleware],
     if middleware is None:
         return partial(specify_middleware, bottex_middleware, receiver_cls)
     specified[receiver_cls] = middleware
+    return middleware
 
 
 class BottexHandlerMiddleware(BottexMiddleware, HandlerMiddleware):
