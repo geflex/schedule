@@ -6,6 +6,7 @@ from sqlalchemy import create_engine
 from bottex2.platforms.tg import TgReceiver
 from bottex2.platforms.vk import VkReceiver
 from bottex2.platforms.tg_webhook import TgWebHookReceiver
+from bottex2.platforms.vk_callback import VkCallbackReceiver
 
 from bottex2.middlewares import loggers, users
 from bottex2.databases.mongodb import MongoUser
@@ -22,9 +23,14 @@ def get_bottex():
         VkReceiver(configs.vk.token, configs.vk.group_id),
         TgWebHookReceiver(token=configs.tg.token,
                           path=configs.tg.path,
-                          host='localhost',
+                          host=configs.host,
                           port=3001,
-                          ssl=configs.tg.ssl)
+                          ssl=configs.tg.ssl),
+        VkCallbackReceiver(token=configs.vk.token,
+                           path=configs.vk.path,
+                           host=configs.host,
+                           port=443,
+                           ssl=configs.vk.ssl)
     )
     bottex.set_handler(logic.main)
     return bottex
