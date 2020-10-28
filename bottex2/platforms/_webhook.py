@@ -1,5 +1,4 @@
 import asyncio
-import ssl
 from abc import ABC, abstractmethod
 
 import aiohttp
@@ -32,9 +31,10 @@ class WebHookReceiverMixin(Receiver, ABC):
     async def listen(self):
         app = aiohttp.web.Application()
         app.router.add_get(self._path, self.web_handler)
-        sslcontext = ssl.SSLContext()
-        task = aiohttp.web._run_app(app, host=self._host, port=self._port)
-        aiotools.create_task(task)
+        run_app = aiohttp.web._run_app(app,
+                                       host=self._host,
+                                       port=self._port)
+        aiotools.create_task(run_app)
         while True:
             request = await self._requests_queue.get()
             yield self.yielder(request)
