@@ -7,7 +7,7 @@ from bottex2.receiver import Request
 
 
 class TgWebHookReceiver(WebHookReceiverMixin):
-    def __init__(self, token: str, *, host, port, path, sslfile):
+    def __init__(self, *, token: str, host: str, port: int, path: str, ssl):
         super().__init__()
         self._token = token
 
