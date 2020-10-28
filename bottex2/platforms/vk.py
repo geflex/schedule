@@ -2,7 +2,6 @@ import sys
 from random import randint
 import json
 import aiohttp
-from aiohttp import web
 from typing import Union, Optional, AsyncIterator
 import asyncio
 
@@ -55,8 +54,8 @@ class VkChat(AbstractChat):
 class VkReceiver(Receiver):
     def __init__(self, token: str, group_id: str):
         super().__init__()
-        self.session = TokenSession(access_token=token)
-        self._longpoll = BotsLongPoll(self.session, mode=0, group_id=group_id)
+        self._session = TokenSession(access_token=token)
+        self._longpoll = BotsLongPoll(self._session, mode=0, group_id=group_id)
 
     async def listen(self) -> AsyncIterator[Request]:
         while True:
@@ -68,7 +67,7 @@ class VkReceiver(Receiver):
             for event in response['updates']:
                 if event['type'] == 'message_new':
                     message = event['object']['message']
-                    chat = VkChat(self.session, message['peer_id'])
+                    chat = VkChat(self._session, message['peer_id'])
                     yield Request(text=message['text'],
                                   chat=self.wrap_chat(chat),
                                   raw=event)
