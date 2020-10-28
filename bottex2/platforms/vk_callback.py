@@ -3,11 +3,12 @@ import asyncio
 from aiovk.sessions import TokenSession
 
 from bottex2.platforms._webhook import WebHookReceiverMixin
-from bottex2.platforms.vk import VkChat
+from bottex2.platforms.vk import VkChat, VkUserHandlerMiddleware
 from bottex2.receiver import Request
+from bottex2.middlewares import users
 
 
-class VKWebHookReceiver(WebHookReceiverMixin):
+class VkCallbackReceiver(WebHookReceiverMixin):
     def __init__(self, *, token: str, host: str, port: int, path: str, ssl):
         super().__init__()
         self._token = token
@@ -23,3 +24,6 @@ class VKWebHookReceiver(WebHookReceiverMixin):
         text = message['text']
         chat = VkChat(self._session, message['peer_id'])
         return Request(text=text, chat=chat, raw=request)
+
+
+users.UserBottexHandlerMiddleware.submiddleware(VkCallbackReceiver, VkUserHandlerMiddleware)
