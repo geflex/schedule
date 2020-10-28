@@ -11,6 +11,8 @@ from bottex2.aiotools import merge_async_iterators
 
 
 class BottexMiddleware:
+    __universal__ = False
+
     @classmethod
     def submiddleware(cls, receiver_cls: Type[Receiver],
                       middleware: Optional[AbstractMiddleware] = None):
@@ -56,9 +58,9 @@ class Bottex(Receiver):
 
     def _get_submiddleware(self, receiver: Receiver, middleware: Type[BottexMiddleware]):
         submiddleware = middleware.get_middleware(type(receiver))
-        if submiddleware is middleware:
-            logging.debug(f'No {middleware.__name__} specified for '
-                          f'{type(receiver).__name__}')
+        if submiddleware is middleware and not middleware.__universal__:
+            logger.debug(f'No {middleware.__name__} specified for '
+                         f'{type(receiver).__name__}')
         return submiddleware
 
     def add_handler_middleware(self, middleware: Type[BottexHandlerMiddleware]):
