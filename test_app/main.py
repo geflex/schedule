@@ -11,17 +11,13 @@ from bottex2.middlewares import loggers, users
 from bottex2.databases.mongodb import MongoUser
 from bottex2.bottex import Bottex
 
-from test_app import logic
-
-
-tg_config = json.load(open('test_app/auth_data/tg.json'))
-vk_config = json.load(open('test_app/auth_data/vk.json'))
+from test_app import logic, configs
 
 
 def get_bottex():
     bottex = Bottex(
-        TgReceiver(**tg_config),
-        VkReceiver(**vk_config),
+        TgReceiver(configs.tg.token),
+        VkReceiver(configs.vk.token, configs.vk.group_id),
     )
     bottex.set_handler(logic.router)
     return bottex

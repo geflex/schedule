@@ -13,17 +13,18 @@ from bottex2.databases import sqlalchemy as sql
 from bottex2.bottex import Bottex
 
 from schedule import logic
-from test_app.main import tg_config, vk_config
+from test_app import configs
 
 
 def get_bottex():
     bottex = Bottex(
-        TgReceiver(**tg_config),
-        VkReceiver(**vk_config),
-        TgWebHookReceiver(**tg_config,
+        TgReceiver(configs.tg.token),
+        VkReceiver(configs.vk.token, configs.vk.group_id),
+        TgWebHookReceiver(token=configs.tg.token,
+                          path=configs.tg.path,
                           host='localhost',
                           port=3001,
-                          sslfile='ssl/tg/vkapi.crt')
+                          ssl=configs.tg.ssl)
     )
     bottex.set_handler(logic.main)
     return bottex
