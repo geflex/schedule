@@ -14,13 +14,13 @@ from bottex2.bottex import Bottex
 from test_app import logic
 
 
-tg_data = json.load(open('schedule/auth_data/tg.json'))
-vk_data = json.load(open('schedule/auth_data/vk.json'))
+tg_config = json.load(open('test_app/auth_data/tg.json'))
+vk_config = json.load(open('test_app/auth_data/vk.json'))
 
 
 bottex = Bottex(
-    TgReceiver(tg_data['token']),
-    VkReceiver(vk_data['token'], vk_data['group_id']),
+    TgReceiver(**tg_config),
+    VkReceiver(**vk_config),
 )
 bottex.set_handler(logic.router)
 

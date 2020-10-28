@@ -3,6 +3,8 @@ import logging
 from motor.motor_asyncio import AsyncIOMotorClient
 from sqlalchemy import create_engine
 
+from bottex2.platforms.tg import TgReceiver
+from bottex2.platforms.vk import VkReceiver
 from bottex2.platforms.tg_webhook import TgWebHookReceiver
 
 from bottex2.middlewares import loggers, users
@@ -11,14 +13,15 @@ from bottex2.databases import sqlalchemy as sql
 from bottex2.bottex import Bottex
 
 from schedule import logic
-from test_app.main import tg_data
+from test_app.main import tg_config, vk_config
 
 
 bottex = Bottex(
-    TgWebHookReceiver(tg_data['token'],
+    TgReceiver(**tg_config),
+    VkReceiver(**vk_config),
+    TgWebHookReceiver(**tg_config,
                       host='localhost',
                       port=3001,
-                      path='/tg',
                       sslfile='ssl/tg/vkapi.crt')
 )
 bottex.set_handler(logic.main)
