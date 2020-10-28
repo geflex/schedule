@@ -9,7 +9,7 @@ from bottex2.platforms.py import PyMessage, PyReceiver, PyUserHandlerMiddleware
 from bottex2 import aiotools
 
 from test_app import logic
-from test_app.main import setup_user_model
+from test_app.main import set_mongo_user_model
 
 
 def rps(repeats, t):
@@ -66,7 +66,7 @@ class Benchmark:
 
 
 if __name__ == '__main__':
-    setup_user_model()
+    set_mongo_user_model()
     tracemalloc.start()
     benchmark = Benchmark(py_receiver, 1e3)
     py_receiver.add_handler_middleware(PyUserHandlerMiddleware)
