@@ -19,18 +19,18 @@ from test_app import configs
 
 def get_bottex():
     bottex = Bottex(
-        # TgReceiver(configs.tg.token),
-        # VkReceiver(configs.vk.token, configs.vk.group_id),
-        TgWebHookReceiver(token=configs.tg.token,
-                          path=configs.tg.path,
-                          host=configs.host,
-                          port=3001,
-                          ssl=configs.tg.ssl),
-        VkCallbackReceiver(token=configs.vk.token,
-                           path=configs.vk.path,
-                           host=configs.host,
-                           port=443,
-                           ssl=configs.vk.ssl)
+        TgReceiver(configs.tg.token),
+        VkReceiver(configs.vk.token, configs.vk.group_id),
+        # TgWebHookReceiver(token=configs.tg.token,
+        #                   path=configs.tg.path,
+        #                   host=configs.host,
+        #                   port=3001,
+        #                   ssl=configs.tg.ssl),
+        # VkCallbackReceiver(token=configs.vk.token,
+        #                    path=configs.vk.path,
+        #                    host=configs.host,
+        #                    port=443,
+        #                    ssl=configs.vk.ssl)
     )
     bottex.set_handler(logic.main)
     return bottex
