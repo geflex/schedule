@@ -17,7 +17,7 @@ class AioHttpReceiverMixin(Receiver, ABC):
     _host: str
     _port: int
     _path: str
-    _requests_queue = asyncio.Queue()  # type: asyncio.Queue[dict]
+    _requests_queue: asyncio.Queue  # type: asyncio.Queue[dict]
 
     async def web_handler(self, request: aiohttp.web.Request):
         dict_request = await request.json()

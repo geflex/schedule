@@ -47,7 +47,7 @@ def set_sql_user_model():
     engine = create_engine('sqlite:///./schedule/schedule.db')  # pool_recycle=280)
     sql.create_tables(engine)
     sql.set_engine(engine)
-    users.set_user_model(sql.SqlAalchemyUser)
+    users.set_user_model(sql.SqlAlchemyUser)
 
 
 def set_middlewares(bottex):

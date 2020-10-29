@@ -11,7 +11,7 @@ Session = sessionmaker()
 
 def set_engine(engine):
     Session.configure(bind=engine)
-    SqlAalchemyUser.session = Session()
+    SqlAlchemyUser.session = Session()
 
 
 def create_tables(engine):
@@ -26,7 +26,7 @@ class _UserModel(Base):
     state = Column(String)
 
 
-class SqlAalchemyUser(AbstractUser):
+class SqlAlchemyUser(AbstractUser):
     session: Session
 
     @property
@@ -50,7 +50,7 @@ class SqlAalchemyUser(AbstractUser):
         user = cls.session.query(_UserModel).filter_by(uid=uid, platform=platform).one_or_none()
         if user is None:
             user = _UserModel(uid=uid, platform=platform)
-            user = cls.session.add(user)
+            cls.session.add(user)
             cls.session.commit()
         return cls(user)
 
