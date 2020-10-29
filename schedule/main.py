@@ -19,8 +19,8 @@ from test_app import configs
 
 def get_bottex():
     bottex = Bottex(
-        TgReceiver(configs.tg.token),
-        VkReceiver(configs.vk.token, configs.vk.group_id),
+        # TgReceiver(configs.tg.token),
+        # VkReceiver(configs.vk.token, configs.vk.group_id),
         TgWebHookReceiver(token=configs.tg.token,
                           path=configs.tg.path,
                           host=configs.host,

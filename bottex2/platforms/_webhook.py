@@ -9,7 +9,7 @@ from bottex2.handler import Request
 from bottex2.receiver import Receiver
 
 
-class WebHookReceiverMixin(Receiver, ABC):
+class AioHttpReceiverMixin(Receiver, ABC):
     headers = {
         'Content-Type': 'application/json'
     }
@@ -28,13 +28,15 @@ class WebHookReceiverMixin(Receiver, ABC):
     def yielder(self, data: dict) -> Request:
         pass
 
-    async def listen(self):
+    async def run_app(self):
         app = aiohttp.web.Application()
         app.router.add_get(self._path, self.web_handler)
-        run_app = aiohttp.web._run_app(app,
-                                       host=self._host,
-                                       port=self._port)
-        aiotools.create_task(run_app)
+        await aiohttp.web._run_app(app,
+                                   host=self._host,
+                                   port=self._port)
+
+    async def listen(self):
+        aiotools.create_task(self.run_app())
         while True:
             request = await self._requests_queue.get()
             yield self.yielder(request)

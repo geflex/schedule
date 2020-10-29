@@ -2,13 +2,13 @@ import asyncio
 
 from aiovk.sessions import TokenSession
 
-from bottex2.platforms._webhook import WebHookReceiverMixin
+from bottex2.platforms._webhook import AioHttpReceiverMixin
 from bottex2.platforms.vk import VkChat, VkUserHandlerMiddleware
 from bottex2.receiver import Request
 from bottex2.middlewares import users
 
 
-class VkCallbackReceiver(WebHookReceiverMixin):
+class VkCallbackReceiver(AioHttpReceiverMixin):
     def __init__(self, *, token: str, host: str, port: int, path: str, ssl):
         super().__init__()
         self._token = token
