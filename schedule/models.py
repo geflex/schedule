@@ -71,6 +71,7 @@ class User(UserModel):
 class Lesson(Base):
     __tablename__ = 'lessons'
 
+    id = Column(Integer, primary_key=True)
     group: str
     weeknum: int
     weekday: int
