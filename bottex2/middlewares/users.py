@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Type
 from types import FunctionType
 
 from sqlalchemy import Column, Integer, String
@@ -9,9 +9,25 @@ from bottex2.router import Condition
 from bottex2.bottex import BottexHandlerMiddleware
 
 
+class UserModel(Base):
+    __tablename__ = 'users'
+
+    uid = Column(Integer, primary_key=True)
+    platform = Column(String)
+    state = Column(String)
+
+
+def set_user_model(cls: Type[UserModel]):
+    global user_cls
+    user_cls = cls
+
+
+user_cls: Type[UserModel]
+
+
 class UserBottexHandlerMiddleware(BottexHandlerMiddleware):
     async def __call__(self, request: Request):
-        request.user = await UserModel.get(None, 'guest')
+        request.user = await user_cls.get(platform=None, uid='guest')
         await self.handler(request)
 
 
@@ -23,11 +39,3 @@ def state_cond(st: str) -> Condition:
 
 def gen_state_conds(routes: List[FunctionType]):
     return {state_cond(func.__name__): func for func in routes}
-
-
-class UserModel(Base):
-    __tablename__ = 'users'
-
-    uid = Column(Integer, primary_key=True)
-    platform = Column(String)
-    state = Column(String)
