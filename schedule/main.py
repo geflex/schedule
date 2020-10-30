@@ -9,7 +9,7 @@ from bottex2.middlewares import loggers, users
 from bottex2 import sqlalchemy as sqldb
 from bottex2.bottex import Bottex
 
-from schedule import logic
+from schedule import logic, models
 from test_app import configs
 
 
@@ -22,8 +22,8 @@ def get_bottex():
     return bottex
 
 
-def set_sql_user_model():
-    db = create_engine('sqlite:///./schedule/schedule.db')
+def setup_db():
+    db = create_engine('sqlite://')
     sqldb.create_tables(db)
     sqldb.set_engine(db)
     users.set_user_model(models.User)
@@ -36,7 +36,7 @@ def set_middlewares(bottex):
 
 
 def main():
-    set_sql_user_model()
+    setup_db()
     bottex = get_bottex()
     set_middlewares(bottex)
     bottex.serve_forever()
