@@ -41,14 +41,12 @@ class SettingsView(BaseView):
         if notifs_allowed:
             button = ('Откл. уведомления',
                       profile_settings.disable_notifs,
-                      Text(_('Отключили')),
-                      color=Color.RED)
+                      Text('Отключили'))
         else:
             button = ('Вкл. уведомления',
                       profile_settings.enable_notifs,
                       Text('Включили'),
-                      TimeSetter.switch,
-                      color=Color.GREEN)
+                      TimeSetter.switch)
         links.append(button)
 
     def _add_teacher_butttons(self, links):
