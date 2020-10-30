@@ -4,20 +4,20 @@ from bases import group_fmt, time_fmt
 
 def bool2onoff(value):
     if value:
-        return _('Вкл')
-    return _('Выкл')
+        return 'Вкл'
+    return 'Выкл'
 
 
 def ifnot(val, res):
     return res if not val else val
 
 
-class BaseView(View, isbase=True):
+class BaseView:
     error = 'ты что-то сломал'
     cannot_parse = 'нипонял('
 
 
-class EndSetup(View, isbase=True):
+class EndSetup:
     success = ('Ура! Всё настроили.\n'
                'Теперь ты можешь жмакать на кнопочки и смотреть расписание)')
 
@@ -26,13 +26,10 @@ class MainView(BaseView):
     __viewname__ = 'main'
 
     links = [
-        ('Сегодня'),
-        ('Завтра', next_line=False),
-        ('Неделя'),
-        ('След. неделя', next_line=False),
-
-        ('Какая неделя'),
-        ('Настройки'),
+        'Сегодня', 'Завтра',
+        'Неделя', 'След. неделя',
+        'Какая неделя',
+        'Настройки',
     ]
 
 
@@ -42,38 +39,38 @@ class SettingsView(BaseView):
     def _add_notif_switcher(self, links):
         notifs_allowed = self.request.user.notifications.allowed
         if notifs_allowed:
-            button = ButtonLink(_('Откл. уведомления'),
-                                profile_settings.disable_notifs,
-                                Text(_('Отключили')),
-                                color=Color.RED)
+            button = ('Откл. уведомления',
+                      profile_settings.disable_notifs,
+                      Text(_('Отключили')),
+                      color=Color.RED)
         else:
-            button = ButtonLink(_('Вкл. уведомления'),
-                                profile_settings.enable_notifs,
-                                Text(_('Включили')),
-                                TimeSetter.switch,
-                                color=Color.GREEN)
+            button = ('Вкл. уведомления',
+                      profile_settings.enable_notifs,
+                      Text('Включили'),
+                      TimeSetter.switch,
+                      color=Color.GREEN)
         links.append(button)
 
     def _add_teacher_butttons(self, links):
         links2 = [
-            ButtonLink(_('Фамилия'),
+            ButtonLink('Фамилия',
                        NameSetter.switch),
-            ButtonLink(_('Стать студентом'),
+            ButtonLink('Стать студентом',
                        profile_settings.ptype_setter(PType.student),
-                       Text(_('Теперь ты студент')),
+                       Text('Теперь ты студент'),
                        SettingsView.switch),
         ]
         links.extend(links2)
 
     def _add_student_buttons(self, links):
         links2 = [
-            ButtonLink(_('Группа'),
+            ButtonLink('Группа',
                        GroupSetter.switch),
-            ButtonLink(_('Подгруппа'),
+            ButtonLink('Подгруппа',
                        SubgroupSetter.switch, next_line=False),
-            ButtonLink(_('Стать преподом'),
+            ButtonLink('Стать преподом',
                        profile_settings.ptype_setter(PType.teacher),
-                       Text(_('Теперь ты препод')),
+                       'Теперь ты препод',
                        SettingsView.switch),
         ]
         links.extend(links2)
@@ -82,7 +79,7 @@ class SettingsView(BaseView):
     def links(self):
         links = []
         self._add_notif_switcher(links)
-        links.append(ButtonLink(_('Время'), TimeSetter.switch, next_line=False))
+        links.append('Время', TimeSetter.switch, next_line=False)
 
         ptype = self.request.user.ptype
         if ptype == PType.student:
@@ -90,8 +87,8 @@ class SettingsView(BaseView):
         else:
             self._add_teacher_butttons(links)
 
-        links.append(ButtonLink(_('Язык'), tests_.test_app.router.router.switch))
-        links.append(BackButton(tests_.test_app.router.router.switch))
+        links.append('Язык', tests_.test_app.router.router.switch)
+        links.append(tests_.test_app.router.router.switch)
         # links.append(ButtonLink('Начать сначала',
         #                         manager.StartProfileTypeSetter.switch,
         #                         start_message))
@@ -102,15 +99,15 @@ class SettingsView(BaseView):
         user = self.request.user
         _ = self.request.gettext
         spl = ': '
-        rows = [_('Тип профиля') + spl + _(user.ptype.name)]
+        rows = ['Тип профиля' + spl + _(user.ptype.name)]
         if user.ptype == PType.student:
             group = ifnot(user.group, '')
-            rows.append(_('Группа') + spl + _(group))
+            rows.append('Группа' + spl + _(group))
             subgroup = ifnot(user.subgroup, '')
-            rows.append(_('Подгруппа') + spl + _(subgroup))
+            rows.append('Подгруппа' + spl + _(subgroup))
         else:
             name = ifnot(user.name, '')
-            rows.append(_('Фамилия') + spl + _(name))
+            rows.append('Фамилия' + spl + _(name))
 
         nfs = user.notifications
         allowed = bool2onoff(nfs.allowed)
@@ -118,8 +115,8 @@ class SettingsView(BaseView):
         time = f', {nfs.time:%H:%M}' if nfs.time else ''
         rows.append(_('Уведомления') + spl + _(allowed) + time)
 
-        rows.append(_('Язык') + spl + _(user.locale.value))
-        return Text('\n'.join(rows))
+        rows.append('Язык' + spl + _(user.locale.value))
+        return '\n'.join(rows)
 
 
 class LanguageSettings(BaseView):
@@ -144,7 +141,7 @@ class GroupSetter(BaseView):
     success = 'Группу установили'
 
     basic_input = ReLink(group_fmt, profile_settings.set_group, success, SettingsView.switch)
-    idontknow = Button('Не знаю номер группы(')
+    idontknow = 'Не знаю номер группы('
     links = [
         idontknow,
         NotChangeButton(SettingsView.switch),
@@ -154,61 +151,60 @@ class GroupSetter(BaseView):
 
 class StartGroupSetter(GroupSetter):
     __viewname__ = 'start_group_setter'
-    hello = Text(_('Теперь введи с клавиатуры номер своей группы'))
+    hello = 'Теперь введи с клавиатуры номер своей группы'
     links = [
         GroupSetter.idontknow,
-        ReLink(group_fmt, profile_settings.set_group, GroupSetter.success, tests_.test_app.router.router.switch),
+        (group_fmt, profile_settings.set_group, GroupSetter.success, tests_.test_app.router.router.switch),
     ]
 
 
 class SubgroupSetter(BaseView):
     __viewname__ = 'subgroup_setter'
-    hello = Text(_('Выбери подгруппу'))
-    success = Text(_('Подгруппу установили'))
+    hello = 'Выбери подгруппу'
+    success = 'Подгруппу установили'
     links = [
-        ButtonLink(_('1'), profile_settings.set_subgroup, success, SettingsView.switch),
-        ButtonLink(_('2'), profile_settings.set_subgroup, success, SettingsView.switch, next_line=False),
+        ('1', profile_settings.set_subgroup, success, SettingsView.switch),
+        ('2', profile_settings.set_subgroup, success, SettingsView.switch, next_line=False),
         NotChangeButton(SettingsView.switch)
     ]
 
 
 class StartSubgroupSetter(SubgroupSetter, EndSetup):
     __viewname__ = 'start_subgroup_setter'
-    hello = Text(_('И последнее. Выбери свою подгруппу'))
+    hello = 'И последнее. Выбери свою подгруппу'
     links = [
-        ButtonLink(_('1'), profile_settings.set_subgroup, EndSetup.success, MainView.switch),
-        ButtonLink(_('2'), profile_settings.set_subgroup, EndSetup.success, MainView.switch, next_line=False),
+        ('1', profile_settings.set_subgroup, EndSetup.success, MainView.switch),
+        ('2', profile_settings.set_subgroup, EndSetup.success, MainView.switch, next_line=False),
     ]
 
 
 class TimeSetter(BaseView):
     __viewname__ = 'time_setter'
-    hello = _('Введи время с клавиатуры или жмакни нужную кнопочку')
-    success = _('Время установили')
-    cannot_parse = _('С форматом проблемка(')
+    hello = 'Введи время с клавиатуры или жмакни нужную кнопочку'
+    success = 'Время установили'
+    cannot_parse = 'С форматом проблемка('
     links = [
-        Button('10:00'),
-        Button('11:00'), next_line=False),
-        Button('12:00'), next_line=False),
+        '10:00',
+        '11:00',
+        '12:00',
 
-        Button('14:00'),
-        Button('15:00'), next_line=False),
-        Button('16:00'), next_line=False),
+        '14:00',
+        '15:00',
+        '16:00',
 
-        Button('18:00'),
-        Button('19:00'), next_line=False),
-        Button('20:00'), next_line=False),
+        '18:00',
+        '19:00',
+        '20:00',
 
         NotChangeButton(SettingsView.switch),
-
         ReLink(time_fmt, profile_settings.set_notifs_time, success, SettingsView.switch),
     ]
 
 
 class NameSetter(BaseView):
     __viewname__ = 'name_setter'
-    hello = _('Введи свою фамилию с клавиатуры'))
-    success = _('Фамилию установили'))
+    hello = 'Введи свою фамилию с клавиатуры'
+    success = 'Фамилию установили'
     links = [
         NotChangeButton(SettingsView.switch),
         InputLink(profile_settings.set_fio, success, SettingsView.switch)
@@ -217,7 +213,7 @@ class NameSetter(BaseView):
 
 class StartNameSetter(NameSetter, EndSetup):
     __viewname__ = 'start_name_setter'
-    hello = _('Теперь введи с клавиатуры свою фамилию')
+    hello = 'Теперь введи с клавиатуры свою фамилию'
     success = EndSetup.success
     links = [
         InputLink(profile_settings.set_fio, success, MainView.switch)
@@ -226,23 +222,23 @@ class StartNameSetter(NameSetter, EndSetup):
 
 class StartProfileTypeSetter(BaseView):
     __viewname__ = 'start_profile_type_setter'
-    hello = _('Выбери тип профиля')
-    success = _('Так, тип профиля установили')
+    hello = 'Выбери тип профиля'
+    success = 'Так, тип профиля установили'
     links = [
-        ButtonLink(_('Студент'), profile_settings.ptype_setter(PType.student), success, StartGroupSetter.switch),
-        ButtonLink(_('Преподаватель'), profile_settings.ptype_setter(PType.teacher), success, StartNameSetter.switch),
+        ('Студент', profile_settings.ptype_setter(PType.student), success, StartGroupSetter.switch),
+        ('Преподаватель', profile_settings.ptype_setter(PType.teacher), success, StartNameSetter.switch),
     ]
 
 
 class StartView(BaseView):
     __viewname__ = 'start'
-    success = _('Привет! Чтобы все заработало, сначала нужно кое-что настроить '
-                '(все это можно будет поменять позже в настройках)')
+    success = ('Привет! Чтобы все заработало, сначала нужно кое-что настроить '
+               '(все это можно будет поменять позже в настройках)')
     links = [
-        InputLink(return_none, success, StartProfileTypeSetter.switch),
+        (return_none, success, StartProfileTypeSetter.switch),
     ]
     buttons = [
-        Button(_('Начать'))
+        'Начать'
     ]
 
 
