@@ -22,22 +22,23 @@ class VkChat(AbstractChat):
         self._peer_id = peer_id
 
     def _prepare_kb(self, kb: Optional[Keyboard]):
-        if kb is None or kb.empty():
+        if kb is None:
             return ''
         json_buttons = []
         json_kb = {'one_time': kb.one_time,
                    'buttons': json_buttons}
-        for line in kb:
-            json_line = []
-            json_buttons.append(json_line)
-            for button in line:
-                json_line.append({
-                    'action': {
-                        'type': 'text',
-                        'label': button.label
-                    },
-                    'color': 'secondary',
-                })
+        if not kb.empty():
+            for line in kb:
+                json_line = []
+                json_buttons.append(json_line)
+                for button in line:
+                    json_line.append({
+                        'action': {
+                            'type': 'text',
+                            'label': button.label
+                        },
+                        'color': 'secondary',
+                    })
         return json.dumps(json_kb)
 
     async def send_message(self, text: Optional[str] = None,
