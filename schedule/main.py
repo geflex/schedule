@@ -37,6 +37,10 @@ def set_sql_user_model():
     users.set_user_model(sqldb.SqlAlchemyUser)
 
 
+def set_memory_user_model():
+    users.set_user_model(users.TempUser)
+
+
 def set_middlewares(bottex):
     bottex.add_middleware(users.UserBottexHandlerMiddleware)
     bottex.add_middleware(loggers.BottexLoggingHandlerMiddleware)
@@ -44,7 +48,7 @@ def set_middlewares(bottex):
 
 
 def main():
-    set_sql_user_model()
+    set_memory_user_model()
     bottex = get_bottex()
     set_middlewares(bottex)
     bottex.serve_forever()
