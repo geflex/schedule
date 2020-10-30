@@ -1,9 +1,7 @@
 aiovk
 aiogram
-aiohttp  # installs with aio*
-pymongo  # installs with motor
+aiohttp  # installs with aiovk
 sqlalchemy
-motor
 xlrd
 # retrying
 # Babel
