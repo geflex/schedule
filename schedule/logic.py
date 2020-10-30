@@ -18,7 +18,7 @@ async def init_user(r: Request):
 
 
 async def student_ptype_input(r: Request):
-    await r.user.update(ptype=models.PType.student.value)
+    await r.user.update(ptype=models.PType.student)
     await r.user.update(state=group_input.__name__)
     await r.chat.send_message('Окей, теперь введи номер своей группы', empty_kb)
 
