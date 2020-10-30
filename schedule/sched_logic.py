@@ -16,11 +16,11 @@ settings_kb = Keyboard([
 
 
 async def unknown_command(r: Request):
-    await r.chat.send_message('Хм непонятная комманда', schedule_kb)
+    await r.chat.send_message('Хм непонятная команда', schedule_kb)
 
 
 async def unknown_settings_command(r: Request):
-    await r.chat.send_message('Хм непонятная комманда', settings_kb)
+    await r.chat.send_message('Хм непонятная команда', settings_kb)
 
 
 async def today(r: Request):

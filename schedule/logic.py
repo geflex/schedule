@@ -3,7 +3,7 @@ from bottex2.router import Router, text_cond
 from bottex2.middlewares.users import gen_state_conds
 from bottex2.chat import Keyboard, Button
 
-from .schedule import schedule, schedule_kb, settings
+from .sched_logic import schedule, schedule_kb, settings
 from . import models
 
 empty_kb = Keyboard([])
