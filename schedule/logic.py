@@ -3,10 +3,10 @@ from bottex2.router import Router, text_cond
 from bottex2.middlewares.users import gen_state_conds
 from bottex2.chat import Keyboard, Button
 
+from .bases import empty_kb
 from .sched_logic import schedule, schedule_kb, settings
 from . import models
 
-empty_kb = Keyboard([])
 ptype_kb = Keyboard([[Button('Студент'), Button('Препод')]])
 
 
