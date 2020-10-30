@@ -1,7 +1,10 @@
 from enum import Enum, IntFlag
 from typing import List
 
-from sqlalchemy import Column, String, Integer, Enum as EnumType
+from sqlalchemy import Column
+from sqlalchemy import types as sqltypes
+from sqlalchemy.orm import relationship
+
 from bottex2.middlewares.users import UserModel
 from bottex2.sqlalchemy import Base
 
@@ -52,32 +55,28 @@ class PType(Enum):
     teacher = 1
 
 
-class Notifications:
-    allowed: bool
-    time: 'time'
-
-
 class User(UserModel):
-    locale = Column(String)
-    notifications: Notifications
-    rights: Rights
+    notifications_time = Column(sqltypes.Time, nullable=True)
 
-    ptype = Column(Enum)
-    name = Column(String)  # for teacher
-    group = Column(String)  # only for student
-    subgroup = Column(String)  # only for student
+    locale = Column(sqltypes.Enum(Lang), default=Lang.ru)
+    rights = Column(sqltypes.Enum(Rights))
+
+    ptype = Column(sqltypes.Enum(PType))
+    name = Column(sqltypes.String)  # for teacher
+    group = Column(sqltypes.String)  # only for student
+    subgroup = Column(sqltypes.String)  # only for student
 
 
 class Lesson(Base):
     __tablename__ = 'lessons'
 
-    id = Column(Integer, primary_key=True)
+    id = Column(sqltypes.Integer, primary_key=True)
     groups: str
     weeknum: int
-    weekday: int
-    subgroup: int
-    time: str
-    name: str
+    weekday = Column(sqltypes.Enum)
+    subgroup = Column(sqltypes.Integer)
+    time = Column(sqltypes.Time)
+    name = Column(sqltypes.String)
     teachers: List[str]
-    building: str
+    building = Column(sqltypes.String)
     auditories: List[str]

@@ -59,7 +59,7 @@ class Bottex(Receiver):
 
     def _get_submiddleware(self, receiver: Receiver, middleware: Type[BottexMiddleware]):
         submiddleware = middleware.get_middleware(type(receiver))
-        if submiddleware is middleware and not middleware.__universal__:
+        if submiddleware is middleware and not middleware.__universal__:  # !!! __universal__?
             logger.debug(f'No {middleware.__name__} specified for '
                          f'{type(receiver).__name__}')
         return submiddleware
