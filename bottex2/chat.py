@@ -30,6 +30,9 @@ class Keyboard(ABC):
     def add_button(self, button: Button):
         self._buttons[-1].append(button)
 
+    def empty(self):
+        return bool(self._buttons)
+
     def __iter__(self):
         yield from self._buttons
 

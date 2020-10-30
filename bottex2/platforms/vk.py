@@ -22,7 +22,7 @@ class VkChat(AbstractChat):
         self._peer_id = peer_id
 
     def _prepare_kb(self, kb: Optional[Keyboard]):
-        if kb is None:
+        if kb is None or kb.empty():
             return ''
         json_buttons = []
         json_kb = {'one_time': kb.one_time,
