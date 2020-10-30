@@ -1,10 +1,8 @@
 caching?
 i18n
 add_locales l10n
-fix models
 notifications
 
 schedule by student lastname
 scedule by group
 group by faculty
-
