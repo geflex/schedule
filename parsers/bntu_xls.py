@@ -4,9 +4,8 @@ from itertools import zip_longest, chain
 from typing import Match
 
 import xlrd
-from pymongo import MongoClient
+from schedule import models
 
-import bottex2.router
 
 WEEKDAYS = [
     'понедельник',
@@ -16,10 +15,6 @@ WEEKDAYS = [
     'пятница',
     'суббота',
 ]
-
-
-client = MongoClient()
-collection = client.schedule_test.lessons
 
 
 re_multispace = re.compile(r'\s+')
@@ -181,7 +176,6 @@ re_teacher = re.compile(r'\b'
                             r'(?P<initials2>(?:[А-Я]\.){2})'
                         r')')
 
-# отдельный случай
 exceptions = {
     'ф и з и ч е с к а я к у л ь т у р а': 'Физическая культура'
 }
@@ -189,15 +183,18 @@ exceptions = {
 
 class LessonArea(BaseArea):
     def save(self):
-        doc = dict(groups=self.groups,
-                   weeknum=self.weeknum,
-                   weekday=self.weekday,
-                   subgroup=self.subgroup,
-                   time=self.time,
-                   name=self.name,
-                   teachers=self.teachers,
-                   building=self.building,
-                   auditories=self.auditories)
+        # !!!
+        doc = models.Lesson.get(
+            groups=self.groups,
+            weeknum=self.weeknum,
+            weekday=self.weekday,
+            subgroup=self.subgroup,
+            time=self.time,
+            name=self.name,
+            teachers=self.teachers,
+            building=self.building,
+            auditories=self.auditories
+        )
         if hasattr(self, '_doc_id'):
             doc['_id'] = self._doc_id
         self._doc_id = collection.insert_one(doc)
@@ -375,7 +372,7 @@ class SheetParser(BaseSheetParser):
         if lesson.groups:
             # если по оси x длина блока меньше чем длина блока с группой
             if lesson.xlen() < self._curr_group.xlen():
-                # проверяем, находится ли блок слева
+                # находится ли блок слева
                 if lesson.start.x == self._curr_group.start.x:
                     lesson.subgroup = 1
                 # или справа
@@ -390,17 +387,17 @@ class SheetParser(BaseSheetParser):
 
     def _set_lesson_time(self, lesson: LessonArea):
         """
-        Устанавливает время начала занятия объекта lesson,
+        Устанавливает время начала занятия для lesson,
         если оно не было определено в тексте
         """
         if self._curr_time and not lesson.time:
             lesson.time = self._curr_time.tstart
 
     def _set_lesson_weeknum(self, lesson: LessonArea):
-        """Устанавливает номер недели объекта lesson"""
+        """Устанавливает номер недели для lesson"""
         if self._curr_time:
             if lesson.ylen() < self._curr_time.ylen():
-                # проверяем, находится ли блок сверху
+                # находится ли блок сверху
                 if lesson.start.y == self._curr_time.start.y:
                     lesson.weeknum = '1'
                 # или снизу
@@ -439,12 +436,12 @@ class SheetParser(BaseSheetParser):
 
 
 def bntu_books():
-    root = '.\\schedule\\data'  # папка с документами
-    paths = [  # Пути к документам
+    root = '.\\parsers\\data'  # папка с документами
+    paths = [
         '1krs_2sem_19-20.xls',
         '2krs_2sem_19-20.xls',
     ]
-    for path in paths:  # поочередно открываем документы
+    for path in paths:
         yield xlrd.open_workbook(os.path.join(root, path), formatting_info=True)
 
 
