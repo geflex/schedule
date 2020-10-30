@@ -31,7 +31,7 @@ class Keyboard(ABC):
         self._buttons[-1].append(button)
 
     def empty(self):
-        return bool(self._buttons)
+        return self._buttons == [[]]
 
     def __iter__(self):
         yield from self._buttons
