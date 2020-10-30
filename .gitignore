@@ -1,7 +1,7 @@
 /venvs/
 /.idea/
 /parsers/data/
-/test_app/configs/
+/schedule/configs/
 /schedule/schedule.db
 bottex.svg
 RUN.BAT

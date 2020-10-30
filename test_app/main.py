@@ -7,7 +7,8 @@ from bottex2.platforms.vk import VkReceiver
 from bottex2.middlewares import loggers, users
 from bottex2.bottex import Bottex
 
-from test_app import logic, configs
+from test_app import logic
+from schedule import configs
 
 
 def get_bottex():

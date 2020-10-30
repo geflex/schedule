@@ -9,8 +9,7 @@ from bottex2.middlewares import loggers, users
 from bottex2 import sqlalchemy as sqldb
 from bottex2.bottex import Bottex
 
-from schedule import logic, models
-from test_app import configs
+from schedule import logic, models, configs
 
 
 def get_bottex():
