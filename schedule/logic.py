@@ -2,7 +2,9 @@ from bottex2.handler import Request
 from bottex2.router import Router, text_cond
 from bottex2.middlewares.users import gen_conds
 from bottex2.chat import Keyboard, Button
+
 from schedule import models
+from .schedule_logic import schedule
 
 
 empty_kb = Keyboard([])
@@ -40,20 +42,16 @@ ptype_input = Router({
 
 async def group_input(r: Request):
     await r.user.update(group=r.text, state=schedule.__name__)
-    await r.chat.send_message('Ура, все настроили')
+    await success_registration(r)
 
 
 async def fio_input(r: Request):
     await r.user.update(fio=r.text, state=schedule.__name__)
+    await success_registration(r)
+
+
+async def success_registration(r: Request):
     await r.chat.send_message('Ура, все настроили')
-
-
-async def schedule_main(r: Request):
-    await r.chat.send_message('упс пака')
-    await r.user.update(state=None)
-
-
-schedule = Router({}, default=schedule_main, name='schedule')
 
 
 main = Router(gen_conds([
