@@ -1,6 +1,7 @@
 from enum import Enum, IntFlag
 from typing import List
 
+from sqlalchemy import Column, String, Integer
 from bottex2.middlewares.users import UserModel
 from bottex2.sqlalchemy import Base
 
@@ -57,19 +58,19 @@ class Notifications:
 
 
 class User(UserModel):
-    locale: str
+    locale = Column(String)
     notifications: Notifications
-    state: str
-    view_args: dict
     rights: Rights
 
-    ptype: PType
-    name: str  # for teacher
-    group: str  # only for student
-    subgroup: str  # only for student
+    ptype = Column(Integer)
+    name = Column(String)  # for teacher
+    group = Column(String)  # only for student
+    subgroup = Column(String)  # only for student
 
 
 class Lesson(Base):
+    __tablename__ = 'lessons'
+
     group: str
     weeknum: int
     weekday: int

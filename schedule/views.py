@@ -113,7 +113,7 @@ class SettingsView(BaseView):
         allowed = bool2onoff(nfs.allowed)
 
         time = f', {nfs.time:%H:%M}' if nfs.time else ''
-        rows.append(_('Уведомления') + spl + _(allowed) + time)
+        rows.append('Уведомления' + spl + _(allowed) + time)
 
         rows.append('Язык' + spl + _(user.locale.value))
         return '\n'.join(rows)
