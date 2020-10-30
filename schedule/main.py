@@ -26,6 +26,7 @@ def set_sql_user_model():
     db = create_engine('sqlite:///./schedule/schedule.db')
     sqldb.create_tables(db)
     sqldb.set_engine(db)
+    users.set_user_model(models.User)
 
 
 def set_middlewares(bottex):

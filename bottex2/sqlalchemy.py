@@ -1,34 +1,34 @@
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
-from bottex2.middlewares.users import UserModel
 
-_Base = declarative_base()
 Session = sessionmaker()
 
 
-class Base(_Base):
-    session: Session
+# noinspection PyArgumentList
+class _Base:
+    session = Session()
 
     @classmethod
-    async def get(cls, platform, uid):
-        # noinspection PyArgumentList
-        user = cls.session.query(cls).filter_by(uid=uid, platform=platform).one_or_none()
+    async def get(cls, **kwargs):
+        user = cls.session.query(cls).filter_by(**kwargs).one_or_none()
         if user is None:
-            user = cls(uid=uid, platform=platform)
+            user = cls(**kwargs)
             cls.session.add(user)
             cls.session.commit()
-        return cls(user)
+        return user
 
     async def update(self, **kwargs):
         for field, value in kwargs.items():
-            setattr(self.user, field, value)
+            setattr(self, field, value)
         self.session.commit()
 
 
+Base = declarative_base(cls=_Base)
+
+
 def set_engine(engine):
-    Session.configure(bind=engine)
-    UserModel.session = Session()
+    Base.session.bind = engine
 
 
 def create_tables(engine):
