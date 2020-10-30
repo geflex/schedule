@@ -7,11 +7,11 @@ from bottex2.platforms.tg import TgReceiver
 from bottex2.platforms.vk import VkReceiver
 
 from bottex2.middlewares import loggers, users
-from bottex2.databases.mongodb import MongoUser
+from bottex2.databases import mongodb
 from bottex2.databases import sqlalchemy as sqldb
 from bottex2.bottex import Bottex
 
-from schedule import logic
+from . import logic
 from test_app import configs
 
 
@@ -25,15 +25,15 @@ def get_bottex():
 
 
 def set_mongo_user_model():
-    mongo = AsyncIOMotorClient('mongodb://localhost:27017')
-    MongoUser.set_db(mongo.schedule_test)
-    users.set_user_model(MongoUser)
+    conn = AsyncIOMotorClient('mongodb://localhost:27017')
+    mongodb.set_db(conn.schedule_test)
+    users.set_user_model(mongodb.MongoUser)
 
 
 def set_sql_user_model():
-    engine = create_engine('sqlite:///./schedule/schedule.db')
-    sqldb.create_tables(engine)
-    sqldb.set_engine(engine)
+    db = create_engine('sqlite:///./schedule/schedule.db')
+    sqldb.create_tables(db)
+    sqldb.set_engine(db)
     users.set_user_model(sqldb.SqlAlchemyUser)
 
 

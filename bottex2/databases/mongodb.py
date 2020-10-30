@@ -5,13 +5,13 @@ import motor.motor_asyncio
 from bottex2.middlewares.users import AbstractUser
 
 
+def set_db(db: motor.motor_asyncio.AsyncIOMotorDatabase):
+    MongoUser._collection = db[MongoUser.__tablename__]
+
+
 class MongoUser(AbstractUser):
     __tablename__: Optional[str] = None
     _collection: Optional[motor.motor_asyncio.AsyncIOMotorCollection] = None
-
-    @classmethod
-    def set_db(cls, db: motor.motor_asyncio.AsyncIOMotorDatabase):
-        cls._collection = db[cls.__tablename__]
 
     @classmethod
     async def get(cls, platform, uid):
