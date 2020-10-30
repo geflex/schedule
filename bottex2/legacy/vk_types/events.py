@@ -1,4 +1,4 @@
-from bottex2.legacy.dict_parser import DictParser, Attr
+from bottex2.dict_parser import DictParser, Attr
 
 from .basic import Message
 

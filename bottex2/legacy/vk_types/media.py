@@ -1,6 +1,6 @@
 from enum import Enum
 
-from bottex2.legacy.dict_parser import DictParser, Attr
+from bottex2.dict_parser import DictParser, Attr
 
 
 class Photo(DictParser):
