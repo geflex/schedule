@@ -12,7 +12,7 @@ ptype_kb = Keyboard([[Button('Студент'), Button('Препод')]])
 
 async def init_user(r: Request):
     await r.user.update(state=ptype_input.__name__)
-    await r.chat.send_message('Йо хай! Сначала нужно кое-что настроить '
+    await r.chat.send_message('Хай! Сначала нужно кое-что настроить '
                               '(все это можно будет поменять позже в настройках)')
     await r.chat.send_message('Сначала выбери тип профиля', ptype_kb)
 

@@ -32,6 +32,14 @@ def str_day(lessons: Collection[models.Lesson]):
 
 
 class Date(date):
+    @classmethod
+    def tomorrow(cls):
+        return cls.today().days_incr(1)
+
+    @classmethod
+    def yesterday(cls):
+        return cls.today().days_decr(1)
+
     def days_incr(self, n):
         return self + timedelta(days=n)
 
