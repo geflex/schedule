@@ -62,10 +62,10 @@ class User(MongoUser):
     view_args: dict
     rights: Rights
 
-    ptype = PType
-    name = str  # for teacher
+    ptype: PType
+    name: str  # for teacher
     group: str  # only for student
-    subgroup = str  # only for student
+    subgroup: str  # only for student
 
 
 class Lesson:

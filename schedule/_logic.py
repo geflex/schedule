@@ -1,35 +1,35 @@
 from datetime import timedelta, date
-from typing import List, Tuple
+from typing import List, Tuple, Collection
 
-from date_utils import Date
-from models import User, Lesson, PType
+from .date_utils import Date
+from . import models
 
 
-class Formatter:
-    splitter = '\n' + '='*28 + '\n'
+_splitter = '\n' + '='*28 + '\n'
 
-    def str_lesson(self, lesson: Lesson):
-        return f'{lesson.time} {lesson.auditories} к{lesson.building}\n{lesson.name}'
+def _str_lesson(lesson: models.Lesson):
+    return f'{lesson.time} {lesson.auditories} к{lesson.building}\n{lesson.name}'
 
-    def format_day(self, db_objects) -> str:
-        lessons = []
-        for lesson in db_objects:
-            s = self.str_lesson(lesson)
-            lessons.append(s)
-        if not lessons:
-            return 'Занятий нет'
-        return self.splitter.join(lessons)
+def str_week(lessons: Collection[models.Lesson]) -> List[str]:
+    days = {}
+    for lesson in lessons:
+        day = days.setdefault(lesson.weekday.name, [])
+        day.append(lesson)
+    response = []
+    for day_name, day_lessons in days.items():
+        day_str = f'> > > {day_name}{_splitter}{str_day(day_lessons)}'
+        response.append(day_str)
+    return response
 
-    def format_week(self, db_objects) -> List[str]:
-        days = {}
-        for lesson in db_objects:
-            day = days.setdefault(lesson.weekday.name, [])
-            day.append(lesson)
-        response = []
-        for day, lessons in days.items():
-            day_str = f'> > > {day}{self.splitter}{self.format_day(lessons)}'
-            response.append(day_str)
-        return response
+
+def str_day(lessons: Collection[models.Lesson]):
+    str_lessons = []
+    for lesson in lessons:
+        s = _str_lesson(lesson)
+        str_lessons.append(s)
+    if not str_lessons:
+        return 'Занятий нет'
+    return _splitter.join(str_lessons)
 
 
 def course_start(dt: date) -> Date:
@@ -54,30 +54,30 @@ def get_week_range(dt: date) -> Tuple[date, date]:
 
 
 def get_day_lessons(dt, **kwargs):
-    result = Lesson.objects(weekday=dt.weekday(),
-                            weeknum__in=[None, get_week_num(Date.today())],
-                            **kwargs)
+    result = models.Lesson.objects(weekday=dt.weekday(),
+                                   weeknum__in=[None, get_week_num(Date.today())],
+                                   **kwargs)
     return result  # .order_by('time')
 
 
 def get_week_lessons(week_num, **kwargs):
-    result = Lesson.objects(weeknum__in=[None, week_num], **kwargs)
+    result = models.Lesson.objects(weeknum__in=[None, week_num], **kwargs)
     return result
 
 
-def day_lessons_str(dt, user: User):
-    if user.ptype == PType.student:
+def day_lessons_str(dt, user: models.User):
+    if user.ptype == models.PType.student:
         group, subgroup = user.group, user.subgroup
         objects = get_day_lessons(dt, group=str(group),
                                   subgroup__in=[None, subgroup])
     else:
         lastname = user.name
         objects = get_day_lessons(dt, teacher=lastname)
-    return Formatter().format_day(objects)
+    return str_day(objects)
 
 
-def week_lessons_str(week_num: int, user: User):
-    if user.ptype == PType.student:
+def week_lessons_str(week_num: int, user: models.User):
+    if user.ptype == models.PType.student:
         group, subgroup = user.group, user.subgroup
         objects = get_week_lessons(week_num,
                                    group=str(group),
@@ -85,4 +85,4 @@ def week_lessons_str(week_num: int, user: User):
     else:
         teacher = user.name
         objects = get_week_lessons(week_num, teacher=teacher)
-    return Formatter().format_week(objects)
+    return str_week(objects)
