@@ -39,6 +39,10 @@ def check_handler(handler: Handler):
 class HandlerMiddleware(Handler):
     def __init__(self, handler: Handler):
         self.handler = handler
+        try:
+            self.__name__ = handler.__name__
+        except AttributeError:
+            pass
 
     async def __call__(self, request):
         await self.handler(request)
