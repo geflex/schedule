@@ -78,5 +78,5 @@ class VkReceiver(Receiver):
 class VkUserHandlerMiddleware(HandlerMiddleware):
     async def __call__(self, request: Request):
         uid = request.raw['object']['message']['from_id']
-        request.user = await users.UserModel.get('vk', uid)
+        request.user = await users.user_cls.get(platform='vk', uid=uid)
         await self.handler(request)
