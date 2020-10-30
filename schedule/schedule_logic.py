@@ -2,7 +2,7 @@ from bottex2.router import Router, text_cond
 from bottex2.handler import Request
 
 
-async def schedule_main(r: Request):
+async def unknown_command(r: Request):
     await r.chat.send_message('упс пака')
 
 
@@ -21,11 +21,11 @@ async def back(r: Request):
 
 settings = Router({
     text_cond('назад'): back,
-}, name='settings')
+}, default=unknown_command, name='settings')
 
 
 schedule = Router({
     text_cond('сегодня'): today,
     text_cond('завтра'): tomorrow,
     text_cond('настройки'): settings,
-}, default=schedule_main, name='schedule')
+}, default=unknown_command, name='schedule')
