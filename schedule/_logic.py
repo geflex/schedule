@@ -1,7 +1,6 @@
 from datetime import timedelta, date
 from typing import List, Tuple, Collection
 
-from .date_utils import Date
 from . import models
 
 
@@ -30,6 +29,14 @@ def str_day(lessons: Collection[models.Lesson]):
     if not str_lessons:
         return 'Занятий нет'
     return _splitter.join(str_lessons)
+
+
+class Date(date):
+    def days_incr(self, n):
+        return self + timedelta(days=n)
+
+    def days_decr(self, n):
+        return self - timedelta(days=n)
 
 
 def course_start(dt: date) -> Date:
