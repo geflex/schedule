@@ -1,7 +1,7 @@
 from enum import Enum, IntFlag
 from typing import List
 
-from bottex2.databases.mongodb import MongoUser
+from bottex2.databases.sqlalchemy import SqlAlchemyUser
 
 
 class Lang(Enum):
@@ -55,7 +55,7 @@ class Notifications:
     time: 'time'
 
 
-class User(MongoUser):
+class User(SqlAlchemyUser):
     locale: str
     notifications: Notifications
     state: str
