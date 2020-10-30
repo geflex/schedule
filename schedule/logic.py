@@ -5,28 +5,31 @@ from bottex2.chat import Keyboard, Button
 from schedule import models
 
 
+empty_kb = Keyboard([])
+ptype_kb = Keyboard([[Button('Студент'), Button('Препод')]])
+
+
 async def init_user(r: Request):
     await r.user.update(state=ptype_input.__name__)
     await r.chat.send_message('Привет! Сначала нужно кое-что настроить '
                               '(все это можно будет поменять позже в настройках)')
-    kb = Keyboard([[Button('Студент'), Button('Препод')]])
-    await r.chat.send_message('Сначала выбери тип профиля', kb=kb)
+    await r.chat.send_message('Сначала выбери тип профиля', kb=ptype_kb)
 
 
 async def student_ptype_input(r: Request):
     await r.user.update(ptype=models.PType.student)
     await r.user.update(state=group_input.__name__)
-    await r.chat.send_message('Окей, теперь введи номер своей группы')
+    await r.chat.send_message('Окей, теперь введи номер своей группы', kb=empty_kb)
 
 
 async def teacher_ptype_input(r: Request):
     await r.user.update(ptype=models.PType.teacher)
     await r.user.update(state=fio_input.__name__)
-    await r.chat.send_message('Хорошо, теперь введите свои ФИО')
+    await r.chat.send_message('Хорошо, теперь введите свои ФИО', empty_kb)
 
 
 async def profile_type_error(r: Request):
-    await r.chat.send_message('Непонятный тип профиля(\nПопробуй еще разок')
+    await r.chat.send_message('Непонятный тип профиля(\nПопробуй еще разок', kb=ptype_kb)
 
 
 ptype_input = Router({
