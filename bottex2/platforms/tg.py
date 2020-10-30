@@ -18,18 +18,21 @@ class TgChat(AbstractChat):
     def _prepare_kb(self, kb: Optional[Keyboard]):
         if kb is None:
             return
-        json_buttons = []
-        json_kb = {
-            'one_time_keyboard': kb.one_time,
-            'keyboard': json_buttons
-        }
-        for line in kb:
-            json_line = []
-            json_buttons.append(json_line)
-            for button in line:
-                json_line.append({
-                    'text': button.label,
-                })
+        if kb.empty():
+            json_kb = {'remove_keyboard': True}
+        else:
+            json_buttons = []
+            json_kb = {
+                'one_time_keyboard': kb.one_time,
+                'keyboard': json_buttons
+            }
+            for line in kb:
+                json_line = []
+                json_buttons.append(json_line)
+                for button in line:
+                    json_line.append({
+                        'text': button.label,
+                    })
         return json_kb
 
     async def send_message(self, text: Optional[str] = None,
