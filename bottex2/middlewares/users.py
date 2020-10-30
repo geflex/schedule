@@ -71,7 +71,7 @@ class UserBottexHandlerMiddleware(BottexHandlerMiddleware):
         await self.handler(request)
 
 
-user_model: Type[AbstractUser] = TempUser
+user_model: Type[AbstractUser]
 
 
 def set_user_model(cls):
@@ -85,5 +85,5 @@ def state_cond(st: str) -> Condition:
     return cond
 
 
-def gen_conds(routes: List[FunctionType]):
+def gen_state_conds(routes: List[FunctionType]):
     return {state_cond(func.__name__): func for func in routes}
