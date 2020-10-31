@@ -12,23 +12,4 @@ def str_time(t):
         return f'{t:%H:%M}'
     return ''
 
-
-# class BackButton(ButtonLink):
-#     def __init__(self, callback, *, next_line=True):
-#         super().__init__('Назад', callback, 'Переходим назад', color=Color.WHITE, next_line=next_line)
-#
-#
-# class CancelButton(ButtonLink):
-#     def __init__(self, callback, *, next_line=True):
-#         super().__init__('Отмена', callback, 'Отменяем', color=Color.RED, next_line=next_line)
-#
-#
-# class NotChangeButton(ButtonLink):
-#     def __init__(self, callback, *, next_line=True):
-#         super().__init__('Не менять', callback, 'Не меняем', color=Color.WHITE, next_line=next_line)
-#
-#
-# class PassButton(ButtonLink):
-#     def __init__(self, callback, *, next_line=True):
-#         super().__init__('Пропустить', callback, 'Пропускаем', color=Color.WHITE, next_line=next_line)
-empty_kb = Keyboard([])
+empty_kb = Keyboard()
