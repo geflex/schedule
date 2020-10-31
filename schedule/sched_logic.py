@@ -28,7 +28,8 @@ async def group_after_switching_ptype(r: Request):
 
 
 class Settings(View):
-    def init_commands(self):
+    @cached_property
+    def commands(self):
         commands = []
         def add(text, cb):
             commands.append([Command(text, cb)])
@@ -112,7 +113,7 @@ async def become_student(r: Request):
 
 
 def get_settings_kb(r: Request):
-    return Settings(r).init_keyboard()
+    return Settings(r).keyboard
 
 
 async def settings(r: Request):
