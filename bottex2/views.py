@@ -45,6 +45,5 @@ class View(ABC):
     async def handle(cls, request: Request):
         await cls(request).router(request)
 
-    @staticmethod
-    async def default(r: Request):
+    async def default(self, r: Request):
         await r.chat.send_message('404')
