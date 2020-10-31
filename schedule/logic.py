@@ -38,8 +38,8 @@ class PTypeInput(View):
     def commands(self) -> List[List[Command]]:
         return [
             [
-                Command('студент', student_ptype_input),
-                Command('препод', teacher_ptype_input)
+                Command('Студент', student_ptype_input),
+                Command('Препод', teacher_ptype_input)
             ]
         ]
 
