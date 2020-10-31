@@ -13,14 +13,53 @@ schedule_kb = Keyboard([
 ])
 
 
-async def name_settings_input(r: Request):
+async def name_after_switching_ptype(r: Request):
     await r.chat.send_message('Теперь ты препод', get_settings_kb(r))
     await r.user.update(name=r.text, state=settings.__name__)
 
 
-async def group_settings_input(r: Request):
+async def group_after_switching_ptype(r: Request):
     await r.chat.send_message('Теперь ты студент', get_settings_kb(r))
     await r.user.update(group=r.text, state=settings.__name__)
+
+
+# =====================================================
+
+
+async def switch_to_settings_group(r: Request):
+    await r.chat.send_message('Введи номер группы', Keyboard())
+    await r.user.update(state=settings_group.__name__)
+
+
+async def switch_to_settings_name(r: Request):
+    await r.chat.send_message('Введи новое имя', Keyboard())
+    await r.user.update(state=settings_name.__name__)
+
+
+async def switch_to_settings_subgroup(r: Request):
+    await r.chat.send_message('Введи номер подгруппы', Keyboard())
+    await r.user.update(state=settings_subgroup.__name__)
+
+
+async def settings_group(r: Request):
+    old_group = r.user.group
+    await r.user.update(group=r.text, state=settings.__name__)
+    await r.chat.send_message(f'Группа изменена: {old_group} -> {r.user.group}', get_settings_kb(r))
+
+
+async def settings_name(r: Request):
+    old_name = r.user.name
+    await r.user.update(name=r.text, state=settings.__name__)
+    await r.chat.send_message(f'ФИО изменены: {old_name} -> {r.user.name}', get_settings_kb(r))
+
+
+async def settings_subgroup(r: Request):
+    old_subgroup = r.user.subgroup
+    await r.user.update(subgroup=r.text, state=settings.__name__)
+    await r.chat.send_message(f'Подгруппа изменена: {old_subgroup} -> {r.user.subgroup}', get_settings_kb(r))
+
+
+# =====================================================
 
 
 async def become_teacher(r: Request):
@@ -29,7 +68,7 @@ async def become_teacher(r: Request):
         await r.chat.send_message('Теперь ты препод', get_settings_kb(r))
     else:
         await r.chat.send_message('Введи свои ФИО', Keyboard())
-        await r.user.update(state=name_settings_input.__name__)
+        await r.user.update(state=name_after_switching_ptype.__name__)
 
 
 async def become_student(r: Request):
@@ -38,15 +77,18 @@ async def become_student(r: Request):
         await r.chat.send_message('Теперь ты студент', get_settings_kb(r))
     else:
         await r.chat.send_message('Введи номер группы', Keyboard())
-        await r.user.update(state=group_settings_input.__name__)
+        await r.user.update(state=group_after_switching_ptype.__name__)
 
 
 def get_settings_kb(r: Request):
     keyboard = Keyboard()
     if r.user.ptype is PType.teacher:
         keyboard.add_line(Button('Стать студентом'))
+        keyboard.add_line(Button('Изменить ФИО'))
     else:
         keyboard.add_line(Button('Стать преподом'))
+        keyboard.add_line(Button('Изменить группу'))
+        keyboard.add_line(Button('Изменить подгруппу'))
     keyboard.add_line(Button('Назад'))
     return keyboard
 
@@ -55,8 +97,11 @@ async def settings(r: Request):
     router = Router(default=unknown_settings_command, name='settings')
     if r.user.ptype is PType.teacher:
         router.add_route(text_cond('Стать студентом'), become_student)
+        router.add_route(text_cond('Изменить ФИО'), switch_to_settings_name)
     else:
         router.add_route(text_cond('Стать преподом'), become_teacher)
+        router.add_route(text_cond('Изменить группу'), switch_to_settings_group)
+        router.add_route(text_cond('Изменить подгруппу'), switch_to_settings_subgroup)
     router.add_route(text_cond('Назад'), switch_to_schedule)
     return await router(r)
 
