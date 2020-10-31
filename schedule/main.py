@@ -22,7 +22,7 @@ def get_bottex():
 
 
 def setup_db():
-    # sqlite_string = 'sqlite://'
+    # db = create_engine('sqlite://')
     db = create_engine('postgres://bysqdjznormjbf:c41a168449bf9c5721cc3c68d01b0b9b5dc903d9fe292457300f9bda0028bebb@ec2-54-75-229-28.eu-west-1.compute.amazonaws.com:5432/debevur5ab08ov')
     sqldb.create_tables(db)
     sqldb.set_engine(db)

@@ -59,6 +59,7 @@ class Router(Handler):
 
 
 def text_cond(s: str) -> Condition:
+    s = s.lower()
     def cond(request: Request) -> bool:
         return request.text.lower() == s.lower()
     return cond
@@ -73,6 +74,7 @@ def regexp_cond(exp: Union[str, Pattern]) -> Condition:
 
 
 def words_cond(*wds: str) -> Condition:
+    wds = [w.lower() for w in wds]
     def cond(request: Request) -> bool:
         return request.text.lower() in wds
     return cond
