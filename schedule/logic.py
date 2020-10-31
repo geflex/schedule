@@ -5,7 +5,6 @@ from bottex2.utils import gen_state_conds
 from bottex2.views import View, Command
 from bottex2.chat import Keyboard
 
-from .bases import empty_kb
 from . import sched_logic
 from . import models
 
@@ -22,13 +21,13 @@ async def start_setup(r: Request):
 async def student_ptype_input(r: Request):
     await r.user.update(ptype=models.PType.student)
     await r.user.update(state=start_group_input.__name__)
-    await r.chat.send_message('Окей, теперь введи номер своей группы', empty_kb)
+    await r.chat.send_message('Окей, теперь введи номер своей группы', Keyboard())
 
 
 async def teacher_ptype_input(r: Request):
     await r.user.update(ptype=models.PType.teacher)
     await r.user.update(state=start_name_input.__name__)
-    await r.chat.send_message('Хорошо, теперь введите свои ФИО', empty_kb)
+    await r.chat.send_message('Хорошо, теперь введите свои ФИО', Keyboard())
 
 
 async def profile_type_error(r: Request):
