@@ -1,6 +1,7 @@
 from bottex2.chat import Button, Keyboard
 from bottex2.router import Router, text_cond
 from bottex2.handler import Request
+from bottex2.views import View, Command
 
 from schedule.models import PType
 from schedule._logic import Date
@@ -24,6 +25,23 @@ async def group_after_switching_ptype(r: Request):
 
 
 # =====================================================
+
+
+class Settings(View):
+    def init_commands(self):
+        commands = []
+        def add(text, cb):
+            commands.append([Command(text, cb)])
+
+        if self.r.user.ptype is PType.teacher:
+            add('Стать студентом', become_student)
+            add('Изменить ФИО', switch_to_settings_name)
+        else:
+            add('Стать преподом', become_teacher)
+            add('Изменить группу', switch_to_settings_group)
+            add('Изменить подгруппу', switch_to_settings_subgroup)
+        add('Назад', switch_to_schedule)
+        return commands
 
 
 async def switch_to_settings_group(r: Request):
@@ -94,29 +112,11 @@ async def become_student(r: Request):
 
 
 def get_settings_kb(r: Request):
-    keyboard = Keyboard()
-    if r.user.ptype is PType.teacher:
-        keyboard.add_line(Button('Стать студентом'))
-        keyboard.add_line(Button('Изменить ФИО'))
-    else:
-        keyboard.add_line(Button('Стать преподом'))
-        keyboard.add_line(Button('Изменить группу'))
-        keyboard.add_line(Button('Изменить подгруппу'))
-    keyboard.add_line(Button('Назад'))
-    return keyboard
+    return Settings(r).init_keyboard()
 
 
 async def settings(r: Request):
-    router = Router(default=unknown_settings_command, name='settings')
-    if r.user.ptype is PType.teacher:
-        router.add_route(text_cond('Стать студентом'), become_student)
-        router.add_route(text_cond('Изменить ФИО'), switch_to_settings_name)
-    else:
-        router.add_route(text_cond('Стать преподом'), become_teacher)
-        router.add_route(text_cond('Изменить группу'), switch_to_settings_group)
-        router.add_route(text_cond('Изменить подгруппу'), switch_to_settings_subgroup)
-    router.add_route(text_cond('Назад'), switch_to_schedule)
-    return await router(r)
+    return await Settings(r).handle()
 
 
 unknown_command_str = 'Хм непонятная команда'
