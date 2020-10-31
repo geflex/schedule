@@ -27,17 +27,17 @@ async def group_after_switching_ptype(r: Request):
 
 
 async def switch_to_settings_group(r: Request):
-    await r.chat.send_message(f'Текущая группа: {r.user.group}\nВведи номер группы', Keyboard())
+    await r.chat.send_message(f'Текущая группа: {r.user.group}\nВведи номер группы', input_kb)
     await r.user.update(state=settings_group.__name__)
 
 
 async def switch_to_settings_name(r: Request):
-    await r.chat.send_message(f'Текущее имя: {r.user.name}\nВведи новое имя', Keyboard())
+    await r.chat.send_message(f'Текущее имя: {r.user.name}\nВведи новое имя', input_kb)
     await r.user.update(state=settings_name.__name__)
 
 
 async def switch_to_settings_subgroup(r: Request):
-    await r.chat.send_message(f'Текущая подгруппа: {r.user.subgroup}\nВведи номер подгруппы', Keyboard())
+    await r.chat.send_message(f'Текущая подгруппа: {r.user.subgroup}\nВведи номер подгруппы', input_kb)
     await r.user.update(state=settings_subgroup.__name__)
 
 
@@ -60,7 +60,7 @@ async def settings_subgroup_input(r: Request):
 
 
 async def settings_cancel_input(r: Request):
-    await r.chat.send_message('Ладно')
+    await r.chat.send_message('Ладно', get_settings_kb(r))
     await r.user.update(state=settings.__name__)
 
 
