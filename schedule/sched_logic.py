@@ -1,3 +1,5 @@
+from functools import cached_property
+
 from bottex2.chat import Button, Keyboard
 from bottex2.router import Router, text_cond
 from bottex2.handler import Request
