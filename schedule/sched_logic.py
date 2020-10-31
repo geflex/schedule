@@ -67,9 +67,9 @@ async def settings_cancel_input(r: Request):
 no_change_label = 'Не менять'
 input_kb = Keyboard([[Button(no_change_label)]])
 input_commands = {text_cond(no_change_label): settings_cancel_input}
-settings_group = Router(input_commands, default=settings_group_input)
-settings_name = Router(input_commands, default=settings_name_input)
-settings_subgroup = Router(input_commands, default=settings_subgroup_input)
+settings_group = Router(input_commands, default=settings_group_input, name='settings_group')
+settings_name = Router(input_commands, default=settings_name_input, name='settings_name')
+settings_subgroup = Router(input_commands, default=settings_subgroup_input, name='settings_subgroup')
 
 
 # =====================================================
