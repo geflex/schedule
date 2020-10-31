@@ -26,6 +26,10 @@ class _Base:
                 raise AttributeError(f'There is no column {field} in {self.__tablename__}')
         self.session.commit()
 
+    async def delete(self):
+        self.session.delete(self)
+        self.session.commit()
+
 
 Base = declarative_base(cls=_Base)
 
