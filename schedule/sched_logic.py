@@ -117,7 +117,7 @@ def get_settings_kb(r: Request):
 
 
 async def settings(r: Request):
-    return await Settings(r).handle()
+    return await Settings.handle(r)
 
 
 unknown_command_str = 'Хм непонятная команда'

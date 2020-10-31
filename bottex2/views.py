@@ -41,8 +41,9 @@ class View(ABC):
                 router.add_route(text_cond(command.text), command.callback)
         return router
 
-    async def handle(self):
-        await self.router(self.r)
+    @classmethod
+    async def handle(cls, request: Request):
+        await cls(request).router(request)
 
     @staticmethod
     async def default(r: Request):
