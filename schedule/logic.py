@@ -4,7 +4,7 @@ from bottex2.middlewares.users import gen_state_conds
 from bottex2.chat import Keyboard, Button
 
 from .bases import empty_kb
-from .sched_logic import schedule, schedule_kb, settings, name_after_switching_ptype, group_after_switching_ptype
+from . import sched_logic
 from . import models
 
 ptype_kb = Keyboard([[Button('Студент'), Button('Препод')]])
@@ -40,25 +40,28 @@ ptype_input = Router({
 
 
 async def start_group_input(r: Request):
-    await r.user.update(group=r.text, state=schedule.__name__)
+    await r.user.update(group=r.text, state=sched_logic.schedule.__name__)
     await success_registration(r)
 
 
 async def start_name_input(r: Request):
-    await r.user.update(name=r.text, state=schedule.__name__)
+    await r.user.update(name=r.text, state=sched_logic.schedule.__name__)
     await success_registration(r)
 
 
 async def success_registration(r: Request):
-    await r.chat.send_message('Ура, все настроили', schedule_kb)
+    await r.chat.send_message('Ура, все настроили', sched_logic.schedule_kb)
 
 
 main = Router(gen_state_conds([
         ptype_input,
         start_group_input,
         start_name_input,
-        schedule,
-        settings,
-        name_after_switching_ptype,
-        group_after_switching_ptype,
+        sched_logic.schedule,
+        sched_logic.settings,
+        sched_logic.name_after_switching_ptype,
+        sched_logic.group_after_switching_ptype,
+        sched_logic.settings_name,
+        sched_logic.settings_group,
+        sched_logic.settings_subgroup,
      ]), default=start_setup)
