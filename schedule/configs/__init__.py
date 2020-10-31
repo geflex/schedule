@@ -1,4 +1,6 @@
 from . import tg, vk
+import os
 
 
-host = 'https://bntu-schedule.herokuapp.com/'
+host = os.environ.get('HOST', None)
+db_url = os.environ.get('DATABASE_URL')
