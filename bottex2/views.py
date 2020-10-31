@@ -13,6 +13,8 @@ class Command:
 
 
 class View(ABC):
+    name: str
+
     def __init__(self, request: Request):
         self.r = request
         self.commands = self.init_commands()

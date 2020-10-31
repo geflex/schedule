@@ -35,7 +35,3 @@ def state_cond(st: str) -> Condition:
     def cond(request: Request) -> bool:
         return request.user.state == st
     return cond
-
-
-def gen_state_conds(routes: List[FunctionType]):
-    return {state_cond(func.__name__): func for func in routes}

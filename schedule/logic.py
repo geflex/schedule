@@ -1,7 +1,9 @@
 from bottex2.handler import Request
 from bottex2.router import Router, text_cond
-from bottex2.middlewares.users import gen_state_conds
-from bottex2.chat import Keyboard, Button
+from bottex2.middlewares.users import state_cond
+from bottex2.utils import gen_state_conds
+from bottex2.views import View, Command
+from bottex2.chat import Keyboard
 
 from .bases import empty_kb
 from . import sched_logic
