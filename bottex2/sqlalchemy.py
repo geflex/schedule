@@ -20,7 +20,10 @@ class _Base:
 
     async def update(self, **kwargs):
         for field, value in kwargs.items():
-            setattr(self, field, value)
+            if hasattr(self, field):
+                setattr(self, field, value)
+            else:
+                raise AttributeError(f'There is no column {field} in {self.__tablename__}')
         self.session.commit()
 
 
