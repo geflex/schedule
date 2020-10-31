@@ -63,6 +63,7 @@ async def success_registration(r: Request):
 
 async def delete_me(r: Request):
     await r.user.delete()
+    await r.chat.send_message('Данные успешно удалены', Keyboard())
 
 
 conds = gen_state_conds([
