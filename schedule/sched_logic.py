@@ -13,24 +13,42 @@ schedule_kb = Keyboard([
 ])
 
 
+async def name_settings_input(r: Request):
+    await r.chat.send_message('Теперь ты препод', get_settings_kb(r))
+    await r.user.update(name=r.text, state=settings.__name__)
+
+
+async def group_settings_input(r: Request):
+    await r.chat.send_message('Теперь ты студент', get_settings_kb(r))
+    await r.user.update(group=r.text, state=settings.__name__)
+
+
+async def become_teacher(r: Request):
+    await r.user.update(ptype=PType.teacher)
+    if r.user.name:
+        await r.chat.send_message('Теперь ты препод', get_settings_kb(r))
+    else:
+        await r.chat.send_message('Введи свои ФИО', Keyboard())
+        await r.user.update(state=name_settings_input.__name__)
+
+
+async def become_student(r: Request):
+    await r.user.update(ptype=PType.student)
+    if r.user.group:
+        await r.chat.send_message('Теперь ты студент', get_settings_kb(r))
+    else:
+        await r.chat.send_message('Введи номер группы', Keyboard())
+        await r.user.update(state=group_settings_input.__name__)
+
+
 def get_settings_kb(r: Request):
-    keyboard = Keyboard([])
+    keyboard = Keyboard()
     if r.user.ptype is PType.teacher:
         keyboard.add_line(Button('Стать студентом'))
     else:
         keyboard.add_line(Button('Стать преподом'))
     keyboard.add_line(Button('Назад'))
     return keyboard
-
-
-async def become_teacher(r: Request):
-    await r.user.update(ptype=PType.teacher)
-    await r.chat.send_message('Теперь ты препод', get_settings_kb(r))
-
-
-async def become_student(r: Request):
-    await r.user.update(ptype=PType.student)
-    await r.chat.send_message('Теперь ты студент', get_settings_kb(r))
 
 
 async def settings(r: Request):

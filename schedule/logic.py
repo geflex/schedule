@@ -4,13 +4,13 @@ from bottex2.middlewares.users import gen_state_conds
 from bottex2.chat import Keyboard, Button
 
 from .bases import empty_kb
-from .sched_logic import schedule, schedule_kb, settings
+from .sched_logic import schedule, schedule_kb, settings, name_settings_input, group_settings_input
 from . import models
 
 ptype_kb = Keyboard([[Button('Студент'), Button('Препод')]])
 
 
-async def init_user(r: Request):
+async def start_setup(r: Request):
     await r.user.update(state=ptype_input.__name__)
     await r.chat.send_message('Хай! Сначала нужно кое-что настроить '
                               '(все это можно будет поменять позже в настройках)')
@@ -19,13 +19,13 @@ async def init_user(r: Request):
 
 async def student_ptype_input(r: Request):
     await r.user.update(ptype=models.PType.student)
-    await r.user.update(state=group_input.__name__)
+    await r.user.update(state=start_group_input.__name__)
     await r.chat.send_message('Окей, теперь введи номер своей группы', empty_kb)
 
 
 async def teacher_ptype_input(r: Request):
     await r.user.update(ptype=models.PType.teacher)
-    await r.user.update(state=fio_input.__name__)
+    await r.user.update(state=start_name_input.__name__)
     await r.chat.send_message('Хорошо, теперь введите свои ФИО', empty_kb)
 
 
@@ -39,13 +39,13 @@ ptype_input = Router({
 }, default=profile_type_error, name='ptype_input')
 
 
-async def group_input(r: Request):
+async def start_group_input(r: Request):
     await r.user.update(group=r.text, state=schedule.__name__)
     await success_registration(r)
 
 
-async def fio_input(r: Request):
-    await r.user.update(fio=r.text, state=schedule.__name__)
+async def start_name_input(r: Request):
+    await r.user.update(name=r.text, state=schedule.__name__)
     await success_registration(r)
 
 
@@ -55,8 +55,10 @@ async def success_registration(r: Request):
 
 main = Router(gen_state_conds([
         ptype_input,
-        group_input,
-        fio_input,
+        start_group_input,
+        start_name_input,
         schedule,
         settings,
-     ]), default=init_user)
+        name_settings_input,
+        group_settings_input,
+     ]), default=start_setup)
