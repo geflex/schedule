@@ -36,6 +36,9 @@ class Router(Handler):
             router = router.routes[condition]
         return router.set_default
 
+    def add_route(self, condition, handler):
+        self.routes[condition] = handler
+
     def find_handler(self, request: Request) -> Handler:
         """Searches and returns handler matching registered conditions"""
         handler = self.default
