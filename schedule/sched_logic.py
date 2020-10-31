@@ -27,36 +27,36 @@ async def group_after_switching_ptype(r: Request):
 
 
 async def switch_to_settings_group(r: Request):
-    await r.chat.send_message('Введи номер группы', Keyboard())
+    await r.chat.send_message(f'Текущая группа: {r.user.group}\nВведи номер группы', Keyboard())
     await r.user.update(state=settings_group.__name__)
 
 
 async def switch_to_settings_name(r: Request):
-    await r.chat.send_message('Введи новое имя', Keyboard())
+    await r.chat.send_message(f'Текущее имя: {r.user.name}\nВведи новое имя', Keyboard())
     await r.user.update(state=settings_name.__name__)
 
 
 async def switch_to_settings_subgroup(r: Request):
-    await r.chat.send_message('Введи номер подгруппы', Keyboard())
+    await r.chat.send_message(f'Текущая подгруппа: {r.user.subgroup}\nВведи номер подгруппы', Keyboard())
     await r.user.update(state=settings_subgroup.__name__)
 
 
 async def settings_group(r: Request):
     old_group = r.user.group
     await r.user.update(group=r.text, state=settings.__name__)
-    await r.chat.send_message(f'Группа изменена: {old_group} -> {r.user.group}', get_settings_kb(r))
+    await r.chat.send_message(f'Группа изменена с {old_group} на {r.user.group}', get_settings_kb(r))
 
 
 async def settings_name(r: Request):
     old_name = r.user.name
     await r.user.update(name=r.text, state=settings.__name__)
-    await r.chat.send_message(f'ФИО изменены: {old_name} -> {r.user.name}', get_settings_kb(r))
+    await r.chat.send_message(f'Имя изменено с {old_name} на {r.user.name}', get_settings_kb(r))
 
 
 async def settings_subgroup(r: Request):
     old_subgroup = r.user.subgroup
     await r.user.update(subgroup=r.text, state=settings.__name__)
-    await r.chat.send_message(f'Подгруппа изменена: {old_subgroup} -> {r.user.subgroup}', get_settings_kb(r))
+    await r.chat.send_message(f'Подгруппа изменена с {old_subgroup} на {r.user.subgroup}', get_settings_kb(r))
 
 
 # =====================================================
