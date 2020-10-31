@@ -61,7 +61,7 @@ async def success_registration(r: Request):
     await r.chat.send_message('Ура, все настроили', sched_logic.schedule_kb)
 
 
-async def reset(r: Request):
+async def delete_me(r: Request):
     await r.user.delete()
 
 
@@ -77,7 +77,7 @@ conds = gen_state_conds([
         sched_logic.settings_group,
         sched_logic.settings_subgroup,
 ])
-main = Router({text_cond('reset'): reset,  # works in any state
+main = Router({text_cond('delete me'): delete_me,  # works in any state
                state_cond(PTypeInput.name): PTypeInput.handle,
                **conds},
               default=start_setup)
