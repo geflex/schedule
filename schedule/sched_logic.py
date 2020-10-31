@@ -65,11 +65,13 @@ unknown_command_str = 'Хм непонятная команда'
 
 
 async def today(r: Request):
-    await r.chat.send_message(f'Так расписание для {r.user.group} на {Date.today()}', schedule_kb)
+    date = Date.today().strftime('%d.%m.%Y')
+    await r.chat.send_message(f'Так расписание для {r.user.group} на {date}', schedule_kb)
 
 
 async def tomorrow(r: Request):
-    await r.chat.send_message(f'Так расписание для {r.user.group} на {Date.tomorrow()}', schedule_kb)
+    date = Date.tomorrow().strftime('%d.%m.%Y')
+    await r.chat.send_message(f'Так расписание для {r.user.group} на {date}', schedule_kb)
 
 
 async def switch_to_schedule(r: Request):
