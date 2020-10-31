@@ -41,22 +41,35 @@ async def switch_to_settings_subgroup(r: Request):
     await r.user.update(state=settings_subgroup.__name__)
 
 
-async def settings_group(r: Request):
+async def settings_group_input(r: Request):
     old_group = r.user.group
     await r.user.update(group=r.text, state=settings.__name__)
     await r.chat.send_message(f'Группа изменена с {old_group} на {r.user.group}', get_settings_kb(r))
 
 
-async def settings_name(r: Request):
+async def settings_name_input(r: Request):
     old_name = r.user.name
     await r.user.update(name=r.text, state=settings.__name__)
     await r.chat.send_message(f'Имя изменено с {old_name} на {r.user.name}', get_settings_kb(r))
 
 
-async def settings_subgroup(r: Request):
+async def settings_subgroup_input(r: Request):
     old_subgroup = r.user.subgroup
     await r.user.update(subgroup=r.text, state=settings.__name__)
     await r.chat.send_message(f'Подгруппа изменена с {old_subgroup} на {r.user.subgroup}', get_settings_kb(r))
+
+
+async def settings_cancel_input(r: Request):
+    await r.chat.send_message('Ладно')
+    await r.user.update(state=settings.__name__)
+
+
+no_change_label = 'Не менять'
+input_kb = Keyboard([[Button(no_change_label)]])
+input_commands = {text_cond(no_change_label): settings_cancel_input}
+settings_group = Router(input_commands, default=settings_group_input)
+settings_name = Router(input_commands, default=settings_name_input)
+settings_subgroup = Router(input_commands, default=settings_subgroup_input)
 
 
 # =====================================================
