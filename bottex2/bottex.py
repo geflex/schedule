@@ -109,6 +109,7 @@ class Bottex(Receiver):
 
     async def listen(self) -> AsyncIterator[ReceiverRequest]:
         aiters = [self.wrap_receiver(rcvr) for rcvr in self._receivers]
+        logger.info('Bottex listening started')
         async for message in merge_async_iterators(aiters):
             yield message
 
