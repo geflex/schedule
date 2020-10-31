@@ -73,7 +73,7 @@ class Lesson(Base):
     id = Column(sqltypes.Integer, primary_key=True)
     groups: str
     weeknum: int
-    weekday = Column(sqltypes.Enum)
+    weekday = Column(sqltypes.Enum(Weekday))
     subgroup = Column(sqltypes.Integer)
     time = Column(sqltypes.Time)
     name = Column(sqltypes.String)
