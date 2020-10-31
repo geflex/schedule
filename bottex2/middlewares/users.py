@@ -1,5 +1,4 @@
-from typing import List, Type
-from types import FunctionType
+from typing import Type
 
 from sqlalchemy import Column, Integer, String
 
