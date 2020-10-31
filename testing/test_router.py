@@ -10,6 +10,6 @@ def valid_condition(message, **params):
 
 
 def test_check_condition():
-    router.check_condition(valid_condition)
+    router.is_cond_valid(valid_condition)
     with pytest.raises(ValueError):
-        router.check_condition(invalid_condition)
+        router.is_cond_valid(invalid_condition)

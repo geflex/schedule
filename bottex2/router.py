@@ -84,7 +84,7 @@ def any_cond(conditions: Iterator[Condition]) -> Condition:
     return cond
 
 
-def check_condition(condition: Condition):
+def is_cond_valid(condition: Condition):
     if not callable(condition):
         raise TypeError('`Condition` must be callable')
     if not tools.have_kwargs_parameter(condition):
