@@ -2,6 +2,7 @@ aiovk
 aiogram
 aiohttp  # installs with aiovk
 sqlalchemy
+psycopg2
 xlrd
 # retrying
 # Babel
