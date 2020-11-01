@@ -5,12 +5,22 @@ from bottex2.middlewares.users import state_cond
 from bottex2.views import View
 
 
-def gen_state_conds(handlers: List[Union[Type[View], FunctionType]]):
+Named = Union[Type[View], FunctionType]
+
+
+def name(obj: Named):
+    if isinstance(obj, type) and issubclass(obj, View):
+        return obj.name
+    else:
+        return obj.__name__
+
+
+def gen_state_conds(handlers: List[Named]):
     routes = {}
-    for handler in handlers:
-        if isinstance(handler, type) and issubclass(handler, View):
-            state, handler = handler.name, handler.handle
+    for obj in handlers:
+        if isinstance(obj, type) and issubclass(obj, View):
+            handler = obj.handle
         else:
-            state = handler.__name__
-        routes[state_cond(state)] = handler
+            handler = obj
+        routes[state_cond(name(obj))] = handler
     return routes
