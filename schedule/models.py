@@ -3,7 +3,6 @@ from typing import List
 
 from sqlalchemy import Column
 from sqlalchemy import types as sqltypes
-from sqlalchemy.orm import relationship
 
 from bottex2.middlewares.users import UserModel
 from bottex2.sqlalchemy import Base
@@ -64,7 +63,7 @@ class User(UserModel):
     ptype = Column(sqltypes.Enum(PType))
     name = Column(sqltypes.String)  # for teacher
     group = Column(sqltypes.String)  # only for student
-    subgroup = Column(sqltypes.String)  # only for student
+    subgroup = Column(sqltypes.Enum('1', '2', name='subgroup'))  # only for student
 
 
 class Lesson(Base):
