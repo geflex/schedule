@@ -55,6 +55,8 @@ class BaseInput(View):
 
 
 class SettingsGroup(BaseInput):
+    name = 'settings_group'
+
     async def default(self, r: Request):
         old_group = r.user.group
         await r.user.update(group=r.text, state=Settings.name)
@@ -69,6 +71,8 @@ class SettingsGroup(BaseInput):
 
 
 class SettingsName(BaseInput):
+    name = 'settings_name'
+
     async def default(self, r: Request):
         old_name = r.user.name
         await r.user.update(name=r.text, state=Settings.name)
@@ -83,6 +87,8 @@ class SettingsName(BaseInput):
 
 
 class SettingsSubgroup(BaseInput):
+    name = 'settings_subgroup'
+
     async def default(self, r: Request):
         old_subgroup = r.user.subgroup
         await r.user.update(subgroup=r.text, state=Settings.name)
