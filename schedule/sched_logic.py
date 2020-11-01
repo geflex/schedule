@@ -114,24 +114,14 @@ async def become_student(r: Request):
         await r.user.update(state=group_after_switching_ptype.__name__)
 
 
-async def today(r: Request):
-    date = Date.today().strftime('%d.%m.%Y')
-    await r.chat.send_message(f'Так расписание для {r.user.group} на {date}', Schedule(r).keyboard)
-
-
-async def tomorrow(r: Request):
-    date = Date.tomorrow().strftime('%d.%m.%Y')
-    await r.chat.send_message(f'Так расписание для {r.user.group} на {date}', Schedule(r).keyboard)
-
-
 class Schedule(View):
     name = 'schedule'
 
     @cached_property
     def commands(self):
         return [
-            [Command('Сегодня', today)],
-            [Command('Завтра', tomorrow)],
+            [Command('Сегодня', self.today)],
+            [Command('Завтра', self.tomorrow)],
             [Command('Настройки', Settings.switch)],
         ]
 
@@ -142,3 +132,22 @@ class Schedule(View):
     async def switch(cls, r: Request):
         await r.chat.send_message('Главное меню', cls(r).keyboard)
         await super().switch(r)
+
+    async def _schedule(self, date: Date, r: Request):
+        if r.user.ptype is PType.student:
+            who = r.user.group
+        else:
+            who = r.user.name
+
+        await r.chat.send_message(f'Так расписание для {who} на {date.strftime("%d.%m.%Y")}',
+                                  self.keyboard)
+
+    @classmethod
+    async def today(cls, r: Request):
+        date = Date.today()
+        await cls(r)._schedule(date, r)
+
+    @classmethod
+    async def tomorrow(cls, r: Request):
+        date = Date.tomorrow()
+        await cls(r)._schedule(date, r)
