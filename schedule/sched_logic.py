@@ -1,19 +1,11 @@
 from functools import cached_property
 
-from bottex2.chat import Button, Keyboard
-from bottex2.router import Router, text_cond
+from bottex2.chat import Keyboard
 from bottex2.handler import Request
 from bottex2.views import View, Command
 
 from schedule.models import PType
 from schedule._logic import Date
-
-
-schedule_kb = Keyboard([
-    [Button('Сегодня')],
-    [Button('Завтра')],
-    [Button('Настройки')],
-])
 
 
 async def name_after_switching_ptype(r: Request):
@@ -60,7 +52,7 @@ class SettingsGroup(BaseInput):
         old_group = r.user.group
         await r.user.update(group=r.text, state=Settings.name)
         await r.chat.send_message(f'Группа изменена с {old_group} на {r.user.group}',
-                                  Settings(r).keyboard)
+                                  self.keyboard)
 
 
 class SettingsName(BaseInput):
@@ -68,7 +60,7 @@ class SettingsName(BaseInput):
         old_name = r.user.name
         await r.user.update(name=r.text, state=Settings.name)
         await r.chat.send_message(f'Имя изменено с {old_name} на {r.user.name}',
-                                  Settings(r).keyboard)
+                                  self.keyboard)
 
 
 class SettingsSubgroup(BaseInput):
@@ -76,7 +68,7 @@ class SettingsSubgroup(BaseInput):
         old_subgroup = r.user.subgroup
         await r.user.update(subgroup=r.text, state=Settings.name)
         await r.chat.send_message(f'Подгруппа изменена с {old_subgroup} на {r.user.subgroup}',
-                                  Settings(r).keyboard)
+                                  self.keyboard)
 
 
 async def switch_to_settings_group(r: Request):
@@ -125,21 +117,17 @@ unknown_command_str = 'Хм непонятная команда'
 
 async def today(r: Request):
     date = Date.today().strftime('%d.%m.%Y')
-    await r.chat.send_message(f'Так расписание для {r.user.group} на {date}', schedule_kb)
+    await r.chat.send_message(f'Так расписание для {r.user.group} на {date}', Schedule(r).keyboard)
 
 
 async def tomorrow(r: Request):
     date = Date.tomorrow().strftime('%d.%m.%Y')
-    await r.chat.send_message(f'Так расписание для {r.user.group} на {date}', schedule_kb)
+    await r.chat.send_message(f'Так расписание для {r.user.group} на {date}', Schedule(r).keyboard)
 
 
 async def switch_to_schedule(r: Request):
-    await r.chat.send_message('Главное меню', schedule_kb)
-    await r.user.update(state=schedule.__name__)
-
-
-async def unknown_settings_command(r: Request):
-    await r.chat.send_message(unknown_command_str, Settings(r).keyboard)
+    await r.chat.send_message('Главное меню', Schedule(r).keyboard)
+    await r.user.update(state=Schedule.name)
 
 
 async def switch_to_settings(r: Request):
@@ -147,12 +135,16 @@ async def switch_to_settings(r: Request):
     await r.user.update(state=Settings.name)
 
 
-async def unknown_schedule_command(r: Request):
-    await r.chat.send_message(unknown_command_str, schedule_kb)
+class Schedule(View):
+    name = 'schedule'
 
+    @cached_property
+    def commands(self):
+        return [
+            [Command('Сегодня', today)],
+            [Command('Завтра', tomorrow)],
+            [Command('Настройки', switch_to_settings)],
+        ]
 
-schedule = Router({
-    text_cond('сегодня'): today,
-    text_cond('завтра'): tomorrow,
-    text_cond('настройки'): switch_to_settings,
-}, default=unknown_schedule_command, name='schedule')
+    async def default(self, r: Request):
+        await r.chat.send_message(unknown_command_str, self.keyboard)

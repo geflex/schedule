@@ -46,17 +46,17 @@ class PTypeInput(View):
 
 
 async def start_group_input(r: Request):
-    await r.user.update(group=r.text, state=sched_logic.schedule.__name__)
+    await r.user.update(group=r.text, state=sched_logic.Schedule.name)
     await success_registration(r)
 
 
 async def start_name_input(r: Request):
-    await r.user.update(name=r.text, state=sched_logic.schedule.__name__)
+    await r.user.update(name=r.text, state=sched_logic.Schedule.name)
     await success_registration(r)
 
 
 async def success_registration(r: Request):
-    await r.chat.send_message('Ура, все настроили', sched_logic.schedule_kb)
+    await r.chat.send_message('Ура, все настроили', sched_logic.Schedule(r).keyboard)
 
 
 async def delete_me(r: Request):
@@ -68,7 +68,7 @@ conds = gen_state_conds([
         PTypeInput,
         start_group_input,
         start_name_input,
-        sched_logic.schedule,
+        sched_logic.Schedule,
         sched_logic.Settings,
         sched_logic.name_after_switching_ptype,
         sched_logic.group_after_switching_ptype,
