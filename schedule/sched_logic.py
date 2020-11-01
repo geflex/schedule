@@ -112,9 +112,6 @@ async def become_student(r: Request):
         await r.user.update(state=group_after_switching_ptype.__name__)
 
 
-unknown_command_str = 'Хм непонятная команда'
-
-
 async def today(r: Request):
     date = Date.today().strftime('%d.%m.%Y')
     await r.chat.send_message(f'Так расписание для {r.user.group} на {date}', Schedule(r).keyboard)
@@ -147,4 +144,4 @@ class Schedule(View):
         ]
 
     async def default(self, r: Request):
-        await r.chat.send_message(unknown_command_str, self.keyboard)
+        await r.chat.send_message('Хм непонятная команда', self.keyboard)
