@@ -145,3 +145,8 @@ class Schedule(View):
 
     async def default(self, r: Request):
         await r.chat.send_message('Хм непонятная команда', self.keyboard)
+
+    @classmethod
+    async def switch(cls, r: Request):
+        await r.chat.send_message('Настройки', cls(r).keyboard)
+        await super().switch(r)
