@@ -40,6 +40,11 @@ class Settings(View):
         add('Назад', Schedule.switch)
         return commands
 
+    @classmethod
+    async def switch(cls, r: Request):
+        await r.chat.send_message('Настройки', Settings(r).keyboard)
+        await super().switch(r)
+
 
 class BaseInput(View):
     @cached_property
@@ -122,11 +127,6 @@ async def tomorrow(r: Request):
     await r.chat.send_message(f'Так расписание для {r.user.group} на {date}', Schedule(r).keyboard)
 
 
-async def switch_to_settings(r: Request):
-    await r.chat.send_message('Настройки', Settings(r).keyboard)
-    await r.user.update(state=Settings.name)
-
-
 class Schedule(View):
     name = 'schedule'
 
@@ -135,7 +135,7 @@ class Schedule(View):
         return [
             [Command('Сегодня', today)],
             [Command('Завтра', tomorrow)],
-            [Command('Настройки', switch_to_settings)],
+            [Command('Настройки', Settings.switch)],
         ]
 
     async def default(self, r: Request):
