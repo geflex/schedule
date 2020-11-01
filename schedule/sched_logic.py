@@ -49,7 +49,7 @@ class BaseInput(View):
         return [[Command('Не менять', self.back)]]
 
     @classmethod
-    def back(cls, r: Request):
+    async def back(cls, r: Request):
         await r.chat.send_message('Ладно', Settings(r).keyboard)
         await r.user.update(state=Settings.name)
 
