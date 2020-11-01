@@ -61,7 +61,7 @@ class SettingsGroup(BaseInput):
         old_group = r.user.group
         await r.user.update(group=r.text, state=Settings.name)
         await r.chat.send_message(f'Группа изменена с {old_group} на {r.user.group}',
-                                  self.keyboard)
+                                  Settings(r).keyboard)
 
     @classmethod
     async def switch(cls, r: Request):
@@ -77,7 +77,7 @@ class SettingsName(BaseInput):
         old_name = r.user.name
         await r.user.update(name=r.text, state=Settings.name)
         await r.chat.send_message(f'Имя изменено с {old_name} на {r.user.name}',
-                                  self.keyboard)
+                                  Settings(r).keyboard)
 
     @classmethod
     async def switch(cls, r: Request):
@@ -93,7 +93,7 @@ class SettingsSubgroup(BaseInput):
         old_subgroup = r.user.subgroup
         await r.user.update(subgroup=r.text, state=Settings.name)
         await r.chat.send_message(f'Подгруппа изменена с {old_subgroup} на {r.user.subgroup}',
-                                  self.keyboard)
+                                  Settings(r).keyboard)
 
     @classmethod
     async def switch(cls, r: Request):
