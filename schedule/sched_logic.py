@@ -37,7 +37,7 @@ class Settings(View):
             add('Стать преподом', become_teacher)
             add('Изменить группу', switch_to_settings_group)
             add('Изменить подгруппу', switch_to_settings_subgroup)
-        add('Назад', switch_to_schedule)
+        add('Назад', Schedule.switch)
         return commands
 
 
@@ -120,11 +120,6 @@ async def today(r: Request):
 async def tomorrow(r: Request):
     date = Date.tomorrow().strftime('%d.%m.%Y')
     await r.chat.send_message(f'Так расписание для {r.user.group} на {date}', Schedule(r).keyboard)
-
-
-async def switch_to_schedule(r: Request):
-    await r.chat.send_message('Главное меню', Schedule(r).keyboard)
-    await r.user.update(state=Schedule.name)
 
 
 async def switch_to_settings(r: Request):
