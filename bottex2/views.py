@@ -47,3 +47,7 @@ class View(ABC):
 
     async def default(self, r: Request):
         await r.chat.send_message('404')
+
+    @classmethod
+    async def switch(cls, r: Request):
+        await r.user.update(state=cls.name)
