@@ -20,14 +20,12 @@ async def start_setup(r: Request):
 
 
 async def student_ptype_input(r: Request):
-    await r.user.update(ptype=models.PType.student)
-    await r.user.update(state=start_group_input.__name__)
+    await r.user.update(ptype=models.PType.student, state=start_group_input.__name__)
     await r.chat.send_message('Окей, теперь введи номер своей группы', Keyboard())
 
 
 async def teacher_ptype_input(r: Request):
-    await r.user.update(ptype=models.PType.teacher)
-    await r.user.update(state=start_name_input.__name__)
+    await r.user.update(state=start_name_input.__name__, ptype=models.PType.teacher)
     await r.chat.send_message('Хорошо, теперь введите свои ФИО', Keyboard())
 
 
@@ -71,7 +69,7 @@ conds = gen_state_conds([
         start_group_input,
         start_name_input,
         sched_logic.schedule,
-        sched_logic.settings,
+        sched_logic.Settings,
         sched_logic.name_after_switching_ptype,
         sched_logic.group_after_switching_ptype,
         sched_logic.settings_name,

@@ -17,19 +17,21 @@ schedule_kb = Keyboard([
 
 
 async def name_after_switching_ptype(r: Request):
-    await r.chat.send_message('Теперь ты препод', get_settings_kb(r))
-    await r.user.update(name=r.text, state=settings.__name__)
+    await r.chat.send_message('Теперь ты препод', Settings(r).keyboard)
+    await r.user.update(name=r.text, state=Settings.name)
 
 
 async def group_after_switching_ptype(r: Request):
-    await r.chat.send_message('Теперь ты студент', get_settings_kb(r))
-    await r.user.update(group=r.text, state=settings.__name__)
+    await r.chat.send_message('Теперь ты студент', Settings(r).keyboard)
+    await r.user.update(group=r.text, state=Settings.name)
 
 
 # =====================================================
 
 
 class Settings(View):
+    name = 'settings'
+    
     @cached_property
     def commands(self):
         commands = []
@@ -64,25 +66,25 @@ async def switch_to_settings_subgroup(r: Request):
 
 async def settings_group_input(r: Request):
     old_group = r.user.group
-    await r.user.update(group=r.text, state=settings.__name__)
-    await r.chat.send_message(f'Группа изменена с {old_group} на {r.user.group}', get_settings_kb(r))
+    await r.user.update(group=r.text, state=Settings.name)
+    await r.chat.send_message(f'Группа изменена с {old_group} на {r.user.group}', Settings(r).keyboard)
 
 
 async def settings_name_input(r: Request):
     old_name = r.user.name
-    await r.user.update(name=r.text, state=settings.__name__)
-    await r.chat.send_message(f'Имя изменено с {old_name} на {r.user.name}', get_settings_kb(r))
+    await r.user.update(name=r.text, state=Settings.name)
+    await r.chat.send_message(f'Имя изменено с {old_name} на {r.user.name}', Settings(r).keyboard)
 
 
 async def settings_subgroup_input(r: Request):
     old_subgroup = r.user.subgroup
-    await r.user.update(subgroup=r.text, state=settings.__name__)
-    await r.chat.send_message(f'Подгруппа изменена с {old_subgroup} на {r.user.subgroup}', get_settings_kb(r))
+    await r.user.update(subgroup=r.text, state=Settings.name)
+    await r.chat.send_message(f'Подгруппа изменена с {old_subgroup} на {r.user.subgroup}', Settings(r).keyboard)
 
 
 async def settings_cancel_input(r: Request):
-    await r.chat.send_message('Ладно', get_settings_kb(r))
-    await r.user.update(state=settings.__name__)
+    await r.chat.send_message('Ладно', Settings(r).keyboard)
+    await r.user.update(state=Settings.name)
 
 
 no_change_label = 'Не менять'
@@ -99,7 +101,7 @@ settings_subgroup = Router(input_commands, default=settings_subgroup_input, name
 async def become_teacher(r: Request):
     await r.user.update(ptype=PType.teacher)
     if r.user.name:
-        await r.chat.send_message('Теперь ты препод', get_settings_kb(r))
+        await r.chat.send_message('Теперь ты препод', Settings(r).keyboard)
     else:
         await r.chat.send_message('Введи свои ФИО', Keyboard())
         await r.user.update(state=name_after_switching_ptype.__name__)
@@ -108,18 +110,10 @@ async def become_teacher(r: Request):
 async def become_student(r: Request):
     await r.user.update(ptype=PType.student)
     if r.user.group:
-        await r.chat.send_message('Теперь ты студент', get_settings_kb(r))
+        await r.chat.send_message('Теперь ты студент', Settings(r).keyboard)
     else:
         await r.chat.send_message('Введи номер группы', Keyboard())
         await r.user.update(state=group_after_switching_ptype.__name__)
-
-
-def get_settings_kb(r: Request):
-    return Settings(r).keyboard
-
-
-async def settings(r: Request):
-    return await Settings.handle(r)
 
 
 unknown_command_str = 'Хм непонятная команда'
@@ -141,12 +135,12 @@ async def switch_to_schedule(r: Request):
 
 
 async def unknown_settings_command(r: Request):
-    await r.chat.send_message(unknown_command_str, get_settings_kb(r))
+    await r.chat.send_message(unknown_command_str, Settings(r).keyboard)
 
 
 async def switch_to_settings(r: Request):
-    await r.chat.send_message('Настройки', get_settings_kb(r))
-    await r.user.update(state=settings.__name__)
+    await r.chat.send_message('Настройки', Settings(r).keyboard)
+    await r.user.update(state=Settings.name)
 
 
 async def unknown_schedule_command(r: Request):
