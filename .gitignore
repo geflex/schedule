@@ -1,5 +1,6 @@
 /venvs/
 /.idea/
+/.run
 /parsers/data/
 /schedule/configs/
 /schedule/schedule.db
