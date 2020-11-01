@@ -46,7 +46,7 @@ class View(ABC):
         await cls(request).router(request)
 
     async def default(self, r: Request):
-        await r.chat.send_message('404')
+        await r.chat.send_message('404', self.keyboard)
 
     @classmethod
     async def switch(cls, r: Request):
