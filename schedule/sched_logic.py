@@ -89,11 +89,21 @@ class SettingsName(BaseInput):
 class SettingsSubgroup(BaseInput):
     name = 'settings_subgroup'
 
-    async def default(self, r: Request):
-        old_subgroup = r.user.subgroup
-        await r.user.update(subgroup=r.text, state=Settings.name)
-        await r.chat.send_message(f'Подгруппа изменена с {old_subgroup} на {r.user.subgroup}',
-                                  Settings(r).keyboard)
+    @cached_property
+    def commands(self):
+        commands = [[
+            Command('Первая', self.get_subgroup_setter('1')),
+            Command('Вторая', self.get_subgroup_setter('2')),
+        ]]
+        return commands
+
+    def get_subgroup_setter(self, subgroup_num: str):
+        def subgroup_setter(r: Request):
+            old_subgroup = r.user.subgroup
+            r.user.update(subgroup=subgroup_num, state=Settings.name)
+            await r.chat.send_message(f'Подгруппа изменена с {old_subgroup} на {r.user.subgroup}',
+                                      Settings(r).keyboard)
+        return subgroup_setter
 
     @classmethod
     async def switch(cls, r: Request):
