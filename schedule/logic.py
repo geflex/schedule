@@ -72,9 +72,9 @@ conds = gen_state_conds([
         sched_logic.Settings,
         sched_logic.name_after_switching_ptype,
         sched_logic.group_after_switching_ptype,
-        sched_logic.settings_name,
-        sched_logic.settings_group,
-        sched_logic.settings_subgroup,
+        sched_logic.SettingsName,
+        sched_logic.SettingsGroup,
+        sched_logic.SettingsSubgroup,
 ])
 main = Router({text_cond('delete me'): delete_me,  # works in any state
                state_cond(PTypeInput.name): PTypeInput.handle,

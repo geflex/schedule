@@ -49,50 +49,54 @@ class Settings(View):
         return commands
 
 
+class BaseInput(View):
+    @cached_property
+    def commands(self):
+        return [[Command('Не менять', settings_cancel_input)]]
+
+
+class SettingsGroup(BaseInput):
+    async def default(self, r: Request):
+        old_group = r.user.group
+        await r.user.update(group=r.text, state=Settings.name)
+        await r.chat.send_message(f'Группа изменена с {old_group} на {r.user.group}',
+                                  Settings(r).keyboard)
+
+
+class SettingsName(BaseInput):
+    async def default(self, r: Request):
+        old_name = r.user.name
+        await r.user.update(name=r.text, state=Settings.name)
+        await r.chat.send_message(f'Имя изменено с {old_name} на {r.user.name}',
+                                  Settings(r).keyboard)
+
+
+class SettingsSubgroup(BaseInput):
+    async def default(self, r: Request):
+        old_subgroup = r.user.subgroup
+        await r.user.update(subgroup=r.text, state=Settings.name)
+        await r.chat.send_message(f'Подгруппа изменена с {old_subgroup} на {r.user.subgroup}',
+                                  Settings(r).keyboard)
+
+
 async def switch_to_settings_group(r: Request):
-    await r.chat.send_message(f'Текущая группа: {r.user.group}\nВведи номер группы', input_kb)
-    await r.user.update(state=settings_group.__name__)
+    await r.chat.send_message(f'Текущая группа: {r.user.group}\nВведи номер группы', SettingsGroup(r).keyboard)
+    await r.user.update(state=SettingsGroup.name)
 
 
 async def switch_to_settings_name(r: Request):
-    await r.chat.send_message(f'Текущее имя: {r.user.name}\nВведи новое имя', input_kb)
-    await r.user.update(state=settings_name.__name__)
+    await r.chat.send_message(f'Текущее имя: {r.user.name}\nВведи новое имя', SettingsName(r).keyboard)
+    await r.user.update(state=SettingsName.name)
 
 
 async def switch_to_settings_subgroup(r: Request):
-    await r.chat.send_message(f'Текущая подгруппа: {r.user.subgroup}\nВведи номер подгруппы', input_kb)
-    await r.user.update(state=settings_subgroup.__name__)
-
-
-async def settings_group_input(r: Request):
-    old_group = r.user.group
-    await r.user.update(group=r.text, state=Settings.name)
-    await r.chat.send_message(f'Группа изменена с {old_group} на {r.user.group}', Settings(r).keyboard)
-
-
-async def settings_name_input(r: Request):
-    old_name = r.user.name
-    await r.user.update(name=r.text, state=Settings.name)
-    await r.chat.send_message(f'Имя изменено с {old_name} на {r.user.name}', Settings(r).keyboard)
-
-
-async def settings_subgroup_input(r: Request):
-    old_subgroup = r.user.subgroup
-    await r.user.update(subgroup=r.text, state=Settings.name)
-    await r.chat.send_message(f'Подгруппа изменена с {old_subgroup} на {r.user.subgroup}', Settings(r).keyboard)
+    await r.chat.send_message(f'Текущая подгруппа: {r.user.subgroup}\nВведи номер подгруппы', SettingsSubgroup(r).keyboard)
+    await r.user.update(state=SettingsSubgroup.name)
 
 
 async def settings_cancel_input(r: Request):
     await r.chat.send_message('Ладно', Settings(r).keyboard)
     await r.user.update(state=Settings.name)
-
-
-no_change_label = 'Не менять'
-input_kb = Keyboard([[Button(no_change_label)]])
-input_commands = {text_cond(no_change_label): settings_cancel_input}
-settings_group = Router(input_commands, default=settings_group_input, name='settings_group')
-settings_name = Router(input_commands, default=settings_name_input, name='settings_name')
-settings_subgroup = Router(input_commands, default=settings_subgroup_input, name='settings_subgroup')
 
 
 # =====================================================
