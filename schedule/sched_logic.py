@@ -98,9 +98,9 @@ class SettingsSubgroup(BaseInput):
         return commands
 
     def get_subgroup_setter(self, subgroup_num: str):
-        def subgroup_setter(r: Request):
+        async def subgroup_setter(r: Request):
             old_subgroup = r.user.subgroup
-            r.user.update(subgroup=subgroup_num, state=Settings.name)
+            await r.user.update(subgroup=subgroup_num, state=Settings.name)
             await r.chat.send_message(f'Подгруппа изменена с {old_subgroup} на {r.user.subgroup}',
                                       Settings(r).keyboard)
         return subgroup_setter
