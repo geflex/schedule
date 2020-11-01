@@ -18,9 +18,6 @@ async def group_after_switching_ptype(r: Request):
     await r.user.update(group=r.text, state=Settings.name)
 
 
-# =====================================================
-
-
 class Settings(View):
     name = 'settings'
     
@@ -32,11 +29,11 @@ class Settings(View):
 
         if self.r.user.ptype is PType.teacher:
             add('Стать студентом', become_student)
-            add('Изменить ФИО', switch_to_settings_name)
+            add('Изменить ФИО', SettingsName.switch)
         else:
             add('Стать преподом', become_teacher)
-            add('Изменить группу', switch_to_settings_group)
-            add('Изменить подгруппу', switch_to_settings_subgroup)
+            add('Изменить группу', SettingsGroup.switch)
+            add('Изменить подгруппу', SettingsSubgroup.switch)
         add('Назад', Schedule.switch)
         return commands
 
@@ -49,7 +46,12 @@ class Settings(View):
 class BaseInput(View):
     @cached_property
     def commands(self):
-        return [[Command('Не менять', settings_cancel_input)]]
+        return [[Command('Не менять', self.back)]]
+
+    @classmethod
+    def back(cls, r: Request):
+        await r.chat.send_message('Ладно', Settings(r).keyboard)
+        await r.user.update(state=Settings.name)
 
 
 class SettingsGroup(BaseInput):
@@ -59,6 +61,12 @@ class SettingsGroup(BaseInput):
         await r.chat.send_message(f'Группа изменена с {old_group} на {r.user.group}',
                                   self.keyboard)
 
+    @classmethod
+    async def switch(cls, r: Request):
+        await r.chat.send_message(f'Текущая группа: {r.user.group}\nВведи номер группы',
+                                  cls(r).keyboard)
+        await super().switch(r)
+
 
 class SettingsName(BaseInput):
     async def default(self, r: Request):
@@ -66,6 +74,12 @@ class SettingsName(BaseInput):
         await r.user.update(name=r.text, state=Settings.name)
         await r.chat.send_message(f'Имя изменено с {old_name} на {r.user.name}',
                                   self.keyboard)
+
+    @classmethod
+    async def switch(cls, r: Request):
+        await r.chat.send_message(f'Текущее имя: {r.user.name}\nВведи новое имя',
+                                  cls(r).keyboard)
+        await super().switch(r)
 
 
 class SettingsSubgroup(BaseInput):
@@ -75,28 +89,11 @@ class SettingsSubgroup(BaseInput):
         await r.chat.send_message(f'Подгруппа изменена с {old_subgroup} на {r.user.subgroup}',
                                   self.keyboard)
 
-
-async def switch_to_settings_group(r: Request):
-    await r.chat.send_message(f'Текущая группа: {r.user.group}\nВведи номер группы', SettingsGroup(r).keyboard)
-    await r.user.update(state=SettingsGroup.name)
-
-
-async def switch_to_settings_name(r: Request):
-    await r.chat.send_message(f'Текущее имя: {r.user.name}\nВведи новое имя', SettingsName(r).keyboard)
-    await r.user.update(state=SettingsName.name)
-
-
-async def switch_to_settings_subgroup(r: Request):
-    await r.chat.send_message(f'Текущая подгруппа: {r.user.subgroup}\nВведи номер подгруппы', SettingsSubgroup(r).keyboard)
-    await r.user.update(state=SettingsSubgroup.name)
-
-
-async def settings_cancel_input(r: Request):
-    await r.chat.send_message('Ладно', Settings(r).keyboard)
-    await r.user.update(state=Settings.name)
-
-
-# =====================================================
+    @classmethod
+    async def switch(cls, r: Request):
+        await r.chat.send_message(f'Текущая подгруппа: {r.user.subgroup}\nВведи номер подгруппы',
+                                  cls(r).keyboard)
+        await super().switch(r)
 
 
 async def become_teacher(r: Request):
