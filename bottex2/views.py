@@ -10,6 +10,7 @@ from bottex2.router import Router, text_cond
 class Command:
     def __init__(self, text: str, callback):
         self.text = text
+        self.condition = text_cond(text)
         self.callback = callback
 
 
@@ -38,7 +39,7 @@ class View(ABC):
         router = Router(default=self.default)
         for line in self.commands:
             for command in line:
-                router.add_route(text_cond(command.text), command.callback)
+                router.add_route(command.condition, command.callback)
         return router
 
     @classmethod
@@ -46,7 +47,7 @@ class View(ABC):
         await cls(request).router(request)
 
     async def default(self, r: Request):
-        await r.chat.send_message('404', self.keyboard)
+        await r.chat.send_message('404: not found', self.keyboard)
 
     @classmethod
     async def switch(cls, r: Request):
