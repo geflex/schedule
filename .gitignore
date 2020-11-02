@@ -1,9 +1,7 @@
-/venvs/
+/.venvs/
 /.idea/
 /.run
 /parsers/data/
 /schedule/configs/
 /schedule/ssl/
 /schedule/schedule.db
-bottex.svg
-RUN.BAT
