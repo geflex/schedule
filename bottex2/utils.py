@@ -8,8 +8,8 @@ from bottex2.views import View
 Named = Union[Type[View], FunctionType]
 
 
-def name(obj: Named):
-    if isinstance(obj, type) and issubclass(obj, View):
+def name(obj):
+    if hasattr(obj, 'name'):
         return obj.name
     else:
         return obj.__name__
