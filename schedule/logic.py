@@ -4,7 +4,7 @@ from typing import List
 from bottex2.handler import Request
 from bottex2.router import Router, text_cond
 from bottex2.middlewares.users import state_cond
-from bottex2.utils import gen_state_conds
+from bottex2.utils import gen_state_conds, name
 from bottex2.views import View, Command
 from bottex2.chat import Keyboard
 
@@ -13,7 +13,7 @@ from . import models
 
 
 async def start_setup(r: Request):
-    await r.user.update(state=PTypeInput.name)
+    await r.user.update(state=name(PTypeInput))
     await r.chat.send_message('Хай! Сначала нужно кое-что настроить '
                               '(все это можно будет поменять позже в настройках)')
     await r.chat.send_message('Сначала выбери тип профиля', PTypeInput(r).keyboard)
@@ -54,7 +54,7 @@ class StartSubgroupInput(sched_logic.SettingsSubgroup):
     def get_subgroup_setter(self, subgroup_num: str):
         async def subgroup_setter(r: Request):
             old_subgroup = r.user.subgroup
-            await r.user.update(subgroup=subgroup_num, state=sched_logic.Schedule.name)
+            await r.user.update(subgroup=subgroup_num, state=name(sched_logic.Schedule))
             await send_end_registratioon_message(r)
         return subgroup_setter
 
@@ -65,7 +65,7 @@ class StartSubgroupInput(sched_logic.SettingsSubgroup):
 
 
 async def start_name_input(r: Request):
-    await r.user.update(name=r.text, state=sched_logic.Schedule.name)
+    await r.user.update(name=r.text, state=name(sched_logic.Schedule))
     await send_end_registratioon_message(r)
 
 
@@ -92,6 +92,6 @@ conds = gen_state_conds([
         sched_logic.SettingsSubgroup,
 ])
 main = Router({text_cond('delete me'): delete_me,  # works in any state
-               state_cond(PTypeInput.name): PTypeInput.handle,
+               state_cond(name(PTypeInput)): PTypeInput.handle,
                **conds},
               default=start_setup)

@@ -2,6 +2,7 @@ from functools import cached_property
 
 from bottex2.chat import Keyboard
 from bottex2.handler import Request
+from bottex2.utils import name
 from bottex2.views import View, Command
 
 from schedule.models import PType
@@ -10,12 +11,12 @@ from schedule._logic import Date
 
 async def name_after_switching_ptype(r: Request):
     await r.chat.send_message('Теперь ты препод', Settings(r).keyboard)
-    await r.user.update(name=r.text, state=Settings.name)
+    await r.user.update(name=r.text, state=name(Settings))
 
 
 async def group_after_switching_ptype(r: Request):
     await r.chat.send_message('Теперь ты студент', Settings(r).keyboard)
-    await r.user.update(group=r.text, state=Settings.name)
+    await r.user.update(group=r.text, state=name(Settings))
 
 
 class Settings(View):
@@ -51,7 +52,7 @@ class BaseInput(View):
     @classmethod
     async def back(cls, r: Request):
         await r.chat.send_message('Ладно', Settings(r).keyboard)
-        await r.user.update(state=Settings.name)
+        await r.user.update(state=name(Settings))
 
 
 class SettingsGroup(BaseInput):
@@ -59,7 +60,7 @@ class SettingsGroup(BaseInput):
 
     async def default(self, r: Request):
         old_group = r.user.group
-        await r.user.update(group=r.text, state=Settings.name)
+        await r.user.update(group=r.text, state=name(Settings))
         await r.chat.send_message(f'Группа изменена с {old_group} на {r.user.group}',
                                   Settings(r).keyboard)
 
@@ -75,7 +76,7 @@ class SettingsName(BaseInput):
 
     async def default(self, r: Request):
         old_name = r.user.name
-        await r.user.update(name=r.text, state=Settings.name)
+        await r.user.update(name=r.text, state=name(Settings))
         await r.chat.send_message(f'Имя изменено с {old_name} на {r.user.name}',
                                   Settings(r).keyboard)
 
@@ -100,7 +101,7 @@ class SettingsSubgroup(BaseInput):
     def get_subgroup_setter(self, subgroup_num: str):
         async def subgroup_setter(r: Request):
             old_subgroup = r.user.subgroup
-            await r.user.update(subgroup=subgroup_num, state=Settings.name)
+            await r.user.update(subgroup=subgroup_num, state=name(Settings))
             await r.chat.send_message(f'Подгруппа изменена с {old_subgroup} на {r.user.subgroup}',
                                       Settings(r).keyboard)
         return subgroup_setter
