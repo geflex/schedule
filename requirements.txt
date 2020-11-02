@@ -3,6 +3,7 @@ aiogram
 aiohttp  # installs with aiovk
 sqlalchemy
 psycopg2
+alembic
 xlrd
 # retrying
 # Babel
