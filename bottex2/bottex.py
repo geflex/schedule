@@ -18,9 +18,19 @@ class BottexMiddleware:
                       middleware: Optional[AbstractMiddleware] = None):
         return specify_middleware(cls, receiver_cls, middleware)
 
-    @classmethod
-    def get_middleware(cls, receiver_cls: Type[Receiver]) -> AbstractMiddleware:
-        return middlewares.setdefault(cls, {}).get(receiver_cls, cls)
+
+def _get_submiddleware(bottex_middleware: Type[BottexMiddleware],
+                       receiver_cls: Type[Receiver]) -> AbstractMiddleware:
+    return middlewares.setdefault(bottex_middleware, {}).get(receiver_cls, bottex_middleware)
+
+
+def get_submiddleware(middleware: Type[BottexMiddleware],
+                      receiver: Receiver) -> AbstractMiddleware:
+    submiddleware = _get_submiddleware(middleware, type(receiver))
+    if submiddleware is middleware and not middleware.__universal__:  # !!! __universal__?
+        logger.debug(f'No {middleware.__name__} specified for '
+                     f'{type(receiver).__name__}')
+    return submiddleware
 
 
 middlewares: Dict[Type[BottexMiddleware], Dict[Type[Receiver], AbstractMiddleware]]
@@ -57,23 +67,16 @@ class Bottex(Receiver):
         super().__init__()
         self._receivers = set(receivers)  # type: Set[Receiver]
 
-    def _get_submiddleware(self, receiver: Receiver, middleware: Type[BottexMiddleware]):
-        submiddleware = middleware.get_middleware(type(receiver))
-        if submiddleware is middleware and not middleware.__universal__:  # !!! __universal__?
-            logger.debug(f'No {middleware.__name__} specified for '
-                         f'{type(receiver).__name__}')
-        return submiddleware
-
     def add_handler_middleware(self, middleware: Type[BottexHandlerMiddleware]):
         super().add_handler_middleware(middleware)
         for receiver in self._receivers:
-            submiddleware = self._get_submiddleware(receiver, middleware)
+            submiddleware = get_submiddleware(middleware, receiver)
             receiver.add_handler_middleware(submiddleware)
 
     def add_chat_middleware(self, middleware: Type[BottexChatMiddleware]):
         super().add_chat_middleware(middleware)
         for receiver in self._receivers:
-            submiddleware = self._get_submiddleware(receiver, middleware)
+            submiddleware = get_submiddleware(middleware, receiver)
             receiver.add_chat_middleware(submiddleware)
 
     def add_middleware(self, middleware: Type[BottexMiddleware]):
