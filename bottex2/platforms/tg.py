@@ -70,8 +70,7 @@ class TgReceiver(Receiver):
 
 
 @users.UserBottexHandlerMiddleware.submiddleware(TgReceiver)
-class TgUserHandlerMiddleware(HandlerMiddleware):
-    async def __call__(self, request: Request):
+class TgUserHandlerMiddleware(users.UserBottexHandlerMiddleware):
+    async def get_user(self, request: Request):
         uid = request.raw['from']['id']
-        request.user = await users.user_cls.get(platform='tg', uid=uid)
-        await self.handler(request)
+        return await users.user_cls.get(platform='tg', uid=uid)

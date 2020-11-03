@@ -25,8 +25,11 @@ user_cls: Type[UserModel]
 
 
 class UserBottexHandlerMiddleware(BottexHandlerMiddleware):
+    async def get_user(self, request: Request):
+        return await user_cls.get(platform=None, uid='guest')
+
     async def __call__(self, request: Request):
-        request.user = await user_cls.get(platform=None, uid='guest')
+        request.user = await self.get_user(request)
         await self.handler(request)
 
 
