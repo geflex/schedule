@@ -1,8 +1,0 @@
-caching?
-i18n
-add_locales l10n
-notifications
-
-schedule by student lastname
-scedule by group
-group by faculty
