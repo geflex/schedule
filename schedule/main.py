@@ -5,7 +5,7 @@ from sqlalchemy import create_engine
 from bottex2.platforms.tg import TgReceiver
 from bottex2.platforms.vk import VkReceiver
 
-from bottex2.middlewares import loggers, users
+from bottex2.extensions import loggers, users
 from bottex2 import sqlalchemy as sqldb
 from bottex2.bottex import Bottex
 

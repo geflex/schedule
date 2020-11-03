@@ -5,7 +5,7 @@ from bottex2 import aiotools
 from bottex2.logging import logger
 from bottex2.chat import ChatMiddleware
 from bottex2.handler import HandlerError, Handler, HandlerMiddleware, Request
-from bottex2.middlewares.middlewares import AbstractMiddleware
+from bottex2.extensions.middlewares import AbstractMiddleware
 from bottex2.receiver import Receiver
 from bottex2.aiotools import merge_async_iterators
 

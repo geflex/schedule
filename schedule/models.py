@@ -4,8 +4,8 @@ from typing import List
 from sqlalchemy import Column
 from sqlalchemy import types as sqltypes
 
-from bottex2.middlewares.rights import RightsMixin
-from bottex2.middlewares.users import UserModel
+from bottex2.extensions.rights import RightsMixin
+from bottex2.extensions.users import UserModel
 from bottex2.sqlalchemy import Base
 
 

@@ -1,7 +1,7 @@
 from types import FunctionType
 from typing import List, Union, Type
 
-from bottex2.middlewares.users import state_cond
+from bottex2.extensions.users import state_cond
 from bottex2.views import View
 
 

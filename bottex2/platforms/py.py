@@ -4,7 +4,7 @@ import asyncio
 from dataclasses import dataclass
 from typing import AsyncIterator, Optional
 
-from bottex2.middlewares.users import UserBottexHandlerMiddleware
+from bottex2.extensions.users import UserBottexHandlerMiddleware
 from bottex2.handler import  Request
 from bottex2.receiver import Receiver
 from bottex2.chat import AbstractChat, Keyboard

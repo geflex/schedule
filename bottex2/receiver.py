@@ -56,7 +56,7 @@ class Receiver(ABC):
     async def serve_async(self):
         """
         Receives events from `listen` and handles it in `_handler`.
-        Also uses middlewares for process events.
+        Also uses extensions for process events.
         """
         self._check()
         async for request in self.listen():
