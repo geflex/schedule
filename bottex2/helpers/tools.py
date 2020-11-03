@@ -1,4 +1,18 @@
 import inspect
+from types import FunctionType
+from typing import Union, Type
+
+from bottex2.views import View
+
+
+Named = Union[Type[View], FunctionType]
+
+
+def name(obj):
+    if hasattr(obj, 'name'):
+        return obj.name
+    else:
+        return obj.__name__
 
 
 invisible_space = '\u200b'

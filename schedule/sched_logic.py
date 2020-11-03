@@ -2,7 +2,7 @@ from functools import cached_property
 
 from bottex2.chat import Keyboard
 from bottex2.handler import Request
-from bottex2.helpers.utils import name
+from bottex2.helpers.tools import name
 from bottex2.views import View, Command
 
 from schedule.models import PType

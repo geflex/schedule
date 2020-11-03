@@ -1,11 +1,13 @@
-from typing import Type
+from typing import Type, List
 
 from sqlalchemy import Column, Integer, String
 
+from bottex2.helpers.tools import Named, name
 from bottex2.sqlalchemy import Base
 from bottex2.handler import Request
 from bottex2.router import Condition
 from bottex2.bottex import BottexHandlerMiddleware
+from bottex2.views import View
 
 
 class UserModel(Base):
@@ -41,3 +43,14 @@ def state_cond(st: str) -> Condition:
     def cond(request: Request) -> bool:
         return request.user.state == st
     return cond
+
+
+def gen_state_conds(handlers: List[Named]):
+    routes = {}
+    for obj in handlers:
+        if isinstance(obj, type) and issubclass(obj, View):
+            handler = obj.handle
+        else:
+            handler = obj
+        routes[state_cond(name(obj))] = handler
+    return routes
