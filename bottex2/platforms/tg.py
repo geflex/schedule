@@ -4,6 +4,7 @@ from typing import Optional, AsyncIterator
 
 import aiogram
 
+from bottex2.logging import logger
 from bottex2.handler import HandlerMiddleware, Request
 from bottex2.chat import AbstractChat, Keyboard
 from bottex2.receiver import Receiver
@@ -54,16 +55,18 @@ class TgReceiver(Receiver):
         while True:
             try:
                 updates = await self.bot.get_updates(offset=offset)
-            except asyncio.TimeoutError:  # aiohttp.ClientOSError):
-                continue
-            if updates:
-                offset = updates[-1].update_id + 1
-                for update in updates:
-                    raw = update['message']
-                    chat = TgChat(self.bot, raw['chat']['id'])
-                    yield Request(text=raw['text'],
-                                  chat=self.wrap_chat(chat),
-                                  raw=raw)
+            except (asyncio.TimeoutError,
+                    aiogram.exceptions.TelegramAPIError) as e:
+                logger.error(e)
+            else:
+                if updates:
+                    offset = updates[-1].update_id + 1
+                    for update in updates:
+                        raw = update['message']
+                        chat = TgChat(self.bot, raw['chat']['id'])
+                        yield Request(text=raw['text'],
+                                      chat=self.wrap_chat(chat),
+                                      raw=raw)
 
 
 @users.UserBottexHandlerMiddleware.submiddleware(TgReceiver)

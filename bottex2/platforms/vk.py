@@ -8,9 +8,11 @@ import asyncio
 from aiovk import API
 from aiovk.sessions import BaseSession, TokenSession
 from aiovk.longpoll import BotsLongPoll
+from aiovk.exceptions import VkAPIError
 
 from bottex2.handler import HandlerMiddleware, Request
 from bottex2.chat import AbstractChat, Keyboard
+from bottex2.logging import logger
 from bottex2.receiver import Receiver
 from bottex2.middlewares import users
 
@@ -62,16 +64,16 @@ class VkReceiver(Receiver):
         while True:
             try:
                 response = await self._longpoll.wait(need_pts=True)
-            except asyncio.TimeoutError:
-                continue
-
-            for event in response['updates']:
-                if event['type'] == 'message_new':
-                    message = event['object']['message']
-                    chat = VkChat(self._session, message['peer_id'])
-                    yield Request(text=message['text'],
-                                  chat=self.wrap_chat(chat),
-                                  raw=event)
+            except (asyncio.TimeoutError, VkAPIError) as e:
+                logger.error(e)
+            else:
+                for event in response['updates']:
+                    if event['type'] == 'message_new':
+                        message = event['object']['message']
+                        chat = VkChat(self._session, message['peer_id'])
+                        yield Request(text=message['text'],
+                                      chat=self.wrap_chat(chat),
+                                      raw=event)
 
 
 @users.UserBottexHandlerMiddleware.submiddleware(VkReceiver)
