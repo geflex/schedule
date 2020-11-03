@@ -6,7 +6,7 @@ from bottex2.helpers.tools import name
 from bottex2.views import View, Command
 
 from schedule.models import PType
-from schedule._logic import Date
+from schedule.db_api import Date
 
 
 async def name_after_switching_ptype(r: Request):
