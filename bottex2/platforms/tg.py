@@ -57,7 +57,7 @@ class TgReceiver(Receiver):
                 updates = await self.bot.get_updates(offset=offset)
             except (asyncio.TimeoutError,
                     aiogram.exceptions.TelegramAPIError) as e:
-                logger.error(e)
+                logger.error(repr(e))
             else:
                 if updates:
                     offset = updates[-1].update_id + 1

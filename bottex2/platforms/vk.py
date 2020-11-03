@@ -65,7 +65,7 @@ class VkReceiver(Receiver):
             try:
                 response = await self._longpoll.wait(need_pts=True)
             except (asyncio.TimeoutError, VkAPIError) as e:
-                logger.error(e)
+                logger.error(repr(e))
             else:
                 for event in response['updates']:
                     if event['type'] == 'message_new':
