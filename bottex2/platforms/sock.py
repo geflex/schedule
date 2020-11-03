@@ -2,7 +2,7 @@ import json
 from typing import AsyncIterator, Optional
 import asyncio
 
-from bottex2 import aiotools
+from bottex2.helpers import aiotools
 from bottex2.chat import AbstractChat, Keyboard
 from bottex2.handler import Request
 from bottex2.receiver import Receiver

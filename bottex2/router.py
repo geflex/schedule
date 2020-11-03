@@ -1,7 +1,7 @@
 import re
 from typing import Optional, MutableMapping, Callable, Union, Pattern, Iterator
 
-from bottex2 import tools
+from bottex2.helpers import tools
 from bottex2.handler import Handler, check_handler, HandlerError, Request
 from bottex2.logging import logger
 

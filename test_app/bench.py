@@ -4,7 +4,7 @@ import time
 from typing import Union, List
 
 from bottex2.platforms.py import PyMessage, PyReceiver, PyUserHandlerMiddleware
-from bottex2 import aiotools
+from bottex2.helpers import aiotools
 
 from test_app import logic
 from schedule.main import setup_db

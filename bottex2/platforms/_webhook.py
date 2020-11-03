@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 import aiohttp
 import aiohttp.web
 
-from bottex2 import aiotools
+from bottex2.helpers import aiotools
 from bottex2.handler import Request
 from bottex2.receiver import Receiver
 

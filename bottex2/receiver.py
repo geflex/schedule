@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import AsyncIterator, List, Type
 
-from bottex2 import aiotools
+from bottex2.helpers import aiotools
 from bottex2.chat import ChatMiddleware, AbstractChat
 from bottex2.handler import Handler, HandlerMiddleware, Request
 from bottex2.logging import logger
