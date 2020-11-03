@@ -4,7 +4,7 @@ import logging
 from bottex2.platforms.tg import TgReceiver
 from bottex2.platforms.vk import VkReceiver
 
-from bottex2.extensions import loggers, users
+from bottex2.extensions import logging as logging_ext, users
 from bottex2.bottex import Bottex
 
 from test_app import logic
@@ -22,8 +22,8 @@ def get_bottex():
 
 def set_middlewares(bottex):
     bottex.add_middleware(users.UserBottexHandlerMiddleware)
-    bottex.add_middleware(loggers.BottexLoggingHandlerMiddleware)
-    bottex.add_middleware(loggers.BottexLoggingChatMiddleware)
+    bottex.add_middleware(logging_ext.BottexLoggingHandlerMiddleware)
+    bottex.add_middleware(logging_ext.BottexLoggingChatMiddleware)
 
 
 def main():

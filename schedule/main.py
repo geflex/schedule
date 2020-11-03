@@ -5,7 +5,7 @@ from sqlalchemy import create_engine
 from bottex2.platforms.tg import TgReceiver
 from bottex2.platforms.vk import VkReceiver
 
-from bottex2.extensions import loggers, users
+from bottex2.extensions import logging as logging_ext, users
 from bottex2 import sqlalchemy as sqldb
 from bottex2.bottex import Bottex
 
@@ -30,8 +30,8 @@ def setup_db():
 
 def set_middlewares(bottex):
     bottex.add_middleware(users.UserBottexHandlerMiddleware)
-    bottex.add_middleware(loggers.BottexLoggingHandlerMiddleware)
-    bottex.add_middleware(loggers.BottexLoggingChatMiddleware)
+    bottex.add_middleware(logging_ext.BottexLoggingHandlerMiddleware)
+    bottex.add_middleware(logging_ext.BottexLoggingChatMiddleware)
 
 
 def main():
