@@ -1,9 +1,10 @@
-from enum import Enum, IntFlag
+from enum import Enum
 from typing import List
 
 from sqlalchemy import Column
 from sqlalchemy import types as sqltypes
 
+from bottex2.middlewares.rights import RightsMixin
 from bottex2.middlewares.users import UserModel
 from bottex2.sqlalchemy import Base
 
@@ -12,12 +13,6 @@ class Lang(Enum):
     ru = 'ru'
     en = 'en'
     be = 'be'
-
-
-class Rights(IntFlag):
-    view = 1
-    edit = 2
-    notifying = 3
 
 
 class Department(Enum):
@@ -54,11 +49,10 @@ class PType(Enum):
     teacher = 1
 
 
-class User(UserModel):
+class User(UserModel, RightsMixin):
     notifications_time = Column(sqltypes.Time, nullable=True)
 
     locale = Column(sqltypes.Enum(Lang), default=Lang.ru)
-    rights = Column(sqltypes.Enum(Rights))
 
     ptype = Column(sqltypes.Enum(PType))
     name = Column(sqltypes.String)  # for teacher
