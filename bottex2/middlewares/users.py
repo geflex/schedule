@@ -25,8 +25,10 @@ user_cls: Type[UserModel]
 
 
 class UserBottexHandlerMiddleware(BottexHandlerMiddleware):
+    get_or_create = staticmethod(user_cls.get_or_create)
+
     async def get_user(self, request: Request):
-        return await user_cls.get(platform=None, uid='guest')
+        return await self.get(platform=None, uid='guest')
 
     async def __call__(self, request: Request):
         request.user = await self.get_user(request)

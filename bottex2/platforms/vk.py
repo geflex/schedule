@@ -10,11 +10,11 @@ from aiovk.sessions import BaseSession, TokenSession
 from aiovk.longpoll import BotsLongPoll
 from aiovk.exceptions import VkAPIError
 
-from bottex2.handler import HandlerMiddleware, Request
+from bottex2.handler import Request
 from bottex2.chat import AbstractChat, Keyboard
 from bottex2.logging import logger
 from bottex2.receiver import Receiver
-from bottex2.middlewares import users
+from bottex2.middlewares.users import UserBottexHandlerMiddleware
 
 
 class VkChat(AbstractChat):
@@ -76,8 +76,8 @@ class VkReceiver(Receiver):
                                       raw=event)
 
 
-@users.UserBottexHandlerMiddleware.submiddleware(VkReceiver)
-class VkUserHandlerMiddleware(users.UserBottexHandlerMiddleware):
+@UserBottexHandlerMiddleware.submiddleware(VkReceiver)
+class VkUserHandlerMiddleware(UserBottexHandlerMiddleware):
     async def get_user(self, request: Request):
         uid = request.raw['object']['message']['from_id']
-        return await users.user_cls.get(platform='vk', uid=uid)
+        return await self.get_or_create(platform='vk', uid=uid)

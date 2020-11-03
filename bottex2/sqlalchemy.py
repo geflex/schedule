@@ -8,9 +8,10 @@ Session = sessionmaker()
 # noinspection PyArgumentList
 class _Base:
     session = Session()
+    __tablename__: str
 
     @classmethod
-    async def get(cls, **kwargs):
+    async def get_or_create(cls, **kwargs):
         user = cls.session.query(cls).filter_by(**kwargs).one_or_none()
         if user is None:
             user = cls(**kwargs)

@@ -5,10 +5,10 @@ from typing import Optional, AsyncIterator
 import aiogram
 
 from bottex2.logging import logger
-from bottex2.handler import HandlerMiddleware, Request
+from bottex2.handler import Request
 from bottex2.chat import AbstractChat, Keyboard
 from bottex2.receiver import Receiver
-from bottex2.middlewares import users
+from bottex2.middlewares.users import UserBottexHandlerMiddleware
 
 
 class TgChat(AbstractChat):
@@ -69,8 +69,8 @@ class TgReceiver(Receiver):
                                       raw=raw)
 
 
-@users.UserBottexHandlerMiddleware.submiddleware(TgReceiver)
-class TgUserHandlerMiddleware(users.UserBottexHandlerMiddleware):
+@UserBottexHandlerMiddleware.submiddleware(TgReceiver)
+class TgUserHandlerMiddleware(UserBottexHandlerMiddleware):
     async def get_user(self, request: Request):
         uid = request.raw['from']['id']
-        return await users.user_cls.get(platform='tg', uid=uid)
+        return await self.get_or_create(platform='tg', uid=uid)
