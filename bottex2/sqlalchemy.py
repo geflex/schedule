@@ -1,4 +1,6 @@
-from sqlalchemy.ext.declarative import declarative_base
+from typing import Type
+
+from sqlalchemy.ext.declarative import declarative_base, DeclarativeMeta
 from sqlalchemy.orm import sessionmaker
 
 
@@ -6,7 +8,7 @@ Session = sessionmaker()
 
 
 # noinspection PyArgumentList
-class _Base:
+class _Model:
     session = Session()
     __tablename__: str
 
@@ -32,12 +34,12 @@ class _Base:
         self.session.commit()
 
 
-Base = declarative_base(cls=_Base)
+Model = declarative_base(cls=_Model)
 
 
 def set_engine(engine):
-    Base.session.bind = engine
+    Model.session.bind = engine
 
 
 def create_tables(engine):
-    Base.metadata.create_all(engine)
+    Model.metadata.create_all(engine)

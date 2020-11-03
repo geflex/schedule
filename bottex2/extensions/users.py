@@ -3,14 +3,14 @@ from typing import Type, List
 from sqlalchemy import Column, Integer, String
 
 from bottex2.helpers.tools import Named, name
-from bottex2.sqlalchemy import Base
+from bottex2.sqlalchemy import Model
 from bottex2.handler import Request
 from bottex2.router import Condition
 from bottex2.bottex import BottexHandlerMiddleware
 from bottex2.views import View
 
 
-class UserModel(Base):
+class UserModel(Model):
     __tablename__ = 'users'
 
     uid = Column(Integer, primary_key=True)

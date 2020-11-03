@@ -6,7 +6,7 @@ from sqlalchemy import types as sqltypes
 
 from bottex2.extensions.rights import RightsMixin
 from bottex2.extensions.users import UserModel
-from bottex2.sqlalchemy import Base
+from bottex2.sqlalchemy import Model
 
 
 class Lang(Enum):
@@ -60,7 +60,7 @@ class User(UserModel, RightsMixin):
     subgroup = Column(sqltypes.Enum('1', '2', name='subgroup'))  # only for student
 
 
-class Lesson(Base):
+class Lesson(Model):
     __tablename__ = 'lessons'
 
     id = Column(sqltypes.Integer, primary_key=True)
