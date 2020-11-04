@@ -186,7 +186,7 @@ class Pattern(Gen):
     def genrand(self, *values, **kwargs):
         values = self._merge_args(values, kwargs)
         return self._gen.genrand(values)
-    #
+
     def match(self, s, **kwargs):
         return self._pattern.match(s, **kwargs)
     def fullmatch(self, s, **kwargs):

@@ -68,7 +68,7 @@ def text_cond(s: str) -> Condition:
 def regexp_cond(exp: Union[str, Pattern]) -> Condition:
     exp = re.compile(exp)
     def cond(request: Request) -> bool:
-        m = exp.match(request.text.lower(), re.I)
+        m = exp.match(request.text)
         return bool(m)
     return cond
 

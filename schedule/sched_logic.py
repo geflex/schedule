@@ -1,9 +1,12 @@
 from functools import cached_property
+import re
 
 from bottex2.chat import Keyboard
 from bottex2.handler import Request
 from bottex2.helpers.tools import state_name
+from bottex2.router import Router, regexp_cond
 from bottex2.views import View, Command
+from bottex2.helpers import regexp
 
 from schedule.models import PType
 from schedule.db_api import Date
@@ -47,8 +50,16 @@ class SettingsInput(View):
 
 class SettingsGroupInput(SettingsInput):
     name = 'settings_group'
+    exp = re.compile(r'\d{8}')
+    revexp = regexp.compile(exp)
 
-    async def default(self, r: Request):
+    @cached_property
+    def router(self) -> Router:
+        router = super().router
+        router.add_route(regexp_cond(self.exp), self.set_subgroup)
+        return router
+
+    async def set_subgroup(self, r: Request):
         old_group = r.user.group
         await r.user.update(group=r.text, state=state_name(Settings))
         await r.chat.send_message(f'Группа изменена с {old_group} на {r.user.group}',
@@ -60,6 +71,9 @@ class SettingsGroupInput(SettingsInput):
         await r.chat.send_message(f'Текущая группа: {r.user.group}', kb)
         await r.chat.send_message('Введи номер группы', kb)
         await super().switch(r)
+
+    async def default(self, r: Request):
+        await r.chat.send_message(f'Номер группы должен состоять из 8 цифр', self.keyboard)
 
 
 class SettingsNameInput(SettingsInput):
