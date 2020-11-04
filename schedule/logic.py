@@ -55,7 +55,7 @@ class StartSubgroupInput(sched_logic.SettingsSubgroup):
         async def subgroup_setter(r: Request):
             old_subgroup = r.user.subgroup
             await r.user.update(subgroup=subgroup_num, state=state_name(sched_logic.Schedule))
-            await send_end_registratioon_message(r)
+            await send_end_registration_message(r)
         return subgroup_setter
 
     @classmethod
@@ -66,10 +66,10 @@ class StartSubgroupInput(sched_logic.SettingsSubgroup):
 
 async def start_name_input(r: Request):
     await r.user.update(name=r.text, state=state_name(sched_logic.Schedule))
-    await send_end_registratioon_message(r)
+    await send_end_registration_message(r)
 
 
-async def send_end_registratioon_message(r: Request):
+async def send_end_registration_message(r: Request):
     await r.chat.send_message('Ура, все настроили', sched_logic.Schedule(r).keyboard)
 
 
