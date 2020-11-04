@@ -48,7 +48,7 @@ async def start_group_input(r: Request):
     await StartSubgroupInput.switch(r)
 
 
-class StartSubgroupInput(sched_logic.SettingsSubgroup):
+class StartSubgroupInput(sched_logic.SettingsSubgroupInput):
     name = 'start_subgroup_input'
 
     def get_subgroup_setter(self, subgroup_num: str):
@@ -61,7 +61,7 @@ class StartSubgroupInput(sched_logic.SettingsSubgroup):
     @classmethod
     async def switch(cls, r: Request):
         await r.chat.send_message('Выбери свою подгруппу', cls(r).keyboard)
-        await super(sched_logic.SettingsSubgroup, cls).switch(r)
+        await super(sched_logic.SettingsSubgroupInput, cls).switch(r)
 
 
 async def start_name_input(r: Request):
@@ -87,9 +87,9 @@ conds = gen_state_conds([
         sched_logic.Settings,
         sched_logic.name_after_switching_ptype,
         sched_logic.group_after_switching_ptype,
-        sched_logic.SettingsName,
-        sched_logic.SettingsGroup,
-        sched_logic.SettingsSubgroup,
+        sched_logic.SettingsNameInput,
+        sched_logic.SettingsGroupInput,
+        sched_logic.SettingsSubgroupInput,
 ])
 main = Router({text_cond('delete me'): delete_me,  # works in any state
                state_cond(state_name(PTypeInput)): PTypeInput.handle,

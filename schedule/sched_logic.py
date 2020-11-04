@@ -30,11 +30,11 @@ class Settings(View):
 
         if self.r.user.ptype is PType.teacher:
             add('Стать студентом', become_student)
-            add('Изменить ФИО', SettingsName.switch)
+            add('Изменить ФИО', SettingsNameInput.switch)
         else:
             add('Стать преподом', become_teacher)
-            add('Изменить группу', SettingsGroup.switch)
-            add('Изменить подгруппу', SettingsSubgroup.switch)
+            add('Изменить группу', SettingsGroupInput.switch)
+            add('Изменить подгруппу', SettingsSubgroupInput.switch)
         add('Назад', Schedule.switch)
         return commands
 
@@ -55,7 +55,7 @@ class SettingsInput(View):
         await r.user.update(state=state_name(Settings))
 
 
-class SettingsGroup(SettingsInput):
+class SettingsGroupInput(SettingsInput):
     name = 'settings_group'
 
     async def default(self, r: Request):
@@ -71,7 +71,7 @@ class SettingsGroup(SettingsInput):
         await super().switch(r)
 
 
-class SettingsName(SettingsInput):
+class SettingsNameInput(SettingsInput):
     name = 'settings_name'
 
     async def default(self, r: Request):
@@ -87,7 +87,7 @@ class SettingsName(SettingsInput):
         await super().switch(r)
 
 
-class SettingsSubgroup(SettingsInput):
+class SettingsSubgroupInput(SettingsInput):
     name = 'settings_subgroup'
 
     @cached_property
