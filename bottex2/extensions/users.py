@@ -28,7 +28,7 @@ user_cls: Type[UserModel]
 class UserBottexHandlerMiddleware(BottexHandlerMiddleware):
     @staticmethod
     async def get_or_create(platform, uid):
-        return await user_cls.get_or_create()
+        return await user_cls.get_or_create(platform=platform, uid=uid)
 
     async def get_user(self, request: Request):
         return await self.get_or_create(None, 'guest')
