@@ -44,7 +44,7 @@ class Settings(View):
         await super().switch(r)
 
 
-class BaseInput(View):
+class SettingsInput(View):
     @cached_property
     def commands(self):
         return [[Command('Не менять', self.back)]]
@@ -55,7 +55,7 @@ class BaseInput(View):
         await r.user.update(state=state_name(Settings))
 
 
-class SettingsGroup(BaseInput):
+class SettingsGroup(SettingsInput):
     name = 'settings_group'
 
     async def default(self, r: Request):
@@ -71,7 +71,7 @@ class SettingsGroup(BaseInput):
         await super().switch(r)
 
 
-class SettingsName(BaseInput):
+class SettingsName(SettingsInput):
     name = 'settings_name'
 
     async def default(self, r: Request):
@@ -87,7 +87,7 @@ class SettingsName(BaseInput):
         await super().switch(r)
 
 
-class SettingsSubgroup(BaseInput):
+class SettingsSubgroup(SettingsInput):
     name = 'settings_subgroup'
 
     @cached_property
