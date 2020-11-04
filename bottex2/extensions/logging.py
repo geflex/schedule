@@ -9,7 +9,7 @@ class BottexLoggingHandlerMiddleware(BottexHandlerMiddleware):
     __universal__ = True
 
     async def __call__(self, request):
-        logger.info(f'in: {request.text!r}')
+        logger.info(f'in : {request.text!r}')
         await self.handler(request)
 
 
