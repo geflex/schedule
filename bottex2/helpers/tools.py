@@ -8,11 +8,18 @@ from bottex2.views import View
 Named = Union[Type[View], FunctionType]
 
 
-def name(obj):
+def state_name(obj):
     if hasattr(obj, 'name'):
         return obj.name
     else:
         return obj.__name__
+
+
+def state_handler(obj):
+    if isinstance(obj, type) and issubclass(obj, View):
+        return obj.handle
+    else:
+        return obj
 
 
 invisible_space = '\u200b'
