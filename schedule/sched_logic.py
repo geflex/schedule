@@ -9,16 +9,6 @@ from schedule.models import PType
 from schedule.db_api import Date
 
 
-async def name_after_switching_ptype(r: Request):
-    await r.chat.send_message('Теперь ты препод', Settings(r).keyboard)
-    await r.user.update(name=r.text, state=state_name(Settings))
-
-
-async def group_after_switching_ptype(r: Request):
-    await r.chat.send_message('Теперь ты студент', Settings(r).keyboard)
-    await r.user.update(group=r.text, state=state_name(Settings))
-
-
 class Settings(View):
     name = 'settings'
     
@@ -66,8 +56,9 @@ class SettingsGroupInput(SettingsInput):
 
     @classmethod
     async def switch(cls, r: Request):
-        await r.chat.send_message(f'Текущая группа: {r.user.group}\nВведи номер группы',
-                                  cls(r).keyboard)
+        kb = cls(r).keyboard
+        await r.chat.send_message(f'Текущая группа: {r.user.group}', kb)
+        await r.chat.send_message('Введи номер группы', kb)
         await super().switch(r)
 
 
@@ -82,8 +73,9 @@ class SettingsNameInput(SettingsInput):
 
     @classmethod
     async def switch(cls, r: Request):
-        await r.chat.send_message(f'Текущее имя: {r.user.name}\nВведи новое имя',
-                                  cls(r).keyboard)
+        kb = cls(r).keyboard
+        await r.chat.send_message(f'Текущее имя: {r.user.name}', kb)
+        await r.chat.send_message('Введи новое имя', kb)
         await super().switch(r)
 
 
@@ -108,9 +100,20 @@ class SettingsSubgroupInput(SettingsInput):
 
     @classmethod
     async def switch(cls, r: Request):
-        await r.chat.send_message(f'Текущая подгруппа: {r.user.subgroup}\nВведи номер подгруппы',
-                                  cls(r).keyboard)
+        kb = cls(r).keyboard
+        await r.chat.send_message(f'Текущая подгруппа: {r.user.subgroup}', kb)
+        await r.chat.send_message('Введи номер подгруппы', kb)
         await super().switch(r)
+
+
+async def name_after_switching_ptype(r: Request):
+    await r.chat.send_message('Теперь ты препод', Settings(r).keyboard)
+    await r.user.update(name=r.text, state=state_name(Settings))
+
+
+async def group_after_switching_ptype(r: Request):
+    await r.chat.send_message('Теперь ты студент', Settings(r).keyboard)
+    await r.user.update(group=r.text, state=state_name(Settings))
 
 
 async def become_teacher(r: Request):
