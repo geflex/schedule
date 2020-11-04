@@ -4,7 +4,7 @@ import logging
 from bottex2.platforms.tg import TgReceiver
 from bottex2.platforms.vk import VkReceiver
 
-from bottex2.extensions import logging as logging_ext, users
+from bottex2.ext import logging as logging_ext, users
 from bottex2.bottex import Bottex
 
 from test_app import logic

@@ -5,7 +5,7 @@ from aiovk.sessions import TokenSession
 from bottex2.platforms._webhook import AioHttpReceiverMixin
 from bottex2.platforms.vk import VkChat, VkUserHandlerMiddleware
 from bottex2.receiver import Request
-from bottex2.extensions import users
+from bottex2.ext import users
 
 
 class VkCallbackReceiver(AioHttpReceiverMixin):

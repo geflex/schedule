@@ -14,7 +14,7 @@ from bottex2.handler import Request
 from bottex2.chat import AbstractChat, Keyboard
 from bottex2.logging import logger
 from bottex2.receiver import Receiver
-from bottex2.extensions.users import UserBottexHandlerMiddleware
+from bottex2.ext.users import UserBottexHandlerMiddleware
 
 
 class VkChat(AbstractChat):

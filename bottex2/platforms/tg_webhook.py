@@ -3,7 +3,7 @@ from aiogram.bot import Bot
 
 from bottex2.platforms._webhook import AioHttpReceiverMixin
 from bottex2.platforms.tg import TgChat, TgUserHandlerMiddleware
-from bottex2.extensions import users
+from bottex2.ext import users
 from bottex2.receiver import Request
 
 

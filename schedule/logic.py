@@ -3,7 +3,7 @@ from typing import List
 
 from bottex2.handler import Request
 from bottex2.router import Router, text_cond
-from bottex2.extensions.users import state_cond, gen_state_conds
+from bottex2.ext.users import state_cond, gen_state_conds
 from bottex2.helpers.tools import state_name
 from bottex2.views import View, Command
 from bottex2.chat import Keyboard
