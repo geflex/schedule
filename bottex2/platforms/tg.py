@@ -73,4 +73,4 @@ class TgReceiver(Receiver):
 class TgUserHandlerMiddleware(UserBottexHandlerMiddleware):
     async def get_user(self, request: Request):
         uid = request.raw['from']['id']
-        return await self.get_or_create(platform='tg', uid=uid)
+        return await self.get_or_create('tg', uid)

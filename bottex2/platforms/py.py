@@ -51,4 +51,4 @@ class PyReceiver(Receiver):
 @UserBottexHandlerMiddleware.submiddleware(PyReceiver)
 class PyUserHandlerMiddleware(UserBottexHandlerMiddleware):
     async def get_user(self, request: Request):
-        return await self.get_or_create(platform='py', uid='default')
+        return await self.get_or_create('py', 'default')

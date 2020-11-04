@@ -80,4 +80,4 @@ class VkReceiver(Receiver):
 class VkUserHandlerMiddleware(UserBottexHandlerMiddleware):
     async def get_user(self, request: Request):
         uid = request.raw['object']['message']['from_id']
-        return await self.get_or_create(platform='vk', uid=uid)
+        return await self.get_or_create('vk', uid)
