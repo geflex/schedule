@@ -1,16 +1,14 @@
 from functools import cached_property
 from typing import List
 
-from bottex2.handler import Request
-from bottex2.router import Router, text_cond
-from bottex2.ext.users import state_cond, gen_state_conds
-from bottex2.helpers.tools import state_name
-from bottex2.views import View, Command
 from bottex2.chat import Keyboard
-
-from . import sched_logic
+from bottex2.ext.users import state_cond, gen_state_conds
+from bottex2.handler import Request
+from bottex2.helpers.tools import state_name
+from bottex2.router import Router, text_cond
+from bottex2.views import View, Command
 from . import models
-
+from . import sched_logic
 
 _ = lambda s: s
 
@@ -90,11 +88,12 @@ conds = gen_state_conds([
         sched_logic.Settings,
         sched_logic.name_after_switching_ptype,
         sched_logic.group_after_switching_ptype,
+        sched_logic.SettingsLanguageInput,
         sched_logic.SettingsNameInput,
         sched_logic.SettingsGroupInput,
         sched_logic.SettingsSubgroupInput,
 ])
-main = Router({text_cond('delete me'): delete_me,  # works in any state
+main = Router({text_cond('delete me'): delete_me,  # works in any states
                state_cond(state_name(PTypeInput)): PTypeInput.handle,
                **conds},
               default=start_setup)

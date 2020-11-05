@@ -1,16 +1,15 @@
-from functools import cached_property
 import re
+from functools import cached_property
 
 from bottex2.chat import Keyboard
+from bottex2.ext.i18n import Lang
 from bottex2.handler import Request
+from bottex2.helpers import regexp
 from bottex2.helpers.tools import state_name
 from bottex2.router import Router, regexp_cond
 from bottex2.views import View, Command
-from bottex2.helpers import regexp
-
-from schedule.models import PType
 from schedule.db_api import Date
-
+from schedule.models import PType
 
 _ = lambda s: s
 
@@ -24,6 +23,7 @@ class Settings(View):
         def add(text, cb):
             commands.append([Command(text, cb)])
 
+        add('Изменить язык', SettingsLanguageInput.switch)
         if self.r.user.ptype is PType.teacher:
             add('Стать студентом', become_student)
             add('Изменить ФИО', SettingsNameInput.switch)
@@ -49,6 +49,38 @@ class BaseSettingsInput(View):
     async def back(cls, r: Request):
         await r.chat.send_message(_('Ладно'), Settings(r).keyboard)
         await r.user.update(state=state_name(Settings))
+
+
+class SettingsLanguageInput(View):
+    name = 'settings_lang'
+
+    @cached_property
+    def commands(self):
+        return [[Command(lang.value, self.get_lang_setter(lang))]
+                for lang in Lang]
+
+    def get_lang_setter(self, lang: Lang):
+        async def subgroup_setter(r: Request):
+            old = r.user.locale
+            if old is not None:
+                old = old.value
+            await r.user.update(locale=lang, state=state_name(Settings))
+            await r.chat.send_message(f'Язык изменен с {old} на {r.user.locale.value}',
+                                      Settings(r).keyboard)
+        return subgroup_setter
+
+    def default(self, r: Request):
+        r.chat.send_message(_('Выбранный язык не поддерживается'))
+
+    @classmethod
+    async def switch(cls, r: Request):
+        kb = cls(r).keyboard
+        current = r.user.locale
+        if current is not None:
+            current = current.value
+        await r.chat.send_message(f'Текущий язык: {r.user.locale}', kb)
+        await r.chat.send_message(_('Выбери новый язык'), kb)
+        await super().switch(r)
 
 
 class SettingsGroupInput(BaseSettingsInput):
