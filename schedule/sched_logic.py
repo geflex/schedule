@@ -40,7 +40,7 @@ class Settings(View):
         await super().switch(r)
 
 
-class SettingsInput(View):
+class BaseSettingsInput(View):
     @cached_property
     def commands(self):
         return [[Command('Не менять', self.back)]]
@@ -51,7 +51,7 @@ class SettingsInput(View):
         await r.user.update(state=state_name(Settings))
 
 
-class SettingsGroupInput(SettingsInput):
+class SettingsGroupInput(BaseSettingsInput):
     name = 'settings_group'
     exp = re.compile(r'\d{8}')
     revexp = regexp.compile(exp)
@@ -79,7 +79,7 @@ class SettingsGroupInput(SettingsInput):
         await r.chat.send_message(_('Номер группы должен состоять из 8 цифр'), self.keyboard)
 
 
-class SettingsNameInput(SettingsInput):
+class SettingsNameInput(BaseSettingsInput):
     name = 'settings_name'
 
     async def default(self, r: Request):
@@ -96,7 +96,7 @@ class SettingsNameInput(SettingsInput):
         await super().switch(r)
 
 
-class SettingsSubgroupInput(SettingsInput):
+class SettingsSubgroupInput(BaseSettingsInput):
     name = 'settings_subgroup'
 
     @cached_property
