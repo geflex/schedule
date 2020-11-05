@@ -53,68 +53,68 @@ msgstr "Data was successfully deleted"
 
 #: schedule\sched_logic.py:26
 msgid "Изменить язык"
-msgstr ""
+msgstr "Change the language"
 
 #: schedule\sched_logic.py:28
 msgid "Стать студентом"
-msgstr ""
+msgstr "Become a student"
 
 #: schedule\sched_logic.py:29
 msgid "Изменить ФИО"
-msgstr ""
+msgstr "Change my name"
 
 #: schedule\sched_logic.py:31
 msgid "Стать преподом"
-msgstr ""
+msgstr "Become a teacher"
 
 #: schedule\sched_logic.py:32
 msgid "Изменить группу"
-msgstr ""
+msgstr "Change my group"
 
 #: schedule\sched_logic.py:33
 #, fuzzy
 msgid "Изменить подгруппу"
-msgstr "Choose your subgroup"
+msgstr "Change my subgroup"
 
 #: schedule\sched_logic.py:34
 msgid "Назад"
-msgstr ""
+msgstr "Go back"
 
 #: schedule\sched_logic.py:39 schedule\sched_logic.py:200
 msgid "Настройки"
-msgstr ""
+msgstr "Settings"
 
 #: schedule\sched_logic.py:46
 msgid "Не менять"
-msgstr ""
+msgstr "Don't change"
 
 #: schedule\sched_logic.py:50
 msgid "Ладно"
-msgstr "okay."
+msgstr "Okay"
 
 #: schedule\sched_logic.py:69
 msgid "Язык изменен с {} на {}"
-msgstr ""
+msgstr "Language changed from {} to {}"
 
 #: schedule\sched_logic.py:75
 msgid "Выбранный язык не поддерживается"
-msgstr ""
+msgstr "Chosen language isn't supported"
 
 #: schedule\sched_logic.py:83
 msgid "Текущий язык: {}"
-msgstr ""
+msgstr "The current language is {}"
 
 #: schedule\sched_logic.py:84
 msgid "Выбери новый язык"
-msgstr ""
+msgstr "Choose a new language"
 
 #: schedule\sched_logic.py:103
 msgid "Группа изменена с {} на {}"
-msgstr ""
+msgstr "Group changed from {} to {}"
 
 #: schedule\sched_logic.py:110
 msgid "Текущая группа: {}"
-msgstr ""
+msgstr "The current group is"
 
 #: schedule\sched_logic.py:111 schedule\sched_logic.py:188
 msgid "Введи номер группы"
@@ -126,11 +126,11 @@ msgstr "The group number must consist of 8 digits"
 
 #: schedule\sched_logic.py:124
 msgid "Имя изменено с {} на {}"
-msgstr ""
+msgstr "Your name changed from {} to {}"
 
 #: schedule\sched_logic.py:130
 msgid "Текущее имя: {}"
-msgstr ""
+msgstr "Your name is {}"
 
 #: schedule\sched_logic.py:131
 msgid "Введи новое имя"
@@ -138,19 +138,19 @@ msgstr "Enter your new name"
 
 #: schedule\sched_logic.py:141
 msgid "Первая"
-msgstr ""
+msgstr "First"
 
 #: schedule\sched_logic.py:142
 msgid "Вторая"
-msgstr ""
+msgstr "Second"
 
 #: schedule\sched_logic.py:151
 msgid "Подгруппа изменена с {} на {}"
-msgstr ""
+msgstr "Subgroup changed from {} to {}"
 
 #: schedule\sched_logic.py:159
 msgid "Текущая подгруппа: {}"
-msgstr ""
+msgstr "Your current group is {}"
 
 #: schedule\sched_logic.py:160
 msgid "Введи номер подгруппы"
@@ -170,11 +170,11 @@ msgstr "Enter your name"
 
 #: schedule\sched_logic.py:198
 msgid "Сегодня"
-msgstr ""
+msgstr "Today"
 
 #: schedule\sched_logic.py:199
 msgid "Завтра"
-msgstr ""
+msgstr "Tomorrow"
 
 #: schedule\sched_logic.py:204
 msgid "Непонятная команда"
@@ -186,4 +186,4 @@ msgstr "Main menu"
 
 #: schedule\sched_logic.py:218
 msgid "Расписание для {} на {}"
-msgstr ""
+msgstr "Schedule for {} on {}"
