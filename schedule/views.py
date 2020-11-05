@@ -97,23 +97,23 @@ class SettingsView(BaseView):
         user = self.request.user
         _ = self.request.gettext
         spl = ': '
-        rows = ['Тип профиля' + spl + _(user.ptype.name)]
+        rows = ['Тип профиля' + spl + user.ptype.name]
         if user.ptype == PType.student:
             group = ifnot(user.group, '')
-            rows.append('Группа' + spl + _(group))
+            rows.append('Группа' + spl + group)
             subgroup = ifnot(user.subgroup, '')
-            rows.append('Подгруппа' + spl + _(subgroup))
+            rows.append('Подгруппа' + spl + subgroup)
         else:
             name = ifnot(user.name, '')
-            rows.append('Фамилия' + spl + _(name))
+            rows.append('Фамилия' + spl + name)
 
         nfs = user.notifications
         allowed = bool2onoff(nfs.allowed)
 
         time = f', {nfs.time:%H:%M}' if nfs.time else ''
-        rows.append('Уведомления' + spl + _(allowed) + time)
+        rows.append('Уведомления' + spl + allowed + time)
 
-        rows.append('Язык' + spl + _(user.locale.value))
+        rows.append('Язык' + spl + user.locale.value)
         return '\n'.join(rows)
 
 
