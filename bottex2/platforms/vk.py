@@ -64,7 +64,7 @@ class VkReceiver(Receiver):
         while True:
             try:
                 response = await self._longpoll.wait(need_pts=True)
-            except (asyncio.TimeoutError, VkAPIError) as e:
+            except (asyncio.TimeoutError, VkAPIError, aiohttp.ClientError) as e:
                 logger.error(repr(e))
             else:
                 for event in response['updates']:
