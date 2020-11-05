@@ -12,6 +12,9 @@ from schedule.models import PType
 from schedule.db_api import Date
 
 
+_ = lambda s: s
+
+
 class Settings(View):
     name = 'settings'
     
@@ -44,7 +47,7 @@ class SettingsInput(View):
 
     @classmethod
     async def back(cls, r: Request):
-        await r.chat.send_message('Ладно', Settings(r).keyboard)
+        await r.chat.send_message(_('Ладно'), Settings(r).keyboard)
         await r.user.update(state=state_name(Settings))
 
 
@@ -69,11 +72,11 @@ class SettingsGroupInput(SettingsInput):
     async def switch(cls, r: Request):
         kb = cls(r).keyboard
         await r.chat.send_message(f'Текущая группа: {r.user.group}', kb)
-        await r.chat.send_message('Введи номер группы', kb)
+        await r.chat.send_message(_('Введи номер группы'), kb)
         await super().switch(r)
 
     async def default(self, r: Request):
-        await r.chat.send_message(f'Номер группы должен состоять из 8 цифр', self.keyboard)
+        await r.chat.send_message(_('Номер группы должен состоять из 8 цифр'), self.keyboard)
 
 
 class SettingsNameInput(SettingsInput):
@@ -89,7 +92,7 @@ class SettingsNameInput(SettingsInput):
     async def switch(cls, r: Request):
         kb = cls(r).keyboard
         await r.chat.send_message(f'Текущее имя: {r.user.name}', kb)
-        await r.chat.send_message('Введи новое имя', kb)
+        await r.chat.send_message(_('Введи новое имя'), kb)
         await super().switch(r)
 
 
@@ -116,35 +119,35 @@ class SettingsSubgroupInput(SettingsInput):
     async def switch(cls, r: Request):
         kb = cls(r).keyboard
         await r.chat.send_message(f'Текущая подгруппа: {r.user.subgroup}', kb)
-        await r.chat.send_message('Введи номер подгруппы', kb)
+        await r.chat.send_message(_('Введи номер подгруппы'), kb)
         await super().switch(r)
 
 
 async def name_after_switching_ptype(r: Request):
-    await r.chat.send_message('Теперь ты препод', Settings(r).keyboard)
+    await r.chat.send_message(_('Теперь ты препод'), Settings(r).keyboard)
     await r.user.update(name=r.text, state=state_name(Settings))
 
 
 async def group_after_switching_ptype(r: Request):
-    await r.chat.send_message('Теперь ты студент', Settings(r).keyboard)
+    await r.chat.send_message(_('Теперь ты студент'), Settings(r).keyboard)
     await r.user.update(group=r.text, state=state_name(Settings))
 
 
 async def become_teacher(r: Request):
     await r.user.update(ptype=PType.teacher)
     if r.user.name:
-        await r.chat.send_message('Теперь ты препод', Settings(r).keyboard)
+        await r.chat.send_message(_('Теперь ты препод'), Settings(r).keyboard)
     else:
-        await r.chat.send_message('Введи свои ФИО', Keyboard())
+        await r.chat.send_message(_('Введи свои ФИО'), Keyboard())
         await r.user.update(state=name_after_switching_ptype.__name__)
 
 
 async def become_student(r: Request):
     await r.user.update(ptype=PType.student)
     if r.user.group:
-        await r.chat.send_message('Теперь ты студент', Settings(r).keyboard)
+        await r.chat.send_message(_('Теперь ты студент'), Settings(r).keyboard)
     else:
-        await r.chat.send_message('Введи номер группы', Keyboard())
+        await r.chat.send_message(_('Введи номер группы'), Keyboard())
         await r.user.update(state=group_after_switching_ptype.__name__)
 
 
@@ -160,11 +163,11 @@ class Schedule(View):
         ]
 
     async def default(self, r: Request):
-        await r.chat.send_message('Непонятная команда', self.keyboard)
+        await r.chat.send_message(_('Непонятная команда'), self.keyboard)
 
     @classmethod
     async def switch(cls, r: Request):
-        await r.chat.send_message('Главное меню', cls(r).keyboard)
+        await r.chat.send_message(_('Главное меню'), cls(r).keyboard)
         await super().switch(r)
 
     async def _schedule(self, date: Date, r: Request):

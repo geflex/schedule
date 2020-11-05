@@ -17,19 +17,19 @@ _ = lambda s: s
 
 async def start_setup(r: Request):
     await r.user.update(state=state_name(PTypeInput))
-    await r.chat.send_message('Хай! Сначала нужно кое-что настроить '
-                              '(все это можно будет поменять позже в настройках)')
-    await r.chat.send_message('Сначала выбери тип профиля', PTypeInput(r).keyboard)
+    await r.chat.send_message(_('Хай! Сначала нужно кое-что настроить '
+                                '(все это можно будет поменять позже в настройках)'))
+    await r.chat.send_message(_('Сначала выбери тип профиля'), PTypeInput(r).keyboard)
 
 
 async def student_ptype_input(r: Request):
     await r.user.update(ptype=models.PType.student, state=start_group_input.__name__)
-    await r.chat.send_message('Окей, теперь введи номер своей группы', Keyboard())
+    await r.chat.send_message(_('Окей, теперь введи номер своей группы'), Keyboard())
 
 
 async def teacher_ptype_input(r: Request):
     await r.user.update(state=start_name_input.__name__, ptype=models.PType.teacher)
-    await r.chat.send_message('Хорошо, теперь введите свои ФИО', Keyboard())
+    await r.chat.send_message(_('Хорошо, теперь введите свои ФИО'), Keyboard())
 
 
 class PTypeInput(View):
@@ -43,7 +43,7 @@ class PTypeInput(View):
         ]]
 
     async def default(self, r: Request):
-        await r.chat.send_message('Непонятный тип профиля', self.keyboard)
+        await r.chat.send_message(_('Непонятный тип профиля'), self.keyboard)
 
 
 async def start_group_input(r: Request):
@@ -63,7 +63,7 @@ class StartSubgroupInput(sched_logic.SettingsSubgroupInput):
 
     @classmethod
     async def switch(cls, r: Request):
-        await r.chat.send_message('Выбери свою подгруппу', cls(r).keyboard)
+        await r.chat.send_message(_('Выбери свою подгруппу'), cls(r).keyboard)
         await super(sched_logic.SettingsSubgroupInput, cls).switch(r)
 
 
@@ -73,7 +73,7 @@ async def start_name_input(r: Request):
 
 
 async def send_end_registration_message(r: Request):
-    await r.chat.send_message('Ура, все настроили', sched_logic.Schedule(r).keyboard)
+    await r.chat.send_message(_('Ура, все настроили'), sched_logic.Schedule(r).keyboard)
 
 
 async def delete_me(r: Request):
