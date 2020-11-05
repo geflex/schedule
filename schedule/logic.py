@@ -12,6 +12,9 @@ from . import sched_logic
 from . import models
 
 
+_ = lambda s: s
+
+
 async def start_setup(r: Request):
     await r.user.update(state=state_name(PTypeInput))
     await r.chat.send_message('Хай! Сначала нужно кое-что настроить '
@@ -35,8 +38,8 @@ class PTypeInput(View):
     @cached_property
     def commands(self) -> List[List[Command]]:
         return [[
-                Command('Студент', student_ptype_input),
-                Command('Препод', teacher_ptype_input),
+            Command('Студент', student_ptype_input),
+            Command('Препод', teacher_ptype_input),
         ]]
 
     async def default(self, r: Request):
@@ -75,7 +78,7 @@ async def send_end_registration_message(r: Request):
 
 async def delete_me(r: Request):
     await r.user.delete()
-    await r.chat.send_message('Данные успешно удалены', Keyboard())
+    await r.chat.send_message(_('Данные успешно удалены'), Keyboard())
 
 
 conds = gen_state_conds([
