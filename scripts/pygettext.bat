@@ -1,1 +1,2 @@
-python C:/Users/Lenovo/AppData/Local/Programs/Python/Python38/Tools/i18n/pygettext.py -d bottex -o schedule/locale/bottex.pot schedule/
+call scripts/_setup_i18n.bat
+python %I18N_PATH%/pygettext.py -d schedule -o schedule/locales/schedule.pot schedule
