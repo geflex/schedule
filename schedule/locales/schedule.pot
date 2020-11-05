@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2020-11-05 22:48+0300\n"
+"POT-Creation-Date: 2020-11-06 00:50+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -15,75 +15,171 @@ msgstr ""
 "Generated-By: pygettext.py 1.5\n"
 
 
-#: schedule\logic.py:20
+#: schedule\logic.py:18
 msgid "Хай! Сначала нужно кое-что настроить (все это можно будет поменять позже в настройках)"
 msgstr ""
 
-#: schedule\logic.py:22
+#: schedule\logic.py:20
 msgid "Сначала выбери тип профиля"
 msgstr ""
 
-#: schedule\logic.py:27
+#: schedule\logic.py:25
 msgid "Окей, теперь введи номер своей группы"
 msgstr ""
 
-#: schedule\logic.py:32
+#: schedule\logic.py:30
 msgid "Хорошо, теперь введите свои ФИО"
 msgstr ""
 
-#: schedule\logic.py:46
+#: schedule\logic.py:44
 msgid "Непонятный тип профиля"
 msgstr ""
 
-#: schedule\logic.py:66
+#: schedule\logic.py:64
 msgid "Выбери свою подгруппу"
 msgstr ""
 
-#: schedule\logic.py:76
+#: schedule\logic.py:74
 msgid "Ура, все настроили"
 msgstr ""
 
-#: schedule\logic.py:81
+#: schedule\logic.py:79
 msgid "Данные успешно удалены"
+msgstr ""
+
+#: schedule\sched_logic.py:26
+msgid "Изменить язык"
+msgstr ""
+
+#: schedule\sched_logic.py:28
+msgid "Стать студентом"
+msgstr ""
+
+#: schedule\sched_logic.py:29
+msgid "Изменить ФИО"
+msgstr ""
+
+#: schedule\sched_logic.py:31
+msgid "Стать преподом"
+msgstr ""
+
+#: schedule\sched_logic.py:32
+msgid "Изменить группу"
+msgstr ""
+
+#: schedule\sched_logic.py:33
+msgid "Изменить подгруппу"
+msgstr ""
+
+#: schedule\sched_logic.py:34
+msgid "Назад"
+msgstr ""
+
+#: schedule\sched_logic.py:39 schedule\sched_logic.py:200
+msgid "Настройки"
+msgstr ""
+
+#: schedule\sched_logic.py:46
+msgid "Не менять"
 msgstr ""
 
 #: schedule\sched_logic.py:50
 msgid "Ладно"
 msgstr ""
 
-#: schedule\sched_logic.py:75 schedule\sched_logic.py:150
+#: schedule\sched_logic.py:69
+msgid "Язык изменен с {} на {}"
+msgstr ""
+
+#: schedule\sched_logic.py:75
+msgid "Выбранный язык не поддерживается"
+msgstr ""
+
+#: schedule\sched_logic.py:83
+msgid "Текущий язык: {}"
+msgstr ""
+
+#: schedule\sched_logic.py:84
+msgid "Выбери новый язык"
+msgstr ""
+
+#: schedule\sched_logic.py:103
+msgid "Группа изменена с {} на {}"
+msgstr ""
+
+#: schedule\sched_logic.py:110
+msgid "Текущая группа: {}"
+msgstr ""
+
+#: schedule\sched_logic.py:111 schedule\sched_logic.py:188
 msgid "Введи номер группы"
 msgstr ""
 
-#: schedule\sched_logic.py:79
+#: schedule\sched_logic.py:115
 msgid "Номер группы должен состоять из 8 цифр"
 msgstr ""
 
-#: schedule\sched_logic.py:95
+#: schedule\sched_logic.py:124
+msgid "Имя изменено с {} на {}"
+msgstr ""
+
+#: schedule\sched_logic.py:130
+msgid "Текущее имя: {}"
+msgstr ""
+
+#: schedule\sched_logic.py:131
 msgid "Введи новое имя"
 msgstr ""
 
-#: schedule\sched_logic.py:122
+#: schedule\sched_logic.py:141
+msgid "Первая"
+msgstr ""
+
+#: schedule\sched_logic.py:142
+msgid "Вторая"
+msgstr ""
+
+#: schedule\sched_logic.py:151
+msgid "Подгруппа изменена с {} на {}"
+msgstr ""
+
+#: schedule\sched_logic.py:159
+msgid "Текущая подгруппа: {}"
+msgstr ""
+
+#: schedule\sched_logic.py:160
 msgid "Введи номер подгруппы"
 msgstr ""
 
-#: schedule\sched_logic.py:127 schedule\sched_logic.py:139
+#: schedule\sched_logic.py:165 schedule\sched_logic.py:177
 msgid "Теперь ты препод"
 msgstr ""
 
-#: schedule\sched_logic.py:132 schedule\sched_logic.py:148
+#: schedule\sched_logic.py:170 schedule\sched_logic.py:186
 msgid "Теперь ты студент"
 msgstr ""
 
-#: schedule\sched_logic.py:141
+#: schedule\sched_logic.py:179
 msgid "Введи свои ФИО"
 msgstr ""
 
-#: schedule\sched_logic.py:166
+#: schedule\sched_logic.py:198
+msgid "Сегодня"
+msgstr ""
+
+#: schedule\sched_logic.py:199
+msgid "Завтра"
+msgstr ""
+
+#: schedule\sched_logic.py:204
 msgid "Непонятная команда"
 msgstr ""
 
-#: schedule\sched_logic.py:170
+#: schedule\sched_logic.py:208
 msgid "Главное меню"
+msgstr ""
+
+#: schedule\sched_logic.py:218
+msgid "Расписание для {} на {}"
 msgstr ""
 
