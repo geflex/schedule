@@ -2,6 +2,7 @@ from functools import cached_property
 from typing import List
 
 from bottex2.chat import Keyboard
+from bottex2.ext.i18n import Lang
 from bottex2.ext.users import state_cond, gen_state_conds
 from bottex2.handler import Request
 from bottex2.helpers.tools import state_name
@@ -13,11 +14,20 @@ from . import sched_logic
 _ = lambda s: s
 
 
-async def start_setup(r: Request):
-    await r.user.update(state=state_name(PTypeInput))
-    await r.chat.send_message(_('Хай! Сначала нужно кое-что настроить '
-                                '(все это можно будет поменять позже в настройках)'))
-    await r.chat.send_message(_('Сначала выбери тип профиля'), PTypeInput(r).keyboard)
+class StartLanguageInput(sched_logic.SettingsLanguageInput):
+    name = 'start_setup'
+
+    def get_lang_setter(self, lang: Lang):
+        async def setter(r: Request):
+            await r.user.update(locale=lang)
+            r.chat.lang = lang
+            await PTypeInput.switch(r)
+        return setter
+
+    @classmethod
+    async def switch(cls, r: Request):
+        await super(sched_logic.BaseSettingsInput, cls).switch(r)
+        await r.chat.send_message(_('Выбери язык'), cls(r).keyboard)
 
 
 async def student_ptype_input(r: Request):
@@ -42,6 +52,13 @@ class PTypeInput(View):
 
     async def default(self, r: Request):
         await r.chat.send_message(_('Непонятный тип профиля'), self.keyboard)
+
+    @classmethod
+    async def switch(cls, r: Request):
+        await super().switch(r)
+        # await r.chat.send_message(_('Хай! Сначала нужно кое-что настроить '
+        #                             '(все это можно будет поменять позже в настройках)'))
+        await r.chat.send_message(_('Теперь выбери тип профиля'), cls(r).keyboard)
 
 
 async def start_group_input(r: Request):
@@ -80,6 +97,7 @@ async def delete_me(r: Request):
 
 
 conds = gen_state_conds([
+        StartLanguageInput,
         PTypeInput,
         start_group_input,
         StartSubgroupInput,
@@ -96,4 +114,4 @@ conds = gen_state_conds([
 main = Router({text_cond('delete me'): delete_me,  # works in any states
                state_cond(state_name(PTypeInput)): PTypeInput.handle,
                **conds},
-              default=start_setup)
+              default=StartLanguageInput.switch)

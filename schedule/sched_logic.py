@@ -64,7 +64,7 @@ class SettingsLanguageInput(BaseSettingsInput):
         return commands
 
     def get_lang_setter(self, lang: Lang):
-        async def subgroup_setter(r: Request):
+        async def setter(r: Request):
             old = r.user.locale
             if old is not None:
                 old = old.value
@@ -74,7 +74,7 @@ class SettingsLanguageInput(BaseSettingsInput):
                 _('Язык изменен с {} на {}').format(old, lang.value),
                 Settings(r).keyboard
             )
-        return subgroup_setter
+        return setter
 
     def default(self, r: Request):
         r.chat.send_message(_('Выбранный язык не поддерживается'), self.keyboard)
