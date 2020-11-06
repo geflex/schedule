@@ -200,8 +200,7 @@ class Schedule(View):
     @cached_property
     def commands(self):
         return [
-            [Command(_('Сегодня'), self.today)],
-            [Command(_('Завтра'), self.tomorrow)],
+            [Command(_('Сегодня'), self.today), Command(_('Завтра'), self.tomorrow)],
             [Command(_('Настройки'), Settings.switch)],
         ]
 
