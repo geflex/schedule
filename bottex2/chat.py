@@ -15,21 +15,21 @@ class Keyboard(ABC):
     def __init__(self, buttons: Buttons = None, one_time=False, inline=False):
         self.one_time = one_time
         self.inline = inline
-        self._buttons = buttons or []
+        self.buttons = buttons or []
 
     def add_line(self, *buttons: Button):
-        self._buttons.append(list(buttons))
+        self.buttons.append(list(buttons))
 
     def add_button(self, button: Button):
-        if not self._buttons:
-            self._buttons.append([])
-        self._buttons[-1].append(button)
+        if not self.buttons:
+            self.buttons.append([])
+        self.buttons[-1].append(button)
 
     def empty(self):
-        return not bool(self._buttons)
+        return not bool(self.buttons)
 
     def __iter__(self):
-        yield from self._buttons
+        yield from self.buttons
 
 
 class AbstractChat(ABC):
