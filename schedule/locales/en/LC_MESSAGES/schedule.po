@@ -52,8 +52,8 @@ msgid "Данные успешно удалены"
 msgstr "Data was successfully deleted"
 
 #: schedule\sched_logic.py:26
-msgid "Изменить язык"
-msgstr "Change the language"
+msgid "Изменить язык (beta)"
+msgstr "Change the language (beta)"
 
 #: schedule\sched_logic.py:28
 msgid "Стать студентом"
