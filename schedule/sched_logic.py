@@ -69,6 +69,7 @@ class SettingsLanguageInput(BaseSettingsInput):
             if old is not None:
                 old = old.value
             await r.user.update(locale=lang, state=state_name(Settings))
+            r.chat.lang = lang  # !!! BAD
             await r.chat.send_message(
                 _('Язык изменен с {} на {}').format(old, lang.value),
                 Settings(r).keyboard
