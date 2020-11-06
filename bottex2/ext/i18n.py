@@ -30,6 +30,7 @@ def translate(text, lang):
 
 class TranslateBottexChatMiddleware(BottexChatMiddleware):
     __universal__ = True
+    lang: Lang
 
     def translate(self, text):
         return translate(text, self.lang.value)
