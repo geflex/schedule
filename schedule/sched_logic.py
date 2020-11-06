@@ -51,13 +51,17 @@ class BaseSettingsInput(View):
         await r.user.update(state=state_name(Settings))
 
 
-class SettingsLanguageInput(View):
+class SettingsLanguageInput(BaseSettingsInput):
     name = 'settings_lang'
 
     @cached_property
     def commands(self):
-        return [[Command(lang.value, self.get_lang_setter(lang))]
-                for lang in Lang]
+        commands = [
+            [Command(lang.value, self.get_lang_setter(lang))]
+            for lang in Lang
+        ]
+        commands.extend(super().commands)
+        return commands
 
     def get_lang_setter(self, lang: Lang):
         async def subgroup_setter(r: Request):
@@ -72,7 +76,7 @@ class SettingsLanguageInput(View):
         return subgroup_setter
 
     def default(self, r: Request):
-        r.chat.send_message(_('Выбранный язык не поддерживается'))
+        r.chat.send_message(_('Выбранный язык не поддерживается'), self.keyboard)
 
     @classmethod
     async def switch(cls, r: Request):
@@ -141,6 +145,7 @@ class SettingsSubgroupInput(BaseSettingsInput):
             Command(_('Первая'), self.get_subgroup_setter('1')),
             Command(_('Вторая'), self.get_subgroup_setter('2')),
         ]]
+        commands.extend(super().commands)
         return commands
 
     def get_subgroup_setter(self, subgroup_num: str):
