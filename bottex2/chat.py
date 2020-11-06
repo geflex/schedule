@@ -25,6 +25,14 @@ class Keyboard(ABC):
             self.buttons.append([])
         self.buttons[-1].append(button)
 
+    def insert_line(self, *buttons: Button):
+        self.buttons.insert(list(buttons))
+
+    def insert_button(self, button: Button):
+        if not self.buttons:
+            self.buttons.append([])
+        self.buttons[0].append(button)
+
     def empty(self):
         return not bool(self.buttons)
 
