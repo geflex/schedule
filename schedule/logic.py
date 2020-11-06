@@ -21,12 +21,12 @@ async def start_setup(r: Request):
 
 
 async def student_ptype_input(r: Request):
-    await r.user.update(ptype=models.PType.student, state=start_group_input.__name__)
+    await r.user.update(ptype=models.PType.student, state=state_name(start_group_input))
     await r.chat.send_message(_('Окей, теперь введи номер своей группы'), Keyboard())
 
 
 async def teacher_ptype_input(r: Request):
-    await r.user.update(state=start_name_input.__name__, ptype=models.PType.teacher)
+    await r.user.update(state=state_name(start_name_input), ptype=models.PType.teacher)
     await r.chat.send_message(_('Хорошо, теперь введите свои ФИО'), Keyboard())
 
 
