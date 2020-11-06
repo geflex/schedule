@@ -36,8 +36,8 @@ class PTypeInput(View):
     @cached_property
     def commands(self) -> List[List[Command]]:
         return [[
-            Command('Студент', student_ptype_input),
-            Command('Препод', teacher_ptype_input),
+            Command(_('Студент'), student_ptype_input),
+            Command(_('Препод'), teacher_ptype_input),
         ]]
 
     async def default(self, r: Request):
