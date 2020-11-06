@@ -23,7 +23,7 @@ def translate(text, lang):
     try:
         trans = gettext.translation('schedule', 'schedule/locales', [lang])
     except FileNotFoundError:
-        pass
+        return text
     else:
         return trans.gettext(text)
 
@@ -31,8 +31,19 @@ def translate(text, lang):
 class TranslateBottexChatMiddleware(BottexChatMiddleware):
     __universal__ = True
 
+    def translate(self, text):
+        return translate(text, self.lang.value)
+
+    def tranlate_keyboard(self, kb: Keyboard):
+        for line in kb.buttons:
+            for button in line:
+                button.label = self.translate(button.label)
+        return kb
+
     async def send_message(self, text: Optional[str] = None, kb: Optional[Keyboard] = None):
-        text = translate(text, self.lang.value)
+        text = self.translate(text)
+        if kb:
+            kb = self.tranlate_keyboard(kb)
         await super().send_message(text, kb)
 
 
@@ -42,5 +53,5 @@ class TranslateBottexHandlerMiddleware(BottexHandlerMiddleware):
     async def __call__(self, request: Request):
         lang = request.user.locale or Lang.ru
         request.chat.lang = lang
-        request.text = translate(request.text, lang.value)
+        # request.text = translate(request.text, lang.value)
         await super().__call__(request)
