@@ -96,10 +96,10 @@ class SettingsGroupInput(BaseSettingsInput):
     @cached_property
     def router(self) -> Router:
         router = super().router
-        router.add_route(regexp_cond(self.exp), self.set_subgroup)
+        router.add_route(regexp_cond(self.exp), self.set_group)
         return router
 
-    async def set_subgroup(self, r: Request):
+    async def set_group(self, r: Request):
         old = r.user.group
         await r.user.update(group=r.text, state=state_name(Settings))
         await r.chat.send_message(
@@ -148,14 +148,14 @@ class SettingsSubgroupInput(BaseSettingsInput):
         return commands
 
     def get_subgroup_setter(self, subgroup_num: str):
-        async def subgroup_setter(r: Request):
+        async def setter(r: Request):
             old = r.user.subgroup
             await r.user.update(subgroup=subgroup_num, state=state_name(Settings))
             await r.chat.send_message(
                 _('Подгруппа изменена с {} на {}').format(old, subgroup_num),
                 Settings(r).keyboard
             )
-        return subgroup_setter
+        return setter
 
     @classmethod
     async def switch(cls, r: Request):
