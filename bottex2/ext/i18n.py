@@ -74,6 +74,7 @@ class TranslateBottexChatMiddleware(BottexChatMiddleware):
 
 class TranslateBottexHandlerMiddleware(BottexHandlerMiddleware):
     __universal__ = True
+    lang: Enum
 
     async def __call__(self, request: Request):
         lang = request.user.locale or Lang.ru

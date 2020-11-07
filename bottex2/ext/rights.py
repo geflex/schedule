@@ -1,7 +1,10 @@
-from sqlalchemy import Column, types as sqltypes
+from enum import Enum
 
-from models import Rights
+from bottex2.handler import Request
+from bottex2.router import Condition
 
 
-class RightsMixin:
-    rights = Column(sqltypes.Enum(Rights))
+def if_user_can(permission: Enum) -> Condition:
+    def case(r: Request):
+        return permission in r.user.rights
+    return case
