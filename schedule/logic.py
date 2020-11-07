@@ -1,20 +1,15 @@
-from functools import cached_property
-from typing import List
-
 from bottex2.chat import Keyboard
-from bottex2.ext.i18n import Lang
-from bottex2.ext.users import state_cond, gen_state_conds
+from bottex2.ext.i18n import Lang, _
+from bottex2.ext.users import gen_state_conds
 from bottex2.handler import Request
 from bottex2.helpers.tools import state_name
 from bottex2.router import Router, text_cond
-from bottex2.views import View, Command
-from . import models
+
+from . import inputs
 from . import sched_logic
 
-_ = lambda s: s
 
-
-class StartLanguageInput(sched_logic.SettingsLanguageInput):
+class StartLanguageInput(inputs.LanguageInput):
     name = 'start_setup'
 
     def get_lang_setter(self, lang: Lang):
@@ -26,32 +21,20 @@ class StartLanguageInput(sched_logic.SettingsLanguageInput):
 
     @classmethod
     async def switch(cls, r: Request):
-        await super(sched_logic.BaseSettingsInput, cls).switch(r)
+        await super().switch(r)
         await r.chat.send_message(_('Выбери язык'), cls(r).keyboard)
 
 
-async def student_ptype_input(r: Request):
-    await r.user.update(ptype=models.PType.student, state=state_name(start_group_input))
-    await r.chat.send_message(_('Окей, теперь введи номер своей группы'), Keyboard())
-
-
-async def teacher_ptype_input(r: Request):
-    await r.user.update(state=state_name(start_name_input), ptype=models.PType.teacher)
-    await r.chat.send_message(_('Хорошо, теперь введите свои ФИО'), Keyboard())
-
-
-class PTypeInput(View):
+class PTypeInput(inputs.PTypeInput):
     name = 'ptype_input'
 
-    @cached_property
-    def commands(self) -> List[List[Command]]:
-        return [[
-            Command(_('Студент'), student_ptype_input),
-            Command(_('Препод'), teacher_ptype_input),
-        ]]
+    async def set_stutent_ptype(self, r: Request):
+        await super().set_stutent_ptype(r)
+        await StartGroupInput.switch(r)
 
-    async def default(self, r: Request):
-        await r.chat.send_message(_('Непонятный тип профиля'), self.keyboard)
+    async def set_teacher_ptype(self, r: Request):
+        await super().set_teacher_ptype(r)
+        await StartNameInput.switch(r)
 
     @classmethod
     async def switch(cls, r: Request):
@@ -61,30 +44,44 @@ class PTypeInput(View):
         await r.chat.send_message(_('Теперь выбери тип профиля'), cls(r).keyboard)
 
 
-async def start_group_input(r: Request):
-    await r.user.update(group=r.text)
-    await StartSubgroupInput.switch(r)
+class StartGroupInput(inputs.GroupInput):
+    name = 'start_group_input'
+
+    async def set_group(self, r: Request):
+        await super().set_group(r)
+        await StartSubgroupInput.switch(r)
+
+    @classmethod
+    async def switch(cls, r: Request):
+        await super().switch(r)
+        await r.chat.send_message(_('Окей, теперь введи номер своей группы'), cls(r).keyboard)
 
 
-class StartSubgroupInput(sched_logic.SettingsSubgroupInput):
+class StartSubgroupInput(inputs.SubgroupInput):
     name = 'start_subgroup_input'
 
     def get_subgroup_setter(self, subgroup_num: str):
-        async def subgroup_setter(r: Request):
+        async def setter(r: Request):
             old_subgroup = r.user.subgroup
-            await r.user.update(subgroup=subgroup_num, state=state_name(sched_logic.Schedule))
+            await r.user.update(state=state_name(sched_logic.Schedule))
             await send_end_registration_message(r)
-        return subgroup_setter
+        return setter
 
     @classmethod
     async def switch(cls, r: Request):
         await r.chat.send_message(_('Выбери свою подгруппу'), cls(r).keyboard)
-        await super(sched_logic.SettingsSubgroupInput, cls).switch(r)
+        await super().switch(r)
 
 
-async def start_name_input(r: Request):
-    await r.user.update(name=r.text, state=state_name(sched_logic.Schedule))
-    await send_end_registration_message(r)
+class StartNameInput(inputs.NameInput):
+    name = 'start_name_input'
+
+    @classmethod
+    async def switch(cls, r: Request):
+        await r.chat.send_message(_('Хорошо, теперь введите свои ФИО'), cls(r).keyboard)
+        await super().switch(r)
+        await r.user.update(state=state_name(sched_logic.Schedule))
+        await send_end_registration_message(r)
 
 
 async def send_end_registration_message(r: Request):
@@ -99,9 +96,9 @@ async def delete_me(r: Request):
 conds = gen_state_conds([
         StartLanguageInput,
         PTypeInput,
-        start_group_input,
+        StartGroupInput,
         StartSubgroupInput,
-        start_name_input,
+        StartNameInput,
         sched_logic.Schedule,
         sched_logic.Settings,
         sched_logic.name_after_switching_ptype,
@@ -112,6 +109,5 @@ conds = gen_state_conds([
         sched_logic.SettingsSubgroupInput,
 ])
 main = Router({text_cond('delete me'): delete_me,  # works in any states
-               state_cond(state_name(PTypeInput)): PTypeInput.handle,
                **conds},
               default=StartLanguageInput.switch)
