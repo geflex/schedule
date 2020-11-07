@@ -1,12 +1,6 @@
-from enum import IntFlag
-
 from sqlalchemy import Column, types as sqltypes
 
-
-class Rights(IntFlag):
-    view = 1
-    edit = 2
-    notifying = 3
+from models import Rights
 
 
 class RightsMixin:
