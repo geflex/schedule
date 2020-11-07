@@ -28,7 +28,7 @@ class PTypeInput(View):
         await r.chat.send_message(_('Неизвестный тип профиля'), self.keyboard)
 
 
-class LanguageInput(View):
+class BaseLanguageInput(View):
     @property
     def commands(self):
         commands = [
@@ -47,7 +47,7 @@ class LanguageInput(View):
         await r.chat.send_message(_('Выбранный язык не поддерживается'), self.keyboard)
 
 
-class SubgroupInput(View):
+class BaseSubgroupInput(View):
     @property
     def commands(self):
         commands = [[
@@ -65,7 +65,7 @@ class SubgroupInput(View):
         await r.chat.send_message(_('Такой подгруппы не существует'))
 
 
-class GroupInput(View):
+class BaseGroupInput(View):
     exp = re.compile(r'\d{8}')
     revexp = regexp.compile(exp)
 
@@ -86,7 +86,7 @@ class GroupInput(View):
         await r.chat.send_message(_('Номер группы должен состоять из 8 цифр'), self.keyboard)
 
 
-class NameInput(View):
+class BaseNameInput(View):
     @property
     def commands(self):
         return []

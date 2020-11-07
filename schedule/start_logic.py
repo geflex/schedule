@@ -9,7 +9,7 @@ from . import inputs
 from . import sched_logic
 
 
-class StartLanguageInput(inputs.LanguageInput):
+class StartLanguageInput(inputs.BaseLanguageInput):
     name = 'start_setup'
 
     def get_lang_setter(self, lang: Lang):
@@ -44,7 +44,7 @@ class PTypeInput(inputs.PTypeInput):
         await r.chat.send_message(_('Теперь выбери тип профиля'), cls(r).keyboard)
 
 
-class StartGroupInput(inputs.GroupInput):
+class StartGroupInput(inputs.BaseGroupInput):
     name = 'start_group_input'
 
     async def set_group(self, r: Request):
@@ -57,7 +57,7 @@ class StartGroupInput(inputs.GroupInput):
         await r.chat.send_message(_('Окей, теперь введи номер своей группы'), cls(r).keyboard)
 
 
-class StartSubgroupInput(inputs.SubgroupInput):
+class StartSubgroupInput(inputs.BaseSubgroupInput):
     name = 'start_subgroup_input'
 
     def get_subgroup_setter(self, subgroup_num: str):
@@ -73,7 +73,7 @@ class StartSubgroupInput(inputs.SubgroupInput):
         await super().switch(r)
 
 
-class StartNameInput(inputs.NameInput):
+class StartNameInput(inputs.BaseNameInput):
     name = 'start_name_input'
 
     @classmethod

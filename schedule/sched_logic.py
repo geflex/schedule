@@ -47,13 +47,13 @@ class BaseSettingsInput(View):
         await r.user.update(state=state_name(Settings))
 
 
-class SettingsLanguageInput(inputs.LanguageInput, BaseSettingsInput):
+class SettingsLanguageInput(inputs.BaseLanguageInput, BaseSettingsInput):
     name = 'settings_lang'
 
     @cached_property
     def commands(self):
         commands = super().commands
-        commands.extend(super(inputs.LanguageInput, self).commands)
+        commands.extend(super(inputs.BaseLanguageInput, self).commands)
         return commands
 
     def get_lang_setter(self, lang: Lang):
@@ -81,7 +81,7 @@ class SettingsLanguageInput(inputs.LanguageInput, BaseSettingsInput):
         await super().switch(r)
 
 
-class SettingsGroupInput(inputs.GroupInput, BaseSettingsInput):
+class SettingsGroupInput(inputs.BaseGroupInput, BaseSettingsInput):
     name = 'settings_group'
 
     async def set_group(self, r: Request):
@@ -101,7 +101,7 @@ class SettingsGroupInput(inputs.GroupInput, BaseSettingsInput):
         await super().switch(r)
 
 
-class SettingsNameInput(inputs.NameInput, BaseSettingsInput):
+class SettingsNameInput(inputs.BaseNameInput, BaseSettingsInput):
     name = 'settings_name'
 
     async def set_name(self, r: Request):
@@ -119,13 +119,13 @@ class SettingsNameInput(inputs.NameInput, BaseSettingsInput):
         await super().switch(r)
 
 
-class SettingsSubgroupInput(inputs.SubgroupInput, BaseSettingsInput):
+class SettingsSubgroupInput(inputs.BaseSubgroupInput, BaseSettingsInput):
     name = 'settings_subgroup'
 
     @cached_property
     def commands(self):
         commands = super().commands
-        commands.extend(super(inputs.SubgroupInput, self).commands)
+        commands.extend(super(inputs.BaseSubgroupInput, self).commands)
         return commands
 
     def get_subgroup_setter(self, subgroup_num: str):
