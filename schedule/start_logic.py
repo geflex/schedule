@@ -99,15 +99,8 @@ conds = gen_state_conds([
         StartGroupInput,
         StartSubgroupInput,
         StartNameInput,
-        main_logic.Schedule,
-        main_logic.Settings,
-        main_logic.name_after_switching_ptype,
-        main_logic.group_after_switching_ptype,
-        main_logic.SettingsLanguageInput,
-        main_logic.SettingsNameInput,
-        main_logic.SettingsGroupInput,
-        main_logic.SettingsSubgroupInput,
 ])
 main = Router({text_cond('delete me'): delete_me,  # works in any states
-               **conds},
+               **conds,
+               **main_logic.conds},
               default=StartLanguageInput.switch)

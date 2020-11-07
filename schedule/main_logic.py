@@ -2,6 +2,7 @@ from functools import cached_property
 
 from bottex2.chat import Keyboard
 from bottex2.ext.i18n import Lang, _
+from bottex2.ext.users import gen_state_conds
 from bottex2.handler import Request
 from bottex2.helpers.tools import state_name
 from bottex2.views import View, Command
@@ -213,3 +214,15 @@ class Schedule(View):
     async def tomorrow(cls, r: Request):
         date = Date.tomorrow()
         await cls(r)._schedule(date, r)
+
+
+conds = gen_state_conds([
+    Schedule,
+    Settings,
+    name_after_switching_ptype,
+    group_after_switching_ptype,
+    SettingsLanguageInput,
+    SettingsNameInput,
+    SettingsGroupInput,
+    SettingsSubgroupInput,
+])
