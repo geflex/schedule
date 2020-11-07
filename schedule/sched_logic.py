@@ -1,15 +1,13 @@
-import re
 from functools import cached_property
 
 from bottex2.chat import Keyboard
 from bottex2.ext.i18n import Lang, _
 from bottex2.handler import Request
-from bottex2.helpers import regexp
 from bottex2.helpers.tools import state_name
-from bottex2.router import Router, regexp_cond
 from bottex2.views import View, Command
 from schedule.db_api import Date
 from schedule.models import PType
+from . import inputs
 
 
 class Settings(View):
@@ -39,7 +37,7 @@ class Settings(View):
 
 
 class BaseSettingsInput(View):
-    @cached_property
+    @property
     def commands(self):
         return [[Command(_('Не менять'), self.back)]]
 
@@ -49,16 +47,13 @@ class BaseSettingsInput(View):
         await r.user.update(state=state_name(Settings))
 
 
-class SettingsLanguageInput(BaseSettingsInput):
+class SettingsLanguageInput(inputs.LanguageInput, BaseSettingsInput):
     name = 'settings_lang'
 
     @cached_property
     def commands(self):
-        commands = [
-            [Command(lang.value, self.get_lang_setter(lang))]
-            for lang in Lang
-        ]
-        commands.extend(super().commands)
+        commands = super().commands
+        commands.extend(super(inputs.LanguageInput, self).commands)
         return commands
 
     def get_lang_setter(self, lang: Lang):
@@ -66,16 +61,14 @@ class SettingsLanguageInput(BaseSettingsInput):
             old = r.user.locale
             if old is not None:
                 old = old.value
-            await r.user.update(locale=lang, state=state_name(Settings))
+            await super().get_lang_setter(lang)(r)
+            await r.user.update(state=state_name(Settings))
             r.chat.lang = lang  # !!! BAD
             await r.chat.send_message(
                 _('Язык изменен с {} на {}').format(old, lang.value),
                 Settings(r).keyboard
             )
         return setter
-
-    def default(self, r: Request):
-        r.chat.send_message(_('Выбранный язык не поддерживается'), self.keyboard)
 
     @classmethod
     async def switch(cls, r: Request):
@@ -88,20 +81,13 @@ class SettingsLanguageInput(BaseSettingsInput):
         await super().switch(r)
 
 
-class SettingsGroupInput(BaseSettingsInput):
+class SettingsGroupInput(inputs.GroupInput, BaseSettingsInput):
     name = 'settings_group'
-    exp = re.compile(r'\d{8}')
-    revexp = regexp.compile(exp)
-
-    @cached_property
-    def router(self) -> Router:
-        router = super().router
-        router.add_route(regexp_cond(self.exp), self.set_group)
-        return router
 
     async def set_group(self, r: Request):
         old = r.user.group
-        await r.user.update(group=r.text, state=state_name(Settings))
+        await super().set_group(r)
+        await r.user.update(state=state_name(Settings))
         await r.chat.send_message(
             _('Группа изменена с {} на {}').format(old, r.user.group),
             Settings(r).keyboard
@@ -114,16 +100,14 @@ class SettingsGroupInput(BaseSettingsInput):
         await r.chat.send_message(_('Введи номер группы'), kb)
         await super().switch(r)
 
-    async def default(self, r: Request):
-        await r.chat.send_message(_('Номер группы должен состоять из 8 цифр'), self.keyboard)
 
-
-class SettingsNameInput(BaseSettingsInput):
+class SettingsNameInput(inputs.NameInput, BaseSettingsInput):
     name = 'settings_name'
 
-    async def default(self, r: Request):
+    async def set_name(self, r: Request):
         old = r.user.name
-        await r.user.update(name=r.text, state=state_name(Settings))
+        await super().set_name(r)
+        await r.user.update(state=state_name(Settings))
         await r.chat.send_message(_('Имя изменено с {} на {}').format(old, r.text),
                                   Settings(r).keyboard)
 
@@ -135,22 +119,20 @@ class SettingsNameInput(BaseSettingsInput):
         await super().switch(r)
 
 
-class SettingsSubgroupInput(BaseSettingsInput):
+class SettingsSubgroupInput(inputs.SubgroupInput, BaseSettingsInput):
     name = 'settings_subgroup'
 
     @cached_property
     def commands(self):
-        commands = [[
-            Command(_('Первая'), self.get_subgroup_setter('1')),
-            Command(_('Вторая'), self.get_subgroup_setter('2')),
-        ]]
-        commands.extend(super().commands)
+        commands = super().commands
+        commands.extend(super(inputs.SubgroupInput, self).commands)
         return commands
 
     def get_subgroup_setter(self, subgroup_num: str):
         async def setter(r: Request):
             old = r.user.subgroup
-            await r.user.update(subgroup=subgroup_num, state=state_name(Settings))
+            await super().get_subgroup_setter(subgroup_num)(r)
+            await r.user.update(state=state_name(Settings))
             await r.chat.send_message(
                 _('Подгруппа изменена с {} на {}').format(old, subgroup_num),
                 Settings(r).keyboard
@@ -181,7 +163,7 @@ async def become_teacher(r: Request):
         await r.chat.send_message(_('Теперь ты препод'), Settings(r).keyboard)
     else:
         await r.chat.send_message(_('Введи свои ФИО'), Keyboard())
-        await r.user.update(state=name_after_switching_ptype.__name__)
+        await r.user.update(state=state_name(name_after_switching_ptype))
 
 
 async def become_student(r: Request):
@@ -190,7 +172,7 @@ async def become_student(r: Request):
         await r.chat.send_message(_('Теперь ты студент'), Settings(r).keyboard)
     else:
         await r.chat.send_message(_('Введи номер группы'), Keyboard())
-        await r.user.update(state=group_after_switching_ptype.__name__)
+        await r.user.update(state=state_name(group_after_switching_ptype))
 
 
 class Schedule(View):
