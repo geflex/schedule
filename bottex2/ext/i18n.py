@@ -7,7 +7,7 @@ from bottex2.chat import Keyboard
 from bottex2.handler import Request
 
 
-class LazyFormat(str):
+class LazyTranslate(str):
     def format(self, *args, **kwargs):
         self.fmt_args = args
         self.fmt_kwargs = kwargs
@@ -28,7 +28,7 @@ class LazyFormat(str):
 
 
 def _(s):
-    return LazyFormat(s)
+    return LazyTranslate(s)
 
 
 class I18nUserMixin:
@@ -39,9 +39,9 @@ def translate(text, lang):
     try:
         trans = gettext.translation('schedule', 'schedule/locales', [lang])
     except FileNotFoundError:
-        return LazyFormat.enforce(text)
+        return LazyTranslate.enforce(text)
     else:
-        return LazyFormat.enforce(trans.gettext(text), text)
+        return LazyTranslate.enforce(trans.gettext(text), text)
 
 
 class TranslateBottexChatMiddleware(BottexChatMiddleware):
