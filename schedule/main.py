@@ -2,14 +2,12 @@ import logging
 
 from sqlalchemy import create_engine
 
-from bottex2.platforms.tg import TgReceiver
-from bottex2.platforms.vk import VkReceiver
-
-from bottex2.ext import users, i18n
 from bottex2 import sqlalchemy as sqldb
 from bottex2.bottex import Bottex
-
-from schedule import logic, models, configs
+from bottex2.ext import users, i18n
+from bottex2.platforms.tg import TgReceiver
+from bottex2.platforms.vk import VkReceiver
+from schedule import start_logic, models, configs
 
 
 def get_bottex():
@@ -17,7 +15,7 @@ def get_bottex():
         TgReceiver(configs.tg.token),
         VkReceiver(configs.vk.token, configs.vk.group_id),
     )
-    bottex.set_handler(logic.main)
+    bottex.set_handler(start_logic.main)
     return bottex
 
 
