@@ -9,8 +9,28 @@ from bottex2.chat import Keyboard
 from bottex2.handler import Request
 
 
+class LazyFormat(str):
+    def format(self, *args, **kwargs):
+        self.fmt_args = args
+        self.fmt_kwargs = kwargs
+        return self
+
+    @classmethod
+    def check(cls, s):
+        return hasattr(s, 'fmt_args') and hasattr(s, 'fmt_kwargs')
+
+    # noinspection PyUnresolvedReferences
+    @classmethod
+    def enforce(cls, s: str, fmt_data: Optional[str] = None):
+        if cls.check(s):
+            return super().format(s, *s.fmt_args, **s.fmt_kwargs)
+        elif cls.check(fmt_data):
+            return s.format(*fmt_data.fmt_args, **fmt_data.fmt_kwargs)
+        return s
+
+
 def _(s):
-    return s
+    return LazyFormat(s)
 
 
 class Lang(Enum):
@@ -27,9 +47,9 @@ def translate(text, lang):
     try:
         trans = gettext.translation('schedule', 'schedule/locales', [lang])
     except FileNotFoundError:
-        return text
+        return LazyFormat.enforce(text)
     else:
-        return trans.gettext(text)
+        return LazyFormat.enforce(trans.gettext(text), text)
 
 
 class TranslateBottexChatMiddleware(BottexChatMiddleware):
