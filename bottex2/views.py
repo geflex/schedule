@@ -4,13 +4,13 @@ from typing import List
 
 from bottex2.chat import Keyboard, Button
 from bottex2.handler import Request, Handler
-from bottex2.router import Router, text_cond
+from bottex2.router import Router, if_text
 
 
 class Command:
     def __init__(self, text: str, callback: Handler):
         self.text = text
-        self.condition = text_cond(text)
+        self.condition = if_text(text)
         self.callback = callback
 
 

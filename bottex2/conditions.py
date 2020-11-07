@@ -1,7 +1,7 @@
 from typing import Iterator, Union, Pattern
 
 from .handler import Request
-from .router import Condition, text_cond, any_cond, regexp_cond, words_cond
+from .router import Condition, if_text, if_in, if_regexp, if_text_in
 
 
 class BaseCondition(Condition):
@@ -11,19 +11,19 @@ class BaseCondition(Condition):
 class TextCond(BaseCondition):
     def __init__(self, s: str):
         self.string = s
-        __call__ = text_cond(self.string)
+        __call__ = if_text(self.string)
 
 class AnyCond(BaseCondition):
     def __init__(self, conditions: Iterator[Condition]):
         self.conds = conditions
-        self.__call__ = any_cond(conditions)
+        self.__call__ = if_in(conditions)
 
 class Reqexp(BaseCondition):
     def __init__(self, exp: Union[str, Pattern]):
         self.exp = exp
-        self.__call__ = regexp_cond(exp)
+        self.__call__ = if_regexp(exp)
 
 class Words(BaseCondition):
     def __init__(self, *words: str):
         self.words = words
-        self.__call__ = words_cond(*words)
+        self.__call__ = if_text_in(*words)

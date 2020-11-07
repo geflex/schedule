@@ -5,7 +5,7 @@ from typing import List
 from bottex2.ext.i18n import _, Lang
 from bottex2.handler import Request
 from bottex2.helpers import regexp
-from bottex2.router import Router, regexp_cond
+from bottex2.router import Router, if_regexp
 from bottex2.views import View, Command
 from .models import PType
 
@@ -76,7 +76,7 @@ class BaseGroupInput(View):
     @cached_property
     def router(self) -> Router:
         router = super().router
-        router.add_route(regexp_cond(self.exp), self.set_group)
+        router.add_route(if_regexp(self.exp), self.set_group)
         return router
 
     async def set_group(self, r: Request):

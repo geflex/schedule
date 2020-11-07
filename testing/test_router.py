@@ -1,4 +1,5 @@
 import pytest
+
 from bottex2 import router
 
 
@@ -10,6 +11,6 @@ def valid_condition(message, **params):
 
 
 def test_check_condition():
-    router.is_cond_valid(valid_condition)
+    router.is_case_valid(valid_condition)
     with pytest.raises(ValueError):
-        router.is_cond_valid(invalid_condition)
+        router.is_case_valid(invalid_condition)

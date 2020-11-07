@@ -1,8 +1,8 @@
 import re
 from typing import Optional, MutableMapping, Callable, Union, Pattern, Iterator
 
-from bottex2.helpers import tools
 from bottex2.handler import Handler, check_handler, HandlerError, Request
+from bottex2.helpers import tools
 from bottex2.logging import logger
 
 
@@ -58,14 +58,14 @@ class Router(Handler):
         return f'{self.__class__.__name__}(default={self.default}, {self.routes})'
 
 
-def text_cond(s: str) -> Condition:
+def if_text(s: str) -> Condition:
     s = s.lower()
     def cond(request: Request) -> bool:
         return request.text.lower() == s.lower()
     return cond
 
 
-def regexp_cond(exp: Union[str, Pattern]) -> Condition:
+def if_regexp(exp: Union[str, Pattern]) -> Condition:
     exp = re.compile(exp)
     def cond(request: Request) -> bool:
         m = exp.match(request.text)
@@ -73,20 +73,20 @@ def regexp_cond(exp: Union[str, Pattern]) -> Condition:
     return cond
 
 
-def words_cond(*wds: str) -> Condition:
+def if_text_in(*wds: str) -> Condition:
     wds = [w.lower() for w in wds]
     def cond(request: Request) -> bool:
         return request.text.lower() in wds
     return cond
 
 
-def any_cond(conditions: Iterator[Condition]) -> Condition:
+def if_in(conditions: Iterator[Condition]) -> Condition:
     def cond(request: Request):
         return any(c(request) for c in conditions)
     return cond
 
 
-def is_cond_valid(condition: Condition):
+def is_case_valid(condition: Condition):
     if not callable(condition):
         raise TypeError('`Condition` must be callable')
     if not tools.have_kwargs_parameter(condition):

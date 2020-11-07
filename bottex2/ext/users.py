@@ -2,11 +2,11 @@ from typing import Type, List
 
 from sqlalchemy import Column, Integer, String
 
-from bottex2.helpers.tools import Named, state_name, state_handler
-from bottex2.sqlalchemy import Model
-from bottex2.handler import Request
-from bottex2.router import Condition
 from bottex2.bottex import BottexHandlerMiddleware
+from bottex2.handler import Request
+from bottex2.helpers.tools import Named, state_name, state_handler
+from bottex2.router import Condition
+from bottex2.sqlalchemy import Model
 
 
 class UserModel(Model):
@@ -44,7 +44,7 @@ def state_cond(st: str) -> Condition:
     return cond
 
 
-def gen_state_conds(handlers: List[Named]):
+def gen_state_cases(handlers: List[Named]):
     routes = {}
     for obj in handlers:
         name, handler = state_name(obj), state_handler(obj)

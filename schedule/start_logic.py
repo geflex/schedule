@@ -1,9 +1,9 @@
 from bottex2.chat import Keyboard
 from bottex2.ext.i18n import Lang, _
-from bottex2.ext.users import gen_state_conds
+from bottex2.ext.users import gen_state_cases
 from bottex2.handler import Request
 from bottex2.helpers.tools import state_name
-from bottex2.router import Router, text_cond
+from bottex2.router import Router, if_text
 
 from . import inputs
 from . import main_logic
@@ -95,14 +95,14 @@ async def delete_me(r: Request):
     await r.chat.send_message(_('Данные успешно удалены'), Keyboard())
 
 
-conds = gen_state_conds([
+cases = gen_state_cases([
         StartLanguageInput,
         PTypeInput,
         StartGroupInput,
         StartSubgroupInput,
         StartNameInput,
 ])
-main = Router({text_cond('delete me'): delete_me,  # works in any states
-               **conds,
-               **main_logic.conds},
+main = Router({if_text('delete me'): delete_me,  # works in any states
+               **cases,
+               **main_logic.cases},
               default=StartLanguageInput.switch)

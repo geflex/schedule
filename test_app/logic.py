@@ -1,8 +1,7 @@
-from bottex2.handler import Request
-from bottex2.router import Router, any_cond, text_cond
 from bottex2.chat import Keyboard, Button
 from bottex2.ext.users import state_cond
-
+from bottex2.handler import Request
+from bottex2.router import Router, if_in, if_text
 
 kb = Keyboard([
     [Button('1'), Button('2'), Button('3')],
@@ -48,7 +47,7 @@ async def set_state(r: Request):
 
 
 router = Router({
-    text_cond('send'): send,
-    text_cond('stop'): stop,
-    any_cond([state_cond(s) for s in states]): switch,
+    if_text('send'): send,
+    if_text('stop'): stop,
+    if_in([state_cond(s) for s in states]): switch,
 }, default=set_state)
