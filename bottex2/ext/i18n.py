@@ -2,8 +2,6 @@ import gettext
 from enum import Enum
 from typing import Optional
 
-from sqlalchemy import Column, types as sqltypes
-
 from bottex2.bottex import BottexChatMiddleware, BottexHandlerMiddleware
 from bottex2.chat import Keyboard
 from bottex2.handler import Request
@@ -40,7 +38,7 @@ class Lang(Enum):
 
 
 class I18nUserMixin:
-    locale = Column(sqltypes.Enum(Lang))
+    locale: Enum
 
 
 def translate(text, lang):

@@ -4,7 +4,8 @@ from typing import List
 from sqlalchemy import Column
 from sqlalchemy import types as sqltypes
 
-from bottex2.ext.i18n import Lang
+from bottex2.ext.i18n import Lang, I18nUserMixin
+from bottex2.ext.rights import RightsUserMixin
 from bottex2.ext.users import UserModel
 from bottex2.sqlalchemy import Model
 
@@ -49,7 +50,7 @@ class Rights(IntFlag):
     notifying = 3
 
 
-class User(UserModel):
+class User(UserModel, I18nUserMixin, RightsUserMixin):
     notifications_time = Column(sqltypes.Time, nullable=True)
 
     rights = Column(sqltypes.Enum(Rights))
