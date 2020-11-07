@@ -66,7 +66,7 @@ class SettingsLanguageInput(inputs.BaseLanguageInput, BaseSettingsInput):
             await r.user.update(state=state_name(Settings))
             r.chat.lang = lang  # !!! BAD
             await r.chat.send_message(
-                _('Язык изменен с {} на {}').format(old, lang.value),
+                _('Язык изменен с {} на {}').format(old.value, lang.value),
                 Settings(r).keyboard
             )
         return setter
@@ -75,7 +75,7 @@ class SettingsLanguageInput(inputs.BaseLanguageInput, BaseSettingsInput):
     async def switch(cls, r: Request):
         kb = cls(r).keyboard
         current = r.user.locale
-        await r.chat.send_message(_('Текущий язык: {}').format(current), kb)
+        await r.chat.send_message(_('Текущий язык: {}').format(current.value), kb)
         await r.chat.send_message(_('Выбери новый язык'), kb)
         await super().switch(r)
 
