@@ -13,9 +13,9 @@ class StartLanguageInput(inputs.BaseLanguageInput):
     name = 'start_setup'
 
     def get_lang_setter(self, lang: Lang):
+        super_setter = super().get_lang_setter(lang)
         async def setter(r: Request):
-            await r.user.update(locale=lang)
-            r.chat.lang = lang
+            await super_setter(r)
             await PTypeInput.switch(r)
         return setter
 
@@ -61,8 +61,10 @@ class StartSubgroupInput(inputs.BaseSubgroupInput):
     name = 'start_subgroup_input'
 
     def get_subgroup_setter(self, subgroup_num: str):
+        super_setter = super().get_subgroup_setter(subgroup_num)
         async def setter(r: Request):
             old_subgroup = r.user.subgroup
+            await super_setter(r)
             await r.user.update(state=state_name(main_logic.Schedule))
             await send_end_registration_message(r)
         return setter
