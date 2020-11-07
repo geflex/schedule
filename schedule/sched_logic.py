@@ -2,7 +2,7 @@ import re
 from functools import cached_property
 
 from bottex2.chat import Keyboard
-from bottex2.ext.i18n import Lang
+from bottex2.ext.i18n import Lang, _
 from bottex2.handler import Request
 from bottex2.helpers import regexp
 from bottex2.helpers.tools import state_name
@@ -10,8 +10,6 @@ from bottex2.router import Router, regexp_cond
 from bottex2.views import View, Command
 from schedule.db_api import Date
 from schedule.models import PType
-
-_ = lambda s: s
 
 
 class Settings(View):

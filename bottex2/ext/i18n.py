@@ -9,6 +9,10 @@ from bottex2.chat import Keyboard
 from bottex2.handler import Request
 
 
+def _(s):
+    return s
+
+
 class Lang(Enum):
     ru = 'ru'
     en = 'en'
