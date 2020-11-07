@@ -1,7 +1,7 @@
 from functools import cached_property
 
 from bottex2.chat import Keyboard
-from bottex2.ext.i18n import Lang, _
+from bottex2.ext.i18n import _
 from bottex2.ext.users import gen_state_cases
 from bottex2.handler import Request
 from bottex2.helpers.tools import state_name
@@ -9,6 +9,7 @@ from bottex2.views import View, Command
 from schedule.db_api import Date
 from schedule.models import PType
 from . import inputs
+from .models import Lang
 
 
 class Settings(View):
@@ -61,8 +62,6 @@ class SettingsLanguageInput(inputs.BaseLanguageInput, BaseSettingsInput):
         super_setter = super().get_lang_setter(lang)
         async def setter(r: Request):
             old = r.user.locale
-            if old is not None:
-                old = old.value
             await super_setter(r)
             await r.user.update(state=state_name(Settings))
             r.chat.lang = lang  # !!! BAD
@@ -76,8 +75,6 @@ class SettingsLanguageInput(inputs.BaseLanguageInput, BaseSettingsInput):
     async def switch(cls, r: Request):
         kb = cls(r).keyboard
         current = r.user.locale
-        if current is not None:
-            current = current.value
         await r.chat.send_message(_('Текущий язык: {}').format(current), kb)
         await r.chat.send_message(_('Выбери новый язык'), kb)
         await super().switch(r)

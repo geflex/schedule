@@ -2,12 +2,12 @@ import re
 from functools import cached_property
 from typing import List
 
-from bottex2.ext.i18n import _, Lang
+from bottex2.ext.i18n import _
 from bottex2.handler import Request
 from bottex2.helpers import regexp
 from bottex2.router import Router, if_regexp
 from bottex2.views import View, Command
-from .models import PType
+from .models import PType, Lang
 
 
 class PTypeInput(View):

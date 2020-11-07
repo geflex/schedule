@@ -1,5 +1,5 @@
 from bottex2.chat import Keyboard
-from bottex2.ext.i18n import Lang, _
+from bottex2.ext.i18n import _
 from bottex2.ext.users import gen_state_cases
 from bottex2.handler import Request
 from bottex2.helpers.tools import state_name
@@ -7,6 +7,7 @@ from bottex2.router import Router, if_text
 
 from . import inputs
 from . import main_logic
+from .models import Lang
 
 
 class StartLanguageInput(inputs.BaseLanguageInput):

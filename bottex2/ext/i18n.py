@@ -31,12 +31,6 @@ def _(s):
     return LazyFormat(s)
 
 
-class Lang(Enum):
-    ru = 'ru'
-    en = 'en'
-    be = 'be'
-
-
 class I18nUserMixin:
     locale: Enum
 
@@ -52,7 +46,7 @@ def translate(text, lang):
 
 class TranslateBottexChatMiddleware(BottexChatMiddleware):
     __universal__ = True
-    lang: Lang
+    lang: Enum
 
     def translate(self, text):
         return translate(text, self.lang.value)
@@ -75,7 +69,7 @@ class TranslateBottexHandlerMiddleware(BottexHandlerMiddleware):
     lang: Enum
 
     async def __call__(self, request: Request):
-        lang = request.user.locale or Lang.ru
+        lang = request.user.locale
         request.chat.lang = lang
         # request.text = translate(request.text, lang.value)
         await super().__call__(request)

@@ -4,7 +4,7 @@ from typing import List
 from sqlalchemy import Column
 from sqlalchemy import types as sqltypes
 
-from bottex2.ext.i18n import Lang, I18nUserMixin
+from bottex2.ext.i18n import I18nUserMixin
 from bottex2.ext.rights import RightsUserMixin
 from bottex2.ext.users import UserModel
 from bottex2.sqlalchemy import Model
@@ -50,11 +50,17 @@ class Rights(IntFlag):
     notifying = 3
 
 
+class Lang(Enum):
+    ru = 'ru'
+    en = 'en'
+    be = 'be'
+
+
 class User(UserModel, I18nUserMixin, RightsUserMixin):
     notifications_time = Column(sqltypes.Time, nullable=True)
 
     rights = Column(sqltypes.Enum(Rights))
-    locale = Column(sqltypes.Enum(Lang))
+    locale = Column(sqltypes.Enum(Lang), default=Lang.ru, nullable=False)
 
     ptype = Column(sqltypes.Enum(PType))
     name = Column(sqltypes.String)  # for teacher
