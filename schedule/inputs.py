@@ -11,7 +11,7 @@ from .models import PType
 
 
 class PTypeInput(View):
-    @cached_property
+    @property
     def commands(self) -> List[List[Command]]:
         return [[
             Command(_('Студент'), self.set_stutent_ptype),
@@ -29,9 +29,7 @@ class PTypeInput(View):
 
 
 class LanguageInput(View):
-    name = 'settings_lang'
-
-    @cached_property
+    @property
     def commands(self):
         commands = [
             [Command(lang.value, self.get_lang_setter(lang))]
@@ -50,7 +48,7 @@ class LanguageInput(View):
 
 
 class SubgroupInput(View):
-    @cached_property
+    @property
     def commands(self):
         commands = [[
             Command(_('Первая'), self.get_subgroup_setter('1')),
@@ -71,7 +69,7 @@ class GroupInput(View):
     exp = re.compile(r'\d{8}')
     revexp = regexp.compile(exp)
 
-    @cached_property
+    @property
     def commands(self):
         return []
 
@@ -89,7 +87,7 @@ class GroupInput(View):
 
 
 class NameInput(View):
-    @cached_property
+    @property
     def commands(self):
         return []
 
