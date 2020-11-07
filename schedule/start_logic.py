@@ -6,7 +6,7 @@ from bottex2.helpers.tools import state_name
 from bottex2.router import Router, text_cond
 
 from . import inputs
-from . import sched_logic
+from . import main_logic
 
 
 class StartLanguageInput(inputs.BaseLanguageInput):
@@ -63,7 +63,7 @@ class StartSubgroupInput(inputs.BaseSubgroupInput):
     def get_subgroup_setter(self, subgroup_num: str):
         async def setter(r: Request):
             old_subgroup = r.user.subgroup
-            await r.user.update(state=state_name(sched_logic.Schedule))
+            await r.user.update(state=state_name(main_logic.Schedule))
             await send_end_registration_message(r)
         return setter
 
@@ -80,12 +80,12 @@ class StartNameInput(inputs.BaseNameInput):
     async def switch(cls, r: Request):
         await r.chat.send_message(_('Хорошо, теперь введите свои ФИО'), cls(r).keyboard)
         await super().switch(r)
-        await r.user.update(state=state_name(sched_logic.Schedule))
+        await r.user.update(state=state_name(main_logic.Schedule))
         await send_end_registration_message(r)
 
 
 async def send_end_registration_message(r: Request):
-    await r.chat.send_message(_('Ура, все настроили'), sched_logic.Schedule(r).keyboard)
+    await r.chat.send_message(_('Ура, все настроили'), main_logic.Schedule(r).keyboard)
 
 
 async def delete_me(r: Request):
@@ -99,14 +99,14 @@ conds = gen_state_conds([
         StartGroupInput,
         StartSubgroupInput,
         StartNameInput,
-        sched_logic.Schedule,
-        sched_logic.Settings,
-        sched_logic.name_after_switching_ptype,
-        sched_logic.group_after_switching_ptype,
-        sched_logic.SettingsLanguageInput,
-        sched_logic.SettingsNameInput,
-        sched_logic.SettingsGroupInput,
-        sched_logic.SettingsSubgroupInput,
+        main_logic.Schedule,
+        main_logic.Settings,
+        main_logic.name_after_switching_ptype,
+        main_logic.group_after_switching_ptype,
+        main_logic.SettingsLanguageInput,
+        main_logic.SettingsNameInput,
+        main_logic.SettingsGroupInput,
+        main_logic.SettingsSubgroupInput,
 ])
 main = Router({text_cond('delete me'): delete_me,  # works in any states
                **conds},
