@@ -58,11 +58,12 @@ class SettingsLanguageInput(inputs.BaseLanguageInput, BaseSettingsInput):
         return commands
 
     def get_lang_setter(self, lang: Lang):
+        super_setter = super().get_lang_setter(lang)
         async def setter(r: Request):
             old = r.user.locale
             if old is not None:
                 old = old.value
-            await super().get_lang_setter(lang)(r)
+            await super_setter(r)
             await r.user.update(state=state_name(Settings))
             r.chat.lang = lang  # !!! BAD
             await r.chat.send_message(
@@ -130,9 +131,10 @@ class SettingsSubgroupInput(inputs.BaseSubgroupInput, BaseSettingsInput):
         return commands
 
     def get_subgroup_setter(self, subgroup_num: str):
+        super_setter = super().get_subgroup_setter(subgroup_num)
         async def setter(r: Request):
             old = r.user.subgroup
-            await super().get_subgroup_setter(subgroup_num)(r)
+            await super_setter(r)
             await r.user.update(state=state_name(Settings))
             await r.chat.send_message(
                 _('Подгруппа изменена с {} на {}').format(old, subgroup_num),
