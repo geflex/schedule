@@ -1,14 +1,14 @@
 from abc import abstractmethod, ABC
-from typing import List
 from functools import cached_property
+from typing import List
 
 from bottex2.chat import Keyboard, Button
-from bottex2.handler import Request
+from bottex2.handler import Request, Handler
 from bottex2.router import Router, text_cond
 
 
 class Command:
-    def __init__(self, text: str, callback):
+    def __init__(self, text: str, callback: Handler):
         self.text = text
         self.condition = text_cond(text)
         self.callback = callback
