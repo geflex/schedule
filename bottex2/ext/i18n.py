@@ -8,6 +8,10 @@ from bottex2.handler import Request
 
 
 class LazyTranslate(str):
+    def __init__(self, s, domain=None):
+        super().__init__(s)
+        self.domain = domain
+
     def format(self, *args, **kwargs):
         self.fmt_args = args
         self.fmt_kwargs = kwargs
@@ -24,11 +28,10 @@ class LazyTranslate(str):
             return super().format(s, *s.fmt_args, **s.fmt_kwargs)
         elif cls.check(fmt_data):
             return s.format(*fmt_data.fmt_args, **fmt_data.fmt_kwargs)
-        return s
 
 
-def _(s):
-    return LazyTranslate(s)
+def _(s, domain=None):
+    return LazyTranslate(s, domain)
 
 
 class I18nUserMixin:
