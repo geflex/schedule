@@ -1,4 +1,5 @@
 import re
+from abc import ABC
 from functools import cached_property
 from typing import List
 
@@ -14,8 +15,8 @@ class PTypeInput(View):
     @property
     def commands(self) -> List[List[Command]]:
         return [[
-            Command(_('Студент'), self.set_stutent_ptype),
-            Command(_('Препод'), self.set_teacher_ptype),
+            Command(_('Студент', 'commands'), self.set_stutent_ptype),
+            Command(_('Препод', 'commands'), self.set_teacher_ptype),
         ]]
 
     async def set_stutent_ptype(self, r: Request):
@@ -51,8 +52,8 @@ class BaseSubgroupInput(View):
     @property
     def commands(self):
         commands = [[
-            Command(_('Первая'), self.get_subgroup_setter('1')),
-            Command(_('Вторая'), self.get_subgroup_setter('2')),
+            Command(_('Первая', 'commands'), self.get_subgroup_setter('1')),
+            Command(_('Вторая', 'commands'), self.get_subgroup_setter('2')),
         ]]
         return commands
 
@@ -65,13 +66,9 @@ class BaseSubgroupInput(View):
         await r.chat.send_message(_('Такой подгруппы не существует'))
 
 
-class BaseGroupInput(View):
+class BaseGroupInput(View, ABC):
     exp = re.compile(r'\d{8}')
     revexp = regexp.compile(exp)
-
-    @property
-    def commands(self):
-        return []
 
     @cached_property
     def router(self) -> Router:
@@ -86,10 +83,7 @@ class BaseGroupInput(View):
         await r.chat.send_message(_('Номер группы должен состоять из 8 цифр'), self.keyboard)
 
 
-class BaseNameInput(View):
-    @property
-    def commands(self):
-        return []
+class BaseNameInput(View, ABC):
 
     async def set_name(self, r: Request):
         await r.user.update(name=r.text)

@@ -103,6 +103,9 @@ class SettingsGroupInput(inputs.BaseGroupInput, BaseSettingsInput):
 class SettingsNameInput(inputs.BaseNameInput, BaseSettingsInput):
     name = 'settings_name'
 
+    def commands(self):
+        return []
+
     async def set_name(self, r: Request):
         old = r.user.name
         await super().set_name(r)

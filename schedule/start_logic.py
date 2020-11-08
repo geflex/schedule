@@ -48,6 +48,10 @@ class PTypeInput(inputs.PTypeInput):
 class StartGroupInput(inputs.BaseGroupInput):
     name = 'start_group_input'
 
+    def commands(self):
+        # return [[Command(_('Я не знаю номер группы', 'commands'), )]]
+        return []
+
     async def set_group(self, r: Request):
         await super().set_group(r)
         await StartSubgroupInput.switch(r)
@@ -78,6 +82,9 @@ class StartSubgroupInput(inputs.BaseSubgroupInput):
 
 class StartNameInput(inputs.BaseNameInput):
     name = 'start_name_input'
+
+    def commands(self):
+        return []
 
     @classmethod
     async def switch(cls, r: Request):
