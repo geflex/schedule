@@ -4,7 +4,7 @@ from typing import List
 from sqlalchemy import Column
 from sqlalchemy import types as sqltypes
 
-from bottex2.ext.i18n import I18nUserMixin
+from bottex2.ext.i18n import I18nUserMixin, set_default_lang
 from bottex2.ext.rights import RightsUserMixin
 from bottex2.ext.users import UserModel
 from bottex2.sqlalchemy import Model
@@ -66,6 +66,9 @@ class User(UserModel, I18nUserMixin, RightsUserMixin):
     name = Column(sqltypes.String)  # for teacher
     group = Column(sqltypes.String)  # only for student
     subgroup = Column(sqltypes.Enum('1', '2', name='subgroup'))  # only for student
+
+
+set_default_lang(Lang.ru.value)
 
 
 class Lesson(Model):

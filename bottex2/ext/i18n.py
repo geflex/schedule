@@ -37,6 +37,12 @@ class LazyTranslate(str):
 
 REVERSIBLE_DOMAIN = 'reversible'
 REVERSED_DOMAIN = 'reversed'
+default_lang: Optional[str] = None
+
+
+def set_default_lang(lang: str):
+    global default_lang
+    default_lang = lang
 
 
 def gettext(s, domain):
@@ -52,8 +58,8 @@ class I18nUserMixin:
     locale: Enum
 
 
-def translate(text: str, lang):
-    if isinstance(text, LazyTranslate):
+def translate(text: str, lang: str):
+    if isinstance(text, LazyTranslate) and lang != default_lang:
         domain = text.domain
         try:
             trans = gettext_module.translation(domain, 'schedule/locales', [lang])
