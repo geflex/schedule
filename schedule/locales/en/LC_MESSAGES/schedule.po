@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2020-11-07 15:00+0300\n"
+"POT-Creation-Date: 2020-11-08 19:12+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -15,31 +15,15 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: pygettext.py 1.5\n"
 
-#: schedule\inputs.py:17
-msgid "Студент"
-msgstr "Student"
-
-#: schedule\inputs.py:18
-msgid "Препод"
-msgstr "Teacher"
-
-#: schedule\inputs.py:28
+#: schedule\inputs.py:32
 msgid "Неизвестный тип профиля"
 msgstr "Unknown profile type"
 
-#: schedule\inputs.py:47
+#: schedule\inputs.py:51
 msgid "Выбранный язык не поддерживается"
 msgstr "Chosen language isn't supported"
 
-#: schedule\inputs.py:54
-msgid "Первая"
-msgstr "First"
-
-#: schedule\inputs.py:55
-msgid "Вторая"
-msgstr "Second"
-
-#: schedule\inputs.py:65
+#: schedule\inputs.py:69
 msgid "Такой подгруппы не существует"
 msgstr "There is no such subgroup"
 
@@ -47,47 +31,15 @@ msgstr "There is no such subgroup"
 msgid "Номер группы должен состоять из 8 цифр"
 msgstr "The group number must consist of 8 digits"
 
-#: schedule\main_logic.py:23
-msgid "Изменить язык (beta)"
-msgstr "Change the language (beta)"
-
-#: schedule\main_logic.py:25
-msgid "Стать студентом"
-msgstr "Become a student"
-
-#: schedule\main_logic.py:26
-msgid "Изменить ФИО"
-msgstr "Change my name"
-
-#: schedule\main_logic.py:28
-msgid "Стать преподом"
-msgstr "Become a teacher"
-
-#: schedule\main_logic.py:29
-msgid "Изменить группу"
-msgstr "Change my group"
-
-#: schedule\main_logic.py:30
-msgid "Изменить подгруппу"
-msgstr "Change my subgroup"
-
-#: schedule\main_logic.py:31
-msgid "Назад"
-msgstr "Go back"
-
-#: schedule\main_logic.py:36 schedule\main_logic.py:188
+#: schedule\main_logic.py:40
 msgid "Настройки"
 msgstr "Settings"
 
-#: schedule\main_logic.py:43
-msgid "Не менять"
-msgstr "Don't change"
-
-#: schedule\main_logic.py:47
+#: schedule\main_logic.py:51
 msgid "Ладно"
 msgstr "Okay"
 
-#: schedule\main_logic.py:70
+#: schedule\main_logic.py:72
 msgid "Язык изменен с {} на {}"
 msgstr "Language changed from {} to {}"
 
@@ -105,99 +57,84 @@ msgstr "Group changed from {} to {}"
 
 #: schedule\main_logic.py:101
 msgid "Текущая группа: {}"
-msgstr "The current group is"
+msgstr "The current group is {}"
 
-#: schedule\main_logic.py:102 schedule\main_logic.py:177
+#: schedule\main_logic.py:102 schedule\main_logic.py:181
 msgid "Введи номер группы"
 msgstr "Enter your group number"
 
-#: schedule\main_logic.py:113
+#: schedule\main_logic.py:117
 msgid "Имя изменено с {} на {}"
 msgstr "Your name changed from {} to {}"
 
-#: schedule\main_logic.py:119
+#: schedule\main_logic.py:123
 msgid "Текущее имя: {}"
 msgstr "Your name is {}"
 
-#: schedule\main_logic.py:120
+#: schedule\main_logic.py:124
 msgid "Введи новое имя"
 msgstr "Enter your new name"
 
-#: schedule\main_logic.py:140
+#: schedule\main_logic.py:144
 msgid "Подгруппа изменена с {} на {}"
 msgstr "Subgroup changed from {} to {}"
 
-#: schedule\main_logic.py:148
+#: schedule\main_logic.py:152
 msgid "Текущая подгруппа: {}"
 msgstr "Your current group is {}"
 
-#: schedule\main_logic.py:149
+#: schedule\main_logic.py:153
 msgid "Введи номер подгруппы"
 msgstr "Enter your subgroup number"
 
-#: schedule\main_logic.py:154 schedule\main_logic.py:166
+#: schedule\main_logic.py:158 schedule\main_logic.py:170
 msgid "Теперь ты препод"
 msgstr "Now you is a teacher"
 
-#: schedule\main_logic.py:159 schedule\main_logic.py:175
+#: schedule\main_logic.py:163 schedule\main_logic.py:179
 msgid "Теперь ты студент"
 msgstr "Now you is a student"
 
-#: schedule\main_logic.py:168
+#: schedule\main_logic.py:172
 msgid "Введи свои ФИО"
 msgstr "Enter your name"
 
-#: schedule\main_logic.py:187
-msgid "Завтра"
-msgstr "Tomorrow"
-
-#: schedule\main_logic.py:187
-msgid "Сегодня"
-msgstr "Today"
-
-#: schedule\main_logic.py:192
+#: schedule\main_logic.py:197
 msgid "Непонятная команда"
 msgstr "Unknown command"
 
-#: schedule\main_logic.py:196
+#: schedule\main_logic.py:201
 msgid "Главное меню"
 msgstr "Main menu"
 
-#: schedule\main_logic.py:206
+#: schedule\main_logic.py:211
 msgid "Расписание для {} на {}"
 msgstr "Schedule for {} on {}"
 
-#: schedule\start_logic.py:25
+#: schedule\start_logic.py:29
 msgid "Выбери язык"
 msgstr "Choose a new language"
 
-#: schedule\start_logic.py:44
+#: schedule\start_logic.py:48
 msgid "Теперь выбери тип профиля"
 msgstr "First choose your profile type"
 
-#: schedule\start_logic.py:57
+#: schedule\start_logic.py:66
 msgid "Окей, теперь введи номер своей группы"
 msgstr "Okay, now enter your group number"
 
-#: schedule\start_logic.py:74
+#: schedule\start_logic.py:83
 msgid "Выбери свою подгруппу"
 msgstr "Choose your subgroup"
 
-#: schedule\start_logic.py:83
+#: schedule\start_logic.py:96
 msgid "Хорошо, теперь введите свои ФИО"
 msgstr "OK, now enter your full name"
 
-#: schedule\start_logic.py:90
+#: schedule\start_logic.py:103
 msgid "Ура, все настроили"
 msgstr "Hooray, everything is set up"
 
-#: schedule\start_logic.py:95
+#: schedule\start_logic.py:108
 msgid "Данные успешно удалены"
 msgstr "Data was successfully deleted"
-
-#~ msgid ""
-#~ "Хай! Сначала нужно кое-что настроить (все это можно будет поменять позже "
-#~ "в настройках)"
-#~ msgstr ""
-#~ "Hi! First, you need to configure something (all this can be changed later "
-#~ "in the settings)"

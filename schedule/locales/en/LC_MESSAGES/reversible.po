@@ -1,0 +1,76 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR ORGANIZATION
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"POT-Creation-Date: 2020-11-08 19:12+0300\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=cp1251\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: pygettext.py 1.5\n"
+
+#: schedule\inputs.py:21
+msgid "Студент"
+msgstr "Student"
+
+#: schedule\inputs.py:22
+msgid "Препод"
+msgstr "Teacher"
+
+#: schedule\inputs.py:58
+msgid "Первая"
+msgstr "First"
+
+#: schedule\inputs.py:59
+msgid "Вторая"
+msgstr "Second"
+
+#: schedule\main_logic.py:27
+msgid "Изменить язык (beta)"
+msgstr "Change the language (beta)"
+
+#: schedule\main_logic.py:29
+msgid "Стать студентом"
+msgstr "Become a student"
+
+#: schedule\main_logic.py:30
+msgid "Изменить ФИО"
+msgstr "Change my name"
+
+#: schedule\main_logic.py:32
+msgid "Стать преподом"
+msgstr "Become a teacher"
+
+#: schedule\main_logic.py:33
+msgid "Изменить группу"
+msgstr "Change my group"
+
+#: schedule\main_logic.py:34
+msgid "Изменить подгруппу"
+msgstr "Change my subgroup"
+
+#: schedule\main_logic.py:35
+msgid "Назад"
+msgstr "Go back"
+
+#: schedule\main_logic.py:47
+msgid "Не менять"
+msgstr "Don't change"
+
+#: schedule\main_logic.py:191
+msgid "Сегодня"
+msgstr "Today"
+
+#: schedule\main_logic.py:192
+msgid "Завтра"
+msgstr "Tomorrow"
+
+#: schedule\main_logic.py:193
+msgid "Настройки"
+msgstr "Settings"
