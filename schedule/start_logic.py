@@ -49,7 +49,7 @@ class StartGroupInput(inputs.BaseGroupInput):
     name = 'start_group_input'
 
     def commands(self):
-        # return [[Command(_('Я не знаю номер группы', 'commands'), )]]
+        # return [[Command(_('Я не знаю номер группы', 'reversible'), )]]
         return []
 
     async def set_group(self, r: Request):

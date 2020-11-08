@@ -15,8 +15,8 @@ class PTypeInput(View):
     @property
     def commands(self) -> List[List[Command]]:
         return [[
-            Command(_('Студент', 'commands'), self.set_stutent_ptype),
-            Command(_('Препод', 'commands'), self.set_teacher_ptype),
+            Command(_('Студент', 'reversible'), self.set_stutent_ptype),
+            Command(_('Препод', 'reversible'), self.set_teacher_ptype),
         ]]
 
     async def set_stutent_ptype(self, r: Request):
@@ -52,8 +52,8 @@ class BaseSubgroupInput(View):
     @property
     def commands(self):
         commands = [[
-            Command(_('Первая', 'commands'), self.get_subgroup_setter('1')),
-            Command(_('Вторая', 'commands'), self.get_subgroup_setter('2')),
+            Command(_('Первая', 'reversible'), self.get_subgroup_setter('1')),
+            Command(_('Вторая', 'reversible'), self.get_subgroup_setter('2')),
         ]]
         return commands
 

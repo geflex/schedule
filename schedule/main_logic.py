@@ -21,15 +21,15 @@ class Settings(View):
         def add(text, cb):
             commands.append([Command(text, cb)])
 
-        add(_('Изменить язык (beta)'), SettingsLanguageInput.switch)
+        add(_('Изменить язык (beta)', 'reversible'), SettingsLanguageInput.switch)
         if self.r.user.ptype is PType.teacher:
-            add(_('Стать студентом'), become_student)
-            add(_('Изменить ФИО'), SettingsNameInput.switch)
+            add(_('Стать студентом', 'reversible'), become_student)
+            add(_('Изменить ФИО', 'reversible'), SettingsNameInput.switch)
         else:
-            add(_('Стать преподом'), become_teacher)
-            add(_('Изменить группу'), SettingsGroupInput.switch)
-            add(_('Изменить подгруппу'), SettingsSubgroupInput.switch)
-        add(_('Назад'), Schedule.switch)
+            add(_('Стать преподом', 'reversible'), become_teacher)
+            add(_('Изменить группу', 'reversible'), SettingsGroupInput.switch)
+            add(_('Изменить подгруппу', 'reversible'), SettingsSubgroupInput.switch)
+        add(_('Назад', 'reversible'), Schedule.switch)
         return commands
 
     @classmethod
@@ -41,7 +41,7 @@ class Settings(View):
 class BaseSettingsInput(View):
     @property
     def commands(self):
-        return [[Command(_('Не менять'), self.back)]]
+        return [[Command(_('Не менять', 'reversible'), self.back)]]
 
     @classmethod
     async def back(cls, r: Request):
@@ -184,8 +184,9 @@ class Schedule(View):
     @cached_property
     def commands(self):
         return [
-            [Command(_('Сегодня'), self.today), Command(_('Завтра'), self.tomorrow)],
-            [Command(_('Настройки'), Settings.switch)],
+            [Command(_('Сегодня', 'reversible'), self.today),
+             Command(_('Завтра', 'reversible'), self.tomorrow)],
+            [Command(_('Настройки', 'reversible'), Settings.switch)],
         ]
 
     async def default(self, r: Request):
