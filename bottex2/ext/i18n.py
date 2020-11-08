@@ -8,43 +8,52 @@ from bottex2.handler import Request
 
 
 class LazyTranslate(str):
-    def __init__(self, s, domain=None):
-        super().__init__(s)
-        self.domain = domain
+    def __init__(self, s):
+        super().__init__()
+        self.domain = None
 
-    def format(self, *args, **kwargs):
+    def format(self, *args, **kwargs) -> 'LazyTranslate':
         self.fmt_args = args
         self.fmt_kwargs = kwargs
         return self
 
-    @classmethod
-    def check(cls, s):
-        return hasattr(s, 'fmt_args') and hasattr(s, 'fmt_kwargs')
+    def __str__(self) -> str:
+        return self.enforce()
 
-    # noinspection PyUnresolvedReferences
-    @classmethod
-    def enforce(cls, s: str, fmt_data: Optional[str] = None):
-        if cls.check(s):
-            return super().format(s, *s.fmt_args, **s.fmt_kwargs)
-        elif cls.check(fmt_data):
-            return s.format(*fmt_data.fmt_args, **fmt_data.fmt_kwargs)
+    def string(self) -> str:
+        return super().__str__()
+
+    def was_formatted(self) -> bool:
+        return hasattr(self, 'fmt_args') and hasattr(self, 'fmt_kwargs')
+
+    def enforce(self, s: Optional[str] = None) -> str:
+        s = self.string() if s is None else s
+        if self.was_formatted():
+            return s.format(*self.fmt_args, **self.fmt_kwargs)
+        return s
 
 
-def _(s, domain=None):
-    return LazyTranslate(s, domain)
+def _(s, domain):
+    s = LazyTranslate(s)
+    s.domain = domain
+    return s
 
 
 class I18nUserMixin:
     locale: Enum
 
 
-def translate(text, lang):
-    try:
-        trans = gettext.translation('schedule', 'schedule/locales', [lang])
-    except FileNotFoundError:
-        return LazyTranslate.enforce(text)
-    else:
-        return LazyTranslate.enforce(trans.gettext(text), text)
+def translate(text: str, lang):
+    if isinstance(text, LazyTranslate):
+        domain = text.domain
+        try:
+            trans = gettext.translation(domain, 'schedule/locales', [lang])
+        except FileNotFoundError:
+            return str(text)
+        else:
+            translated = trans.gettext(text)
+            return text.enforce(translated)
+    return text
 
 
 class TranslateBottexChatMiddleware(BottexChatMiddleware):

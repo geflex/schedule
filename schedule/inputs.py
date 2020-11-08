@@ -1,6 +1,6 @@
 import re
 from abc import ABC
-from functools import cached_property
+from functools import cached_property, partial
 from typing import List
 
 from bottex2.ext.i18n import _
@@ -10,13 +10,16 @@ from bottex2.router import Router, if_regexp
 from bottex2.views import View, Command
 from .models import PType, Lang
 
+_c = partial(_, domain='reversible')
+_ = partial(_, domain='schedule')
+
 
 class PTypeInput(View):
     @property
     def commands(self) -> List[List[Command]]:
         return [[
-            Command(_('Студент', 'reversible'), self.set_stutent_ptype),
-            Command(_('Препод', 'reversible'), self.set_teacher_ptype),
+            Command(_c('Студент'), self.set_stutent_ptype),
+            Command(_c('Препод'), self.set_teacher_ptype),
         ]]
 
     async def set_stutent_ptype(self, r: Request):
@@ -52,8 +55,8 @@ class BaseSubgroupInput(View):
     @property
     def commands(self):
         commands = [[
-            Command(_('Первая', 'reversible'), self.get_subgroup_setter('1')),
-            Command(_('Вторая', 'reversible'), self.get_subgroup_setter('2')),
+            Command(_c('Первая'), self.get_subgroup_setter('1')),
+            Command(_c('Вторая'), self.get_subgroup_setter('2')),
         ]]
         return commands
 

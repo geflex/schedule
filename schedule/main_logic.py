@@ -1,4 +1,4 @@
-from functools import cached_property
+from functools import cached_property, partial
 
 from bottex2.chat import Keyboard
 from bottex2.ext.i18n import _
@@ -11,6 +11,9 @@ from schedule.models import PType
 from . import inputs
 from .models import Lang
 
+_c = partial(_, domain='reversible')
+_ = partial(_, domain='schedule')
+
 
 class Settings(View):
     name = 'settings'
@@ -21,15 +24,15 @@ class Settings(View):
         def add(text, cb):
             commands.append([Command(text, cb)])
 
-        add(_('Изменить язык (beta)', 'reversible'), SettingsLanguageInput.switch)
+        add(_c('Изменить язык (beta)'), SettingsLanguageInput.switch)
         if self.r.user.ptype is PType.teacher:
-            add(_('Стать студентом', 'reversible'), become_student)
-            add(_('Изменить ФИО', 'reversible'), SettingsNameInput.switch)
+            add(_c('Стать студентом'), become_student)
+            add(_c('Изменить ФИО'), SettingsNameInput.switch)
         else:
-            add(_('Стать преподом', 'reversible'), become_teacher)
-            add(_('Изменить группу', 'reversible'), SettingsGroupInput.switch)
-            add(_('Изменить подгруппу', 'reversible'), SettingsSubgroupInput.switch)
-        add(_('Назад', 'reversible'), Schedule.switch)
+            add(_c('Стать преподом'), become_teacher)
+            add(_c('Изменить группу'), SettingsGroupInput.switch)
+            add(_c('Изменить подгруппу'), SettingsSubgroupInput.switch)
+        add(_c('Назад'), Schedule.switch)
         return commands
 
     @classmethod
@@ -41,7 +44,7 @@ class Settings(View):
 class BaseSettingsInput(View):
     @property
     def commands(self):
-        return [[Command(_('Не менять', 'reversible'), self.back)]]
+        return [[Command(_c('Не менять'), self.back)]]
 
     @classmethod
     async def back(cls, r: Request):
@@ -103,6 +106,7 @@ class SettingsGroupInput(inputs.BaseGroupInput, BaseSettingsInput):
 class SettingsNameInput(inputs.BaseNameInput, BaseSettingsInput):
     name = 'settings_name'
 
+    @cached_property
     def commands(self):
         return []
 
@@ -184,9 +188,9 @@ class Schedule(View):
     @cached_property
     def commands(self):
         return [
-            [Command(_('Сегодня', 'reversible'), self.today),
-             Command(_('Завтра', 'reversible'), self.tomorrow)],
-            [Command(_('Настройки', 'reversible'), Settings.switch)],
+            [Command(_c('Сегодня'), self.today),
+             Command(_c('Завтра'), self.tomorrow)],
+            [Command(_c('Настройки'), Settings.switch)],
         ]
 
     async def default(self, r: Request):
