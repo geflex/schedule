@@ -1,4 +1,4 @@
-import gettext
+import gettext as gettext_module
 from enum import Enum
 from typing import Optional
 
@@ -33,7 +33,7 @@ class LazyTranslate(str):
         return s
 
 
-def _(s, domain):
+def gettext(s, domain):
     s = LazyTranslate(s)
     s.domain = domain
     return s
@@ -47,7 +47,7 @@ def translate(text: str, lang):
     if isinstance(text, LazyTranslate):
         domain = text.domain
         try:
-            trans = gettext.translation(domain, 'schedule/locales', [lang])
+            trans = gettext_module.translation(domain, 'schedule/locales', [lang])
         except FileNotFoundError:
             return str(text)
         else:

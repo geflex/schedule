@@ -1,7 +1,7 @@
 from functools import cached_property, partial
 
 from bottex2.chat import Keyboard
-from bottex2.ext.i18n import _
+from bottex2.ext.i18n import gettext
 from bottex2.ext.users import gen_state_cases
 from bottex2.handler import Request
 from bottex2.helpers.tools import state_name
@@ -10,7 +10,7 @@ from . import inputs
 from . import main_logic
 from .models import Lang
 
-_ = partial(_, domain='schedule')
+_ = partial(gettext, domain='schedule')
 
 
 class StartLanguageInput(inputs.BaseLanguageInput):
