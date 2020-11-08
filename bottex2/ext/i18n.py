@@ -57,7 +57,8 @@ def translate(text: str, lang):
         domain = text.domain
         try:
             trans = gettext_module.translation(domain, 'schedule/locales', [lang])
-        except FileNotFoundError:
+        except FileNotFoundError as e:
+            logger.warn(e)
             return str(text)
         else:
             translated = trans.gettext(text)
