@@ -1,10 +1,12 @@
 import gettext as gettext_module
 from enum import Enum
+from functools import partial
 from typing import Optional
 
 from bottex2.bottex import BottexChatMiddleware, BottexHandlerMiddleware
 from bottex2.chat import Keyboard
 from bottex2.handler import Request
+from bottex2.logging import logger
 
 
 class LazyTranslate(str):
@@ -33,10 +35,17 @@ class LazyTranslate(str):
         return s
 
 
+REVERSIBLE_DOMAIN = 'reversible'
+REVERSED_DOMAIN = 'reversed'
+
+
 def gettext(s, domain):
     s = LazyTranslate(s)
     s.domain = domain
     return s
+
+
+rgettext = partial(gettext, domain=REVERSIBLE_DOMAIN)
 
 
 class I18nUserMixin:
