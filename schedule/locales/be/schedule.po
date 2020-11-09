@@ -1,0 +1,141 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR ORGANIZATION
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"POT-Creation-Date: 2020-11-09 20:17+0300\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=cp1251\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: pygettext.py 1.5\n"
+
+
+#: schedule\inputs.py:32
+msgid "Неизвестный тип профиля"
+msgstr "Невядомы тып профілю"
+
+#: schedule\inputs.py:51
+msgid "Выбранный язык не поддерживается"
+msgstr "Вылучаны мова не падтрымліваецца"
+
+#: schedule\inputs.py:69
+msgid "Такой подгруппы не существует"
+msgstr "Такі падгрупы не існуе"
+
+#: schedule\inputs.py:86
+msgid "Номер группы должен состоять из 8 цифр"
+msgstr "Нумар групы павінен складацца з 8 лічбаў"
+
+#: schedule\main_logic.py:40
+msgid "Настройки"
+msgstr "Налады"
+
+#: schedule\main_logic.py:51
+msgid "Ладно"
+msgstr "Добра"
+
+#: schedule\main_logic.py:72
+msgid "Язык изменен с {} на {}"
+msgstr "Мова зменена з {} на {}"
+
+#: schedule\main_logic.py:81
+msgid "Текущий язык: {}"
+msgstr "Усталяваная мова: {}"
+
+#: schedule\main_logic.py:82
+msgid "Выбери новый язык"
+msgstr "Выберы новую мову"
+
+#: schedule\main_logic.py:94
+msgid "Группа изменена с {} на {}"
+msgstr "Група зменена з {} на {}"
+
+#: schedule\main_logic.py:101
+msgid "Текущая группа: {}"
+msgstr "Усталяваная група: {}"
+
+#: schedule\main_logic.py:102 schedule\main_logic.py:181
+msgid "Введи номер группы"
+msgstr "Увядзі нумар групы"
+
+#: schedule\main_logic.py:117
+msgid "Имя изменено с {} на {}"
+msgstr "Імя зменена з {} на {}"
+
+#: schedule\main_logic.py:123
+msgid "Текущее имя: {}"
+msgstr "Усталяванае імя: {}"
+
+#: schedule\main_logic.py:124
+msgid "Введи новое имя"
+msgstr "Увядзі новае імя"
+
+#: schedule\main_logic.py:144
+msgid "Подгруппа изменена с {} на {}"
+msgstr "Падгрупа зменена з {} на {}"
+
+#: schedule\main_logic.py:152
+msgid "Текущая подгруппа: {}"
+msgstr "Усталяваная падгрупа"
+
+#: schedule\main_logic.py:153
+msgid "Введи номер подгруппы"
+msgstr "Увядзі нумар падгрупы"
+
+#: schedule\main_logic.py:158 schedule\main_logic.py:170
+msgid "Теперь ты препод"
+msgstr "Цяпер ты выкладчык"
+
+#: schedule\main_logic.py:163 schedule\main_logic.py:179
+msgid "Теперь ты студент"
+msgstr "Цяпер ты студэнт"
+
+#: schedule\main_logic.py:172
+msgid "Введи свои ФИО"
+msgstr "Ўвядзі свае імя"
+
+#: schedule\main_logic.py:197
+msgid "Непонятная команда"
+msgstr "Незразумелая каманда"
+
+#: schedule\main_logic.py:201
+msgid "Главное меню"
+msgstr "Галоўнае меню"
+
+#: schedule\main_logic.py:211
+msgid "Расписание для {} на {}"
+msgstr "Расклад для {} на {}"
+
+#: schedule\start_logic.py:29
+msgid "Выбери язык"
+msgstr "Выберы мову"
+
+#: schedule\start_logic.py:48
+msgid "Теперь выбери тип профиля"
+msgstr "Цяпер выберы тып профілю"
+
+#: schedule\start_logic.py:66
+msgid "Окей, теперь введи номер своей группы"
+msgstr "Окей, цяпер увядзі нумар сваёй групы"
+
+#: schedule\start_logic.py:83
+msgid "Выбери свою подгруппу"
+msgstr "Выберы сваю падгрупу"
+
+#: schedule\start_logic.py:96
+msgid "Хорошо, теперь введите свои ФИО"
+msgstr "Добра, цяпер калі ласка, увядзіце свае імя"
+
+#: schedule\start_logic.py:103
+msgid "Ура, все настроили"
+msgstr "Ура, усё наладзілі"
+
+#: schedule\start_logic.py:108
+msgid "Данные успешно удалены"
+msgstr "Дадзеныя паспяхова выдаленыя"
+
