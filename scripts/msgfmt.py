@@ -24,63 +24,35 @@ Options:
     --version
         Display version information and exit.
 """
-
+import argparse
 import array
 import ast
-import getopt
 import os
 import struct
 import sys
 from email.parser import HeaderParser
 
+
 __version__ = "1.2"
 
 
-def usage(code, msg=''):
-    print(__doc__, file=sys.stderr)
-    if msg:
-        print(msg, file=sys.stderr)
-    sys.exit(code)
+def parse_args():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--version', action='version', version=f'bottex-%(prog)s {__version__}')
+    parser.add_argument('-o', '--output-file')
+    parser.add_argument('--reversed', action='store_true')
+    parser.add_argument('input_file')
+    return parser.parse_args()
 
 
-def generate(messages):
-    """Return the generated output."""
-    # the keys are sorted in the .mo file
-    keys = sorted(messages.keys())
-    offsets = []
-    ids = strs = b''
-    for id in keys:
-        # For each string, we need size and file offset.  Each string is NUL
-        # terminated; the NUL does not count into the size.
-        offsets.append((len(ids), len(id), len(strs), len(messages[id])))
-        ids += id + b'\0'
-        strs += messages[id] + b'\0'
-    output = ''
-    # The header is 7 32-bit unsigned integers.  We don't use hash tables, so
-    # the keys start right after the index tables.
-    # translated string.
-    keystart = 7*4+16*len(keys)
-    # and the values start after the keys
-    valuestart = keystart + len(ids)
-    koffsets = []
-    voffsets = []
-    # The string table first has the list of keys, then the list of values.
-    # Each entry has first the size of the string, then the file offset.
-    for o1, l1, o2, l2 in offsets:
-        koffsets += [l1, o1+keystart]
-        voffsets += [l2, o2+valuestart]
-    offsets = koffsets + voffsets
-    output = struct.pack("Iiiiiii",
-                         0x950412de,       # Magic
-                         0,                 # Version
-                         len(keys),         # # of entries
-                         7*4,               # start of key index
-                         7*4+len(keys)*8,   # start of value index
-                         0, 0)              # size and offset of hash table
-    output += array.array("i", offsets).tobytes()
-    output += ids
-    output += strs
-    return output
+def swap(messages: dict):
+    new = {}
+    for key, value in messages.items():
+        if key:
+            new[value] = key
+        else:
+            new[key] = value
+    return new
 
 
 def po_filename(filename):
@@ -217,40 +189,65 @@ def parse(lines):
     return messages
 
 
+def generate(messages):
+    """Return the generated output."""
+    # the keys are sorted in the .mo file
+    keys = sorted(messages.keys())
+    offsets = []
+    ids = strs = b''
+    for id in keys:
+        # For each string, we need size and file offset.  Each string is NUL
+        # terminated; the NUL does not count into the size.
+        offsets.append((len(ids), len(id), len(strs), len(messages[id])))
+        ids += id + b'\0'
+        strs += messages[id] + b'\0'
+    output = ''
+    # The header is 7 32-bit unsigned integers.  We don't use hash tables, so
+    # the keys start right after the index tables.
+    # translated string.
+    keystart = 7*4+16*len(keys)
+    # and the values start after the keys
+    valuestart = keystart + len(ids)
+    koffsets = []
+    voffsets = []
+    # The string table first has the list of keys, then the list of values.
+    # Each entry has first the size of the string, then the file offset.
+    for o1, l1, o2, l2 in offsets:
+        koffsets += [l1, o1+keystart]
+        voffsets += [l2, o2+valuestart]
+    offsets = koffsets + voffsets
+    output = struct.pack("Iiiiiii",
+                         0x950412de,       # Magic
+                         0,                 # Version
+                         len(keys),         # # of entries
+                         7*4,               # start of key index
+                         7*4+len(keys)*8,   # start of value index
+                         0, 0)              # size and offset of hash table
+    output += array.array("i", offsets).tobytes()
+    output += ids
+    output += strs
+    return output
+
+
 def main():
-    try:
-        opts, args = getopt.getopt(sys.argv[1:], 'hVo:',
-                                   ['help', 'version', 'output-file='])
-    except getopt.error as msg:
-        usage(1, msg)
-        return
+    args = parse_args()
 
-    outfile = None
-    # parse options
-    for opt, arg in opts:
-        if opt in ('-h', '--help'):
-            usage(0)
-        elif opt in ('-V', '--version'):
-            print("msgfmt.py", __version__)
-            sys.exit(0)
-        elif opt in ('-o', '--output-file'):
-            outfile = arg
-
-    if not args:
-        print('No input file given', file=sys.stderr)
-        print("Try `msgfmt --help' for more information.", file=sys.stderr)
-        return
-
-    # Compute .mo name from .po name and arguments
-    filename = args[0]
-    infile = po_filename(filename)
-    if outfile is None:
-        outfile = mo_filename(infile)
+    infile = po_filename(args.input_file)
+    if args.output_file is None:
+        args.output_file = mo_filename(infile)
 
     lines = readlines(infile)
     messages = parse(lines)
     binary = generate(messages)
-    write(outfile, binary)
+    write(args.output_file, binary)
+
+    if args.reversed:
+        # if reversed_filename is None:
+        dirname = os.path.dirname(infile)
+        reversed_filename = os.path.join(dirname, 'reversed.mo')
+        swapped = swap(messages)
+        reversed_binary = generate(swapped)
+        write(reversed_filename, reversed_binary)
 
 
 if __name__ == '__main__':
