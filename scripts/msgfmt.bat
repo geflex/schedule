@@ -1,4 +1,8 @@
 @echo off
 call scripts/_setup_i18n.bat
-python scripts/msgfmt.py %EN_LOCALES_PATH%/schedule.po
-python scripts/msgfmt.py --reversed %EN_LOCALES_PATH%/reversible.po
+
+for /f %%l in ('dir /b /d /a:d %LOCALES_PATH%') do (
+    python scripts/msgfmt.py %LOCALES_PATH%\%%l\LC_MESSAGES\schedule.po
+    python scripts/msgfmt.py --reversed %LOCALES_PATH%\%%l\LC_MESSAGES\reversible.po
+)
+
