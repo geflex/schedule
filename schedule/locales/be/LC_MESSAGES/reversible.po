@@ -5,15 +5,15 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2020-11-09 20:17+0300\n"
+"POT-Creation-Date: 2020-11-09 21:00+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=cp1251\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: pygettext.py 1.5\n"
-
 
 #: schedule\inputs.py:21
 msgid "Студент"
@@ -32,8 +32,8 @@ msgid "Вторая"
 msgstr "Другая"
 
 #: schedule\main_logic.py:27
-msgid "Изменить язык (beta)"
-msgstr "Змяніць мову (beta)"
+msgid "Изменить язык"
+msgstr "Змяніць мову"
 
 #: schedule\main_logic.py:29
 msgid "Стать студентом"
@@ -74,4 +74,3 @@ msgstr "Заўтра"
 #: schedule\main_logic.py:193
 msgid "Настройки"
 msgstr "Налады"
-

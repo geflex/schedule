@@ -24,7 +24,7 @@ class Settings(View):
         def add(text, cb):
             commands.append([Command(text, cb)])
 
-        add(_c('Изменить язык (beta)'), SettingsLanguageInput.switch)
+        add(_c('Изменить язык'), SettingsLanguageInput.switch)
         if self.r.user.ptype is PType.teacher:
             add(_c('Стать студентом'), become_student)
             add(_c('Изменить ФИО'), SettingsNameInput.switch)
