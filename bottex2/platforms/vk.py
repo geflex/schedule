@@ -1,20 +1,20 @@
+import asyncio
+import json
 import sys
 from random import randint
-import json
-import aiohttp
 from typing import Union, Optional, AsyncIterator
-import asyncio
 
+import aiohttp
 from aiovk import API
-from aiovk.sessions import BaseSession, TokenSession
-from aiovk.longpoll import BotsLongPoll
 from aiovk.exceptions import VkAPIError
+from aiovk.longpoll import BotsLongPoll
+from aiovk.sessions import BaseSession, TokenSession
 
-from bottex2.handler import Request
 from bottex2.chat import AbstractChat, Keyboard
+from bottex2.ext.users import UserBottexHandlerMiddleware
+from bottex2.handler import Request
 from bottex2.logging import logger
 from bottex2.receiver import Receiver
-from bottex2.ext.users import UserBottexHandlerMiddleware
 
 
 class VkChat(AbstractChat):
@@ -50,8 +50,8 @@ class VkChat(AbstractChat):
                                           user_id=self._peer_id,
                                           message=text,
                                           keyboard=self._prepare_kb(kb))
-        except (asyncio.TimeoutError, aiohttp.ClientOSError):
-            pass
+        except (asyncio.TimeoutError, aiohttp.ClientOSError, VkAPIError) as e:
+            logger.error(repr(e))
 
 
 class VkReceiver(Receiver):
