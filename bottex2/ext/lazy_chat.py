@@ -25,11 +25,19 @@ class LazyChatMiddleware(ChatMiddleware):
             await super().send_message(text=response.text, kb=response.kb)
 
 
+def response_factory(text: Optional[str] = None, kb: Optional[Keyboard] = None):
+    return Message(text, kb)
+
+
 class ResponseMiddleware(BottexMiddleware):
     __universal__ = True
 
     async def __call__(self, request: Request):
         chat = LazyChatMiddleware(request.chat)
         request.chat = chat
-        await super().__call__(request)
-        await chat.flush()
+        request.resp = response_factory
+        response = await super().__call__(request)
+        for resp in chat.responses:
+            await chat.send_message(resp.text, resp.kb)
+        if isinstance(response, Message):
+            await chat.send_message(response.text, response.kb)
