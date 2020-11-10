@@ -3,8 +3,8 @@ from enum import Enum
 from functools import partial
 from typing import Optional
 
-from bottex2.bottex import BottexChatMiddleware, BottexHandlerMiddleware
-from bottex2.chat import Keyboard
+from bottex2.bottex import BottexHandlerMiddleware
+from bottex2.chat import Keyboard, AbstractChat, ChatMiddleware
 from bottex2.handler import Request
 from bottex2.logging import logger
 
@@ -72,11 +72,13 @@ def translate(text: str, lang: str):
     return text
 
 
-class TranslateBottexChatMiddleware(BottexChatMiddleware):
-    __universal__ = True
-    lang: Enum
+class TranslateBottexChatMiddleware(ChatMiddleware):
+    def __init__(self, chat: AbstractChat, lang: Enum):
+        super().__init__(chat)
+        self.lang = lang
 
     def translate(self, text):
+        # noinspection PyTypeChecker
         return translate(text, self.lang.value)
 
     def tranlate_keyboard(self, kb: Keyboard):
@@ -98,12 +100,7 @@ class TranslateBottexHandlerMiddleware(BottexHandlerMiddleware):
 
     async def __call__(self, request: Request):
         lang = request.user.locale
-        # !!! super bad
-        chat = request.chat
-        while not isinstance(chat, TranslateBottexChatMiddleware):
-            chat = chat.chat
-        chat.lang = lang
-        # !!!
+        request.chat = TranslateBottexChatMiddleware(request.chat, lang)
         text = gettext(request.text, REVERSED_DOMAIN)
         request.text = translate(text, lang.value)
         await super().__call__(request)

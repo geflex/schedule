@@ -1,14 +1,14 @@
-import aiohttp
 import asyncio
 from typing import Optional, AsyncIterator
 
 import aiogram
+import aiohttp
 
-from bottex2.logging import logger
-from bottex2.handler import Request
 from bottex2.chat import AbstractChat, Keyboard
-from bottex2.receiver import Receiver
 from bottex2.ext.users import UserBottexHandlerMiddleware
+from bottex2.handler import Request
+from bottex2.logging import logger
+from bottex2.receiver import Receiver
 
 
 class TgChat(AbstractChat):
@@ -65,7 +65,7 @@ class TgReceiver(Receiver):
                         raw = update['message']
                         chat = TgChat(self.bot, raw['chat']['id'])
                         yield Request(text=raw['text'],
-                                      chat=self.wrap_chat(chat),
+                                      chat=chat,
                                       raw=raw)
 
 

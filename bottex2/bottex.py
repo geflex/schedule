@@ -1,13 +1,13 @@
 from functools import partial
 from typing import Type, Set, List, AsyncIterator, Dict, Optional
 
-from bottex2.helpers import aiotools
-from bottex2.logging import logger
 from bottex2.chat import ChatMiddleware
 from bottex2.handler import HandlerError, Handler, HandlerMiddleware, Request
+from bottex2.helpers import aiotools
+from bottex2.helpers.aiotools import merge_async_iterators
+from bottex2.logging import logger
 from bottex2.middlewares import AbstractMiddleware
 from bottex2.receiver import Receiver
-from bottex2.helpers.aiotools import merge_async_iterators
 
 
 class BottexMiddleware:
@@ -67,30 +67,17 @@ class Bottex(Receiver):
         super().__init__()
         self._receivers = set(receivers)  # type: Set[Receiver]
 
-    def add_handler_middleware(self, middleware: Type[BottexHandlerMiddleware]):
-        super().add_handler_middleware(middleware)
+    def add_middleware(self, middleware: Type[BottexHandlerMiddleware]):
+        super().add_middleware(middleware)
         for receiver in self._receivers:
             submiddleware = get_submiddleware(middleware, receiver)
-            receiver.add_handler_middleware(submiddleware)
-
-    def add_chat_middleware(self, middleware: Type[BottexChatMiddleware]):
-        super().add_chat_middleware(middleware)
-        for receiver in self._receivers:
-            submiddleware = get_submiddleware(middleware, receiver)
-            receiver.add_chat_middleware(submiddleware)
-
-    def add_middleware(self, middleware: Type[BottexMiddleware]):
-        if issubclass(middleware, BottexHandlerMiddleware):
-            self.add_handler_middleware(middleware)
-        if issubclass(middleware, BottexChatMiddleware):
-            self.add_chat_middleware(middleware)
+            receiver.add_middleware(submiddleware)
 
     def add_receiver(self, receiver: Receiver):
         self._receivers.add(receiver)
         for middleware in self.handler_middlewares:
-            self.add_handler_middleware(receiver, middleware)
-        for middleware in self.chat_middlewares:
-            self.add_chat_middleware(receiver, middleware)
+            submiddleware = get_submiddleware(middleware, receiver)
+            receiver.add_middleware(submiddleware)
 
     async def handle(self, request: Request):
         handler = request.__receiver__._handler

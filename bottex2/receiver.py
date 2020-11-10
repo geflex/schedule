@@ -1,9 +1,8 @@
 from abc import ABC, abstractmethod
 from typing import AsyncIterator, List, Type
 
-from bottex2.helpers import aiotools
-from bottex2.chat import ChatMiddleware, AbstractChat
 from bottex2.handler import Handler, HandlerMiddleware, Request
+from bottex2.helpers import aiotools
 from bottex2.logging import logger
 
 
@@ -14,17 +13,8 @@ class Receiver(ABC):
     def __init__(self):
         super().__init__()
         self.handler_middlewares = []  # type: List[Type[HandlerMiddleware]]
-        self.chat_middlewares = []  # type: List[Type[ChatMiddleware]]
 
-    def add_chat_middleware(self, middleware: Type[ChatMiddleware]):
-        self.chat_middlewares.append(middleware)
-
-    def wrap_chat(self, chat: AbstractChat):
-        for middleware in self.chat_middlewares:
-            chat = middleware(chat)
-        return chat
-
-    def add_handler_middleware(self, middleware: Type[HandlerMiddleware]):
+    def add_middleware(self, middleware: Type[HandlerMiddleware]):
         self.handler_middlewares.append(middleware)
         self._wrapped_handler = middleware(self._wrapped_handler)
 

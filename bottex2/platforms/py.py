@@ -4,10 +4,10 @@ import asyncio
 from dataclasses import dataclass
 from typing import AsyncIterator, Optional
 
-from bottex2.ext.users import UserBottexHandlerMiddleware
-from bottex2.handler import  Request
-from bottex2.receiver import Receiver
 from bottex2.chat import AbstractChat, Keyboard
+from bottex2.ext.users import UserBottexHandlerMiddleware
+from bottex2.handler import Request
+from bottex2.receiver import Receiver
 
 
 @dataclass
@@ -44,7 +44,7 @@ class PyReceiver(Receiver):
             message = await self._queue.get()
             chat = PyChat(message.queue, self._queue, message.response_id)
             yield Request(text=message.text,
-                          chat=self.wrap_chat(chat),
+                          chat=chat,
                           raw=message)
 
 

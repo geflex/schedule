@@ -1,10 +1,10 @@
+import asyncio
 import json
 from typing import AsyncIterator, Optional
-import asyncio
 
-from bottex2.helpers import aiotools
 from bottex2.chat import AbstractChat, Keyboard
 from bottex2.handler import Request
+from bottex2.helpers import aiotools
 from bottex2.receiver import Receiver
 
 
@@ -45,5 +45,5 @@ class SockReciever(Receiver):
             event, writer = await self._queue.get()
             chat = SockChat(writer)
             yield Request(text=event,
-                          chat=self.wrap_chat(chat),
+                          chat=chat,
                           raw=event)
