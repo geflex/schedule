@@ -29,7 +29,7 @@ def response_factory(text: Optional[str] = None, kb: Optional[Keyboard] = None):
     return Message(text, kb)
 
 
-class ResponseMiddleware(BottexMiddleware):
+class ResponseBottexMiddleware(BottexMiddleware):
     __universal__ = True
 
     async def __call__(self, request: Request):
