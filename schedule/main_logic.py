@@ -37,8 +37,8 @@ class Settings(View):
 
     @classmethod
     async def switch(cls, r: Request):
-        await r.chat.send_message(_('Настройки'), Settings(r).keyboard)
         await super().switch(r)
+        return r.resp(_('Настройки'), Settings(r).keyboard)
 
 
 class BaseSettingsInput(View):
@@ -48,8 +48,8 @@ class BaseSettingsInput(View):
 
     @classmethod
     async def back(cls, r: Request):
-        await r.chat.send_message(_('Ладно'), Settings(r).keyboard)
         await r.user.update(state=state_name(Settings))
+        return r.resp(_('Ладно'), Settings(r).keyboard)
 
 
 class SettingsLanguageInput(inputs.BaseLanguageInput, BaseSettingsInput):
@@ -68,7 +68,7 @@ class SettingsLanguageInput(inputs.BaseLanguageInput, BaseSettingsInput):
             await super_setter(r)
             await r.user.update(state=state_name(Settings))
             r.chat.lang = lang  # !!! BAD
-            await r.chat.send_message(
+            return r.resp(
                 _('Язык изменен с {} на {}').format(old.value, lang.value),
                 Settings(r).keyboard
             )
@@ -90,7 +90,7 @@ class SettingsGroupInput(inputs.BaseGroupInput, BaseSettingsInput):
         old = r.user.group
         await super().set_group(r)
         await r.user.update(state=state_name(Settings))
-        await r.chat.send_message(
+        return r.resp(
             _('Группа изменена с {} на {}').format(old, r.user.group),
             Settings(r).keyboard
         )
@@ -114,8 +114,8 @@ class SettingsNameInput(inputs.BaseNameInput, BaseSettingsInput):
         old = r.user.name
         await super().set_name(r)
         await r.user.update(state=state_name(Settings))
-        await r.chat.send_message(_('Имя изменено с {} на {}').format(old, r.text),
-                                  Settings(r).keyboard)
+        return r.resp(_('Имя изменено с {} на {}').format(old, r.text),
+                        Settings(r).keyboard)
 
     @classmethod
     async def switch(cls, r: Request):
@@ -140,7 +140,7 @@ class SettingsSubgroupInput(inputs.BaseSubgroupInput, BaseSettingsInput):
             old = r.user.subgroup
             await super_setter(r)
             await r.user.update(state=state_name(Settings))
-            await r.chat.send_message(
+            return r.resp(
                 _('Подгруппа изменена с {} на {}').format(old, subgroup_num),
                 Settings(r).keyboard
             )
@@ -155,31 +155,31 @@ class SettingsSubgroupInput(inputs.BaseSubgroupInput, BaseSettingsInput):
 
 
 async def name_after_switching_ptype(r: Request):
-    await r.chat.send_message(_('Теперь ты препод'), Settings(r).keyboard)
     await r.user.update(name=r.text, state=state_name(Settings))
+    return r.resp(_('Теперь ты препод'), Settings(r).keyboard)
 
 
 async def group_after_switching_ptype(r: Request):
-    await r.chat.send_message(_('Теперь ты студент'), Settings(r).keyboard)
     await r.user.update(group=r.text, state=state_name(Settings))
+    return r.resp(_('Теперь ты студент'), Settings(r).keyboard)
 
 
 async def become_teacher(r: Request):
     await r.user.update(ptype=PType.teacher)
     if r.user.name:
-        await r.chat.send_message(_('Теперь ты препод'), Settings(r).keyboard)
+        return r.resp(_('Теперь ты препод'), Settings(r).keyboard)
     else:
-        await r.chat.send_message(_('Введи свои ФИО'), Keyboard())
         await r.user.update(state=state_name(name_after_switching_ptype))
+        return r.resp(_('Введи свои ФИО'), Keyboard())
 
 
 async def become_student(r: Request):
     await r.user.update(ptype=PType.student)
     if r.user.group:
-        await r.chat.send_message(_('Теперь ты студент'), Settings(r).keyboard)
+        return r.resp(_('Теперь ты студент'), Settings(r).keyboard)
     else:
-        await r.chat.send_message(_('Введи номер группы'), Keyboard())
         await r.user.update(state=state_name(group_after_switching_ptype))
+        return r.resp(_('Введи номер группы'), Keyboard())
 
 
 class Schedule(View):
@@ -194,12 +194,12 @@ class Schedule(View):
         ]
 
     async def default(self, r: Request):
-        await r.chat.send_message(_('Непонятная команда'), self.keyboard)
+        return r.resp(_('Непонятная команда'), self.keyboard)
 
     @classmethod
     async def switch(cls, r: Request):
-        await r.chat.send_message(_('Главное меню'), cls(r).keyboard)
         await super().switch(r)
+        return r.resp(_('Главное меню'), cls(r).keyboard)
 
     async def _schedule(self, date: Date, r: Request):
         if r.user.ptype is PType.student:
@@ -207,7 +207,7 @@ class Schedule(View):
         else:
             who = r.user.name
 
-        await r.chat.send_message(
+        return r.resp(
             _('Расписание для {} на {}').format(who, date.strftime("%d.%m.%Y")),
             self.keyboard
         )
@@ -215,12 +215,12 @@ class Schedule(View):
     @classmethod
     async def today(cls, r: Request):
         date = Date.today()
-        await cls(r)._schedule(date, r)
+        return await cls(r)._schedule(date, r)
 
     @classmethod
     async def tomorrow(cls, r: Request):
         date = Date.tomorrow()
-        await cls(r)._schedule(date, r)
+        return await cls(r)._schedule(date, r)
 
 
 cases = gen_state_cases([
