@@ -43,8 +43,7 @@ class VkChat(AbstractChat):
                     })
         return json.dumps(json_kb)
 
-    async def send_message(self, text: Optional[str] = None,
-                           kb: Optional[Keyboard] = None):
+    async def send_message(self, text: Optional[str] = None, kb: Optional[Keyboard] = None):
         try:
             await self._api.messages.send(random_id=randint(0, sys.maxsize),
                                           user_id=self._peer_id,
