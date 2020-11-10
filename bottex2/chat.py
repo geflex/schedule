@@ -26,7 +26,7 @@ class Keyboard(ABC):
         self.buttons[-1].append(button)
 
     def insert_line(self, *buttons: Button):
-        self.buttons.insert(list(buttons))
+        self.buttons.insert(0, list(buttons))
 
     def insert_button(self, button: Button):
         if not self.buttons:
@@ -42,9 +42,7 @@ class Keyboard(ABC):
 
 class AbstractChat(ABC):
     @abstractmethod
-    async def send_message(self,
-                           text: Optional[str] = None,
-                           kb: Optional[Keyboard] = None):
+    async def send_message(self, text: Optional[str] = None, kb: Optional[Keyboard] = None):
         pass
 
 

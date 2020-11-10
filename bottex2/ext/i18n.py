@@ -98,7 +98,12 @@ class TranslateBottexHandlerMiddleware(BottexHandlerMiddleware):
 
     async def __call__(self, request: Request):
         lang = request.user.locale
-        request.chat.lang = lang
+        # !!! super bad
+        chat = request.chat
+        while not isinstance(chat, TranslateBottexChatMiddleware):
+            chat = chat.chat
+        chat.lang = lang
+        # !!!
         text = gettext(request.text, REVERSED_DOMAIN)
         request.text = translate(text, lang.value)
         await super().__call__(request)

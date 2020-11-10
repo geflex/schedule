@@ -4,7 +4,7 @@ from sqlalchemy import create_engine
 
 from bottex2 import sqlalchemy as sqldb
 from bottex2.bottex import Bottex
-from bottex2.ext import users, i18n
+from bottex2.ext import users, i18n, lazy_chat
 from bottex2.platforms.tg import TgReceiver
 from bottex2.platforms.vk import VkReceiver
 from schedule import start_logic, models, configs
@@ -14,6 +14,12 @@ def get_bottex():
     bottex = Bottex(
         TgReceiver(configs.tg.token),
         VkReceiver(configs.vk.token, configs.vk.group_id),
+        # VkCallbackReceiver(token=configs.vk.token,
+        #                    group_id=configs.vk.group_id,
+        #                    host=configs.host,
+        #                    port=configs.vk.port,
+        #                    path='',
+        #                    secret=configs.vk.secret)
     )
     bottex.set_handler(start_logic.main)
     return bottex
@@ -30,6 +36,8 @@ def set_middlewares(bottex):
     bottex.add_middleware(i18n.TranslateBottexChatMiddleware)
     bottex.add_middleware(i18n.TranslateBottexHandlerMiddleware)
     bottex.add_middleware(users.UserBottexHandlerMiddleware)
+    bottex.add_middleware(lazy_chat.LazyChatMiddleware)
+    bottex.add_middleware(lazy_chat.ResponseHandlerMiddleware)
 
 
 def main():

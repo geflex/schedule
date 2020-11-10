@@ -44,7 +44,7 @@ class HandlerMiddleware(Handler):
         except AttributeError:
             pass
 
-    async def __call__(self, request):
+    async def __call__(self, request: Request):
         await self.handler(request)
 
 
