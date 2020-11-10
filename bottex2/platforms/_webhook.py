@@ -23,6 +23,7 @@ class AioHttpReceiverMixin(Receiver, ABC):
     _port: int
     _path: str
     _requests_queue: asyncio.Queue  # type: asyncio.Queue[dict]
+    _responses_queue: asyncio.Queue  # type: asyncio.Queue[aiohttp.web.Response]
 
     async def web_handler(self, request: aiohttp.web.Request):
         try:
@@ -32,7 +33,10 @@ class AioHttpReceiverMixin(Receiver, ABC):
             return aiohttp.web.HTTPBadRequest(headers=self.headers)
         else:
             self._requests_queue.put_nowait(dict_request)
-            return aiohttp.web.Response(status=200, headers=self.headers)
+            return await self._responses_queue.get()
+
+    def response(self, resp: aiohttp.web.Response):
+        self._responses_queue.put_nowait(resp)
 
     @abstractmethod
     def parse_request(self, data: dict) -> Request:
@@ -44,9 +48,7 @@ class AioHttpReceiverMixin(Receiver, ABC):
     async def run_app(self):
         app = aiohttp.web.Application()
         app.router.add_post(self._path, self.web_handler)
-        await aiohttp.web._run_app(app,
-                                   host=self._host,
-                                   port=self._port)
+        await aiohttp.web._run_app(app, host=self._host, port=self._port)
 
     async def listen(self):
         aiotools.create_task(self.run_app())

@@ -30,6 +30,7 @@ class VkCallbackReceiver(AioHttpReceiverMixin):
         except KeyError as e:
             raise InvalidRequest(e) from e
         else:
+            self.response(aiohttp.web.Response(headers=self.headers))
             chat = VkChat(self._session, from_id)
             return Request(text=text, chat=chat, raw=request)
 
