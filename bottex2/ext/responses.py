@@ -30,7 +30,7 @@ def response_factory(text: Optional[str] = None, kb: Optional[Keyboard] = None):
 
 
 class ResponseBottexMiddleware(BottexMiddleware):
-    __universal__ = True
+    __unified__ = True
 
     async def __call__(self, request: Request):
         chat = LazyChatMiddleware(request.chat)

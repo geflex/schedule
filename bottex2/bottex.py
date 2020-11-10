@@ -10,7 +10,7 @@ from bottex2.receiver import Receiver
 
 
 class BottexMiddleware(HandlerMiddleware):
-    __universal__ = False
+    __unified__ = False
 
     @classmethod
     def submiddleware(cls, receiver_cls: Type[Receiver],
@@ -26,7 +26,7 @@ def _get_submiddleware(bottex_middleware: Type[BottexMiddleware],
 def get_submiddleware(middleware: Type[BottexMiddleware],
                       receiver: Receiver) -> AbstractMiddleware:
     submiddleware = _get_submiddleware(middleware, type(receiver))
-    if submiddleware is middleware and not middleware.__universal__:  # !!! __universal__?
+    if submiddleware is middleware and not middleware.__unified__:
         logger.debug(f'No {middleware.__name__} specified for '
                      f'{type(receiver).__name__}')
     return submiddleware
@@ -52,7 +52,7 @@ class ReceiverRequest(Request):
 
 
 class HandlerBottexMiddleware(BottexMiddleware):
-    __universal__ = False
+    __unified__ = False
 
     async def __call__(self, request: Request) -> Awaitable[Any]:
         handler = request.__receiver__._handler

@@ -6,7 +6,7 @@ from bottex2.logging import logger
 
 
 class BottexLoggingMiddleware(BottexMiddleware):
-    __universal__ = True
+    __unified__ = True
 
     async def __call__(self, request) -> Awaitable[Any]:
         logger.info(f'in : {request.text!r}')

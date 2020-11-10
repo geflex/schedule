@@ -94,7 +94,7 @@ class TranslateBottexChatMiddleware(ChatMiddleware):
 
 
 class TranslateBottexMiddleware(BottexMiddleware):
-    __universal__ = True
+    __unified__ = True
 
     async def __call__(self, request: Request) -> Awaitable[Any]:
         user = request.user
