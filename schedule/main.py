@@ -33,9 +33,9 @@ def setup_db():
 
 
 def set_middlewares(bottex):
+    bottex.add_middleware(lazy_chat.ResponseMiddleware)
     bottex.add_middleware(i18n.TranslateBottexMiddleware)
     bottex.add_middleware(users.UserBottexMiddleware)
-    bottex.add_middleware(lazy_chat.ResponseMiddleware)
 
 
 def main():

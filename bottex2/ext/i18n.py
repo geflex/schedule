@@ -96,7 +96,6 @@ class TranslateBottexChatMiddleware(ChatMiddleware):
 
 class TranslateBottexMiddleware(BottexMiddleware):
     __universal__ = True
-    lang: Enum
 
     async def __call__(self, request: Request) -> Awaitable[Any]:
         lang = request.user.locale
