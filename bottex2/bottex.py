@@ -51,12 +51,26 @@ class ReceiverRequest(Request):
     __handler__: Handler
 
 
+class HandlerBottexMiddleware(BottexMiddleware):
+    __universal__ = False
+
+    async def __call__(self, request: Request) -> Awaitable[Any]:
+        handler = request.__receiver__._handler
+        if handler is not None:
+            try:
+                return await handler(request)
+            except HandlerError:  # !!! Maybe NoHandlerError?
+                pass
+        return await super().__call__(request)
+
+
 class Bottex(Receiver):
     middlewares: List[BottexMiddleware]
 
     def __init__(self, *receivers: Receiver):
         super().__init__()
         self._receivers = set(receivers)  # type: Set[Receiver]
+        self.add_middleware(HandlerBottexMiddleware)
 
     def add_middleware(self, middleware: Type[BottexMiddleware]):
         super().add_middleware(middleware)
@@ -70,17 +84,8 @@ class Bottex(Receiver):
             submiddleware = get_submiddleware(middleware, receiver)
             receiver.add_middleware(submiddleware)
 
-    async def handle(self, request: Request) -> Awaitable[Any]:
-        handler = request.__receiver__._handler
-        if handler is not None:
-            try:
-                return await handler(request)
-            except HandlerError:  # !!! Maybe NoHandlerError?
-                pass
-        return await self._handler(request)
-
     async def wrap_receiver(self, receiver: Receiver) -> AsyncIterator[ReceiverRequest]:
-        handler = receiver.wrap_handler(self.handle)
+        handler = receiver.wrap_handler(self._handler)
         async for request in receiver.listen():
             request = request.copy()
             request.__receiver__ = receiver
