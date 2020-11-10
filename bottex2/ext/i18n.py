@@ -73,13 +73,12 @@ def translate(text: str, lang: str):
 
 
 class TranslateBottexChatMiddleware(ChatMiddleware):
-    def __init__(self, chat: AbstractChat, lang: Enum):
+    def __init__(self, chat: AbstractChat, user: I18nUserMixin):
         super().__init__(chat)
-        self.lang = lang
+        self.user = user
 
     def translate(self, text):
-        # noinspection PyTypeChecker
-        return translate(text, self.lang.value)
+        return translate(text, self.user.locale.value)
 
     def tranlate_keyboard(self, kb: Keyboard):
         for line in kb.buttons:
@@ -98,8 +97,8 @@ class TranslateBottexMiddleware(BottexMiddleware):
     __universal__ = True
 
     async def __call__(self, request: Request) -> Awaitable[Any]:
-        lang = request.user.locale
-        request.chat = TranslateBottexChatMiddleware(request.chat, lang)
+        user = request.user
+        request.chat = TranslateBottexChatMiddleware(request.chat, user)
         text = gettext(request.text, REVERSED_DOMAIN)
-        request.text = translate(text, lang.value)
+        request.text = translate(text, user.locale.value)
         return await super().__call__(request)

@@ -44,7 +44,6 @@ class BaseLanguageInput(View):
     def get_lang_setter(self, lang: Lang):
         async def setter(r: Request):
             await r.user.update(locale=lang)
-            r.chat.lang = lang  # !!! BAD
         return setter
 
     async def default(self, r: Request):

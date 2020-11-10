@@ -67,7 +67,6 @@ class SettingsLanguageInput(inputs.BaseLanguageInput, BaseSettingsInput):
             old = r.user.locale
             await super_setter(r)
             await r.user.update(state=state_name(Settings))
-            r.chat.lang = lang  # !!! BAD
             return r.resp(
                 _('Язык изменен с {} на {}').format(old.value, lang.value),
                 Settings(r).keyboard
