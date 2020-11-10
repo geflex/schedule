@@ -47,8 +47,9 @@ class View(ABC):
         return await cls(request).router(request)
 
     async def default(self, r: Request) -> Awaitable[Any]:
-        return await r.chat.send_message('404: command not found', self.keyboard)
+        return r.resp('404: command not found', self.keyboard)
 
     @classmethod
     async def switch(cls, r: Request) -> Awaitable[Any]:
-        return await r.user.update(state=cls.name)
+        await r.user.update(state=cls.name)
+        return None

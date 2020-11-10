@@ -26,7 +26,7 @@ class StartLanguageInput(inputs.BaseLanguageInput):
     @classmethod
     async def switch(cls, r: Request):
         await super().switch(r)
-        await r.chat.send_message(_('Выбери язык'), cls(r).keyboard)
+        return r.resp(_('Выбери язык'), cls(r).keyboard)
 
 
 class PTypeInput(inputs.PTypeInput):
@@ -43,9 +43,7 @@ class PTypeInput(inputs.PTypeInput):
     @classmethod
     async def switch(cls, r: Request):
         await super().switch(r)
-        # await r.chat.send_message(_('Хай! Сначала нужно кое-что настроить '
-        #                             '(все это можно будет поменять позже в настройках)'))
-        await r.chat.send_message(_('Теперь выбери тип профиля'), cls(r).keyboard)
+        return r.resp(_('Теперь выбери тип профиля'), cls(r).keyboard)
 
 
 class StartGroupInput(inputs.BaseGroupInput):
@@ -63,7 +61,7 @@ class StartGroupInput(inputs.BaseGroupInput):
     @classmethod
     async def switch(cls, r: Request):
         await super().switch(r)
-        await r.chat.send_message(_('Окей, теперь введи номер своей группы'), cls(r).keyboard)
+        return r.resp(_('Окей, теперь введи номер своей группы'), cls(r).keyboard)
 
 
 class StartSubgroupInput(inputs.BaseSubgroupInput):
@@ -75,13 +73,13 @@ class StartSubgroupInput(inputs.BaseSubgroupInput):
             old_subgroup = r.user.subgroup
             await super_setter(r)
             await r.user.update(state=state_name(main_logic.Schedule))
-            await send_end_registration_message(r)
+            return end_registration_message(r)
         return setter
 
     @classmethod
     async def switch(cls, r: Request):
-        await r.chat.send_message(_('Выбери свою подгруппу'), cls(r).keyboard)
         await super().switch(r)
+        return r.resp(_('Выбери свою подгруппу'), cls(r).keyboard)
 
 
 class StartNameInput(inputs.BaseNameInput):
@@ -91,21 +89,24 @@ class StartNameInput(inputs.BaseNameInput):
     def commands(self):
         return []
 
+    async def set_name(self, r: Request):
+        await super().set_name(r)
+        await r.user.update(state=state_name(main_logic.Schedule))
+        return end_registration_message(r)
+
     @classmethod
     async def switch(cls, r: Request):
-        await r.chat.send_message(_('Хорошо, теперь введите свои ФИО'), cls(r).keyboard)
         await super().switch(r)
-        await r.user.update(state=state_name(main_logic.Schedule))
-        await send_end_registration_message(r)
+        return r.resp(_('Хорошо, теперь введите свои ФИО'), cls(r).keyboard)
 
 
-async def send_end_registration_message(r: Request):
-    await r.chat.send_message(_('Ура, все настроили'), main_logic.Schedule(r).keyboard)
+def end_registration_message(r: Request):
+    return r.resp(_('Ура, все настроили'), main_logic.Schedule(r).keyboard)
 
 
 async def delete_me(r: Request):
     await r.user.delete()
-    await r.chat.send_message(_('Данные успешно удалены'), Keyboard())
+    return r.resp(_('Данные успешно удалены'), Keyboard())
 
 
 cases = gen_state_cases([

@@ -29,7 +29,7 @@ class PTypeInput(View):
         await self.r.user.update(ptype=PType.teacher)
 
     async def default(self, r: Request):
-        await r.chat.send_message(_('Неизвестный тип профиля'), self.keyboard)
+        return r.resp(_('Неизвестный тип профиля'), self.keyboard)
 
 
 class BaseLanguageInput(View):
@@ -48,7 +48,7 @@ class BaseLanguageInput(View):
         return setter
 
     async def default(self, r: Request):
-        await r.chat.send_message(_('Выбранный язык не поддерживается'), self.keyboard)
+        return r.resp(_('Выбранный язык не поддерживается'), self.keyboard)
 
 
 class BaseSubgroupInput(View):
@@ -66,7 +66,7 @@ class BaseSubgroupInput(View):
         return setter
 
     async def default(self, r: Request):
-        await r.chat.send_message(_('Такой подгруппы не существует'))
+        return r.resp(_('Такой подгруппы не существует'), self.keyboard)
 
 
 class BaseGroupInput(View, ABC):
@@ -83,13 +83,12 @@ class BaseGroupInput(View, ABC):
         await r.user.update(group=r.text)
 
     async def default(self, r: Request):
-        await r.chat.send_message(_('Номер группы должен состоять из 8 цифр'), self.keyboard)
+        return r.resp(_('Номер группы должен состоять из 8 цифр'), self.keyboard)
 
 
 class BaseNameInput(View, ABC):
-
     async def set_name(self, r: Request):
         await r.user.update(name=r.text)
 
     async def default(self, r: Request):
-        await self.set_name(r)
+        return self.set_name(r)
