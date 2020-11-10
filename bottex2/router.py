@@ -1,5 +1,5 @@
 import re
-from typing import Optional, MutableMapping, Callable, Union, Pattern, Iterator
+from typing import Optional, MutableMapping, Callable, Union, Pattern, Iterator, Any, Awaitable
 
 from bottex2.handler import Handler, check_handler, HandlerError, Request
 from bottex2.helpers import tools
@@ -50,9 +50,9 @@ class Router(Handler):
             raise NoHandlerError
         return handler
 
-    async def __call__(self, request: Request):
+    async def __call__(self, request: Request) -> Awaitable[Any]:
         handler = self.find_handler(request)
-        await handler(request)
+        return await handler(request)
 
     def __repr__(self):
         return f'{self.__class__.__name__}(default={self.default}, {self.routes})'

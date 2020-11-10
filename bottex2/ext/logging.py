@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, Any, Awaitable
 
 from bottex2.bottex import BottexMiddleware
 from bottex2.chat import Keyboard, ChatMiddleware
@@ -8,10 +8,10 @@ from bottex2.logging import logger
 class BottexLoggingMiddleware(BottexMiddleware):
     __universal__ = True
 
-    async def __call__(self, request):
+    async def __call__(self, request) -> Awaitable[Any]:
         logger.info(f'in : {request.text!r}')
         request.chat = BottexLoggingChatMiddleware(request.chat)
-        await self.handler(request)
+        return await self.handler(request)
 
 
 class BottexLoggingChatMiddleware(ChatMiddleware):

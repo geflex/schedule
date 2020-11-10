@@ -37,7 +37,8 @@ class ResponseMiddleware(BottexMiddleware):
         request.chat = chat
         request.resp = response_factory
         response = await super().__call__(request)
+        send = super(LazyChatMiddleware, chat).send_message
         for resp in chat.responses:
-            await chat.send_message(resp.text, resp.kb)
+            await send(resp.text, resp.kb)
         if isinstance(response, Message):
-            await chat.send_message(response.text, response.kb)
+            await send(response.text, response.kb)

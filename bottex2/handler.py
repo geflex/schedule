@@ -25,7 +25,7 @@ class Request(dict):
         return Request(**self)
 
 
-Handler = Callable[[Request], Awaitable]
+Handler = Callable[[Request], Awaitable[Any]]
 
 
 def check_handler(handler: Handler):
@@ -44,8 +44,8 @@ class HandlerMiddleware(Handler):
         except AttributeError:
             pass
 
-    async def __call__(self, request: Request):
-        await self.handler(request)
+    async def __call__(self, request: Request) -> Awaitable[Any]:
+        return await self.handler(request)
 
 
 ParamsHandler = Callable[..., Awaitable]

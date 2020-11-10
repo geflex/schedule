@@ -1,5 +1,5 @@
 from functools import partial
-from typing import Type, Set, List, AsyncIterator, Dict, Optional
+from typing import Type, Set, List, AsyncIterator, Dict, Optional, Any, Awaitable
 
 from bottex2.handler import HandlerError, Handler, HandlerMiddleware, Request
 from bottex2.helpers import aiotools
@@ -70,15 +70,14 @@ class Bottex(Receiver):
             submiddleware = get_submiddleware(middleware, receiver)
             receiver.add_middleware(submiddleware)
 
-    async def handle(self, request: Request):
+    async def handle(self, request: Request) -> Awaitable[Any]:
         handler = request.__receiver__._handler
         if handler is not None:
             try:
-                await handler(request)
-                return
+                return await handler(request)
             except HandlerError:  # !!! Maybe NoHandlerError?
                 pass
-        await self._handler(request)
+        return await self._handler(request)
 
     async def wrap_receiver(self, receiver: Receiver) -> AsyncIterator[ReceiverRequest]:
         handler = receiver.wrap_handler(self.handle)

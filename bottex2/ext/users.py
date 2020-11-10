@@ -1,4 +1,4 @@
-from typing import Type, List
+from typing import Type, List, Awaitable, Any
 
 from sqlalchemy import Column, Integer, String
 
@@ -33,9 +33,9 @@ class UserBottexMiddleware(BottexMiddleware):
     async def get_user(self, request: Request):
         return await self.get_or_create(None, 'guest')
 
-    async def __call__(self, request: Request):
+    async def __call__(self, request: Request) -> Awaitable[Any]:
         request.user = await self.get_user(request)
-        await self.handler(request)
+        return await self.handler(request)
 
 
 def state_cond(st: str) -> Condition:
