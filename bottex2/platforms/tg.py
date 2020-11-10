@@ -5,7 +5,7 @@ import aiogram
 import aiohttp
 
 from bottex2.chat import AbstractChat, Keyboard
-from bottex2.ext.users import UserBottexHandlerMiddleware
+from bottex2.ext.users import UserBottexMiddleware
 from bottex2.handler import Request
 from bottex2.logging import logger
 from bottex2.receiver import Receiver
@@ -69,8 +69,8 @@ class TgReceiver(Receiver):
                                       raw=raw)
 
 
-@UserBottexHandlerMiddleware.submiddleware(TgReceiver)
-class TgUserHandlerMiddleware(UserBottexHandlerMiddleware):
+@UserBottexMiddleware.submiddleware(TgReceiver)
+class TgUserHandlerMiddleware(UserBottexMiddleware):
     async def get_user(self, request: Request):
         uid = request.raw['from']['id']
         return await self.get_or_create('tg', uid)

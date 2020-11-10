@@ -1,7 +1,6 @@
 from functools import partial
 from typing import Type, Set, List, AsyncIterator, Dict, Optional
 
-from bottex2.chat import ChatMiddleware
 from bottex2.handler import HandlerError, Handler, HandlerMiddleware, Request
 from bottex2.helpers import aiotools
 from bottex2.helpers.aiotools import merge_async_iterators
@@ -10,7 +9,7 @@ from bottex2.middlewares import AbstractMiddleware
 from bottex2.receiver import Receiver
 
 
-class BottexMiddleware:
+class BottexMiddleware(HandlerMiddleware):
     __universal__ = False
 
     @classmethod
@@ -47,27 +46,19 @@ def specify_middleware(bottex_middleware: Type[BottexMiddleware],
     return middleware
 
 
-class BottexHandlerMiddleware(BottexMiddleware, HandlerMiddleware):
-    pass
-
-
-class BottexChatMiddleware(BottexMiddleware, ChatMiddleware):
-    pass
-
-
 class ReceiverRequest(Request):
     __receiver__: Receiver
     __handler__: Handler
 
 
 class Bottex(Receiver):
-    middlewares: List[BottexHandlerMiddleware]
+    middlewares: List[BottexMiddleware]
 
     def __init__(self, *receivers: Receiver):
         super().__init__()
         self._receivers = set(receivers)  # type: Set[Receiver]
 
-    def add_middleware(self, middleware: Type[BottexHandlerMiddleware]):
+    def add_middleware(self, middleware: Type[BottexMiddleware]):
         super().add_middleware(middleware)
         for receiver in self._receivers:
             submiddleware = get_submiddleware(middleware, receiver)

@@ -21,8 +21,8 @@ def get_bottex():
 
 
 def set_middlewares(bottex):
-    bottex.add_middleware(users.UserBottexHandlerMiddleware)
-    bottex.add_middleware(logging_ext.BottexLoggingHandlerMiddleware)
+    bottex.add_middleware(users.UserBottexMiddleware)
+    bottex.add_middleware(logging_ext.BottexLoggingMiddleware)
     bottex.add_middleware(logging_ext.BottexLoggingChatMiddleware)
 
 

@@ -1,11 +1,11 @@
 from typing import Optional
 
-from bottex2.bottex import BottexHandlerMiddleware
+from bottex2.bottex import BottexMiddleware
 from bottex2.chat import Keyboard, ChatMiddleware
 from bottex2.logging import logger
 
 
-class BottexLoggingHandlerMiddleware(BottexHandlerMiddleware):
+class BottexLoggingMiddleware(BottexMiddleware):
     __universal__ = True
 
     async def __call__(self, request):

@@ -3,7 +3,7 @@ from enum import Enum
 from functools import partial
 from typing import Optional
 
-from bottex2.bottex import BottexHandlerMiddleware
+from bottex2.bottex import BottexMiddleware
 from bottex2.chat import Keyboard, AbstractChat, ChatMiddleware
 from bottex2.handler import Request
 from bottex2.logging import logger
@@ -94,7 +94,7 @@ class TranslateBottexChatMiddleware(ChatMiddleware):
         await super().send_message(text, kb)
 
 
-class TranslateBottexHandlerMiddleware(BottexHandlerMiddleware):
+class TranslateBottexMiddleware(BottexMiddleware):
     __universal__ = True
     lang: Enum
 

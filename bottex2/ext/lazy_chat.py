@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import Optional
 
-from bottex2.bottex import BottexHandlerMiddleware
+from bottex2.bottex import BottexMiddleware
 from bottex2.chat import AbstractChat, Keyboard, ChatMiddleware
 from bottex2.handler import Request
 
@@ -25,7 +25,7 @@ class LazyChatMiddleware(ChatMiddleware):
             await super().send_message(text=response.text, kb=response.kb)
 
 
-class ResponseHandlerMiddleware(BottexHandlerMiddleware):
+class ResponseMiddleware(BottexMiddleware):
     __universal__ = True
 
     async def __call__(self, request: Request):

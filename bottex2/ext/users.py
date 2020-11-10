@@ -2,7 +2,7 @@ from typing import Type, List
 
 from sqlalchemy import Column, Integer, String
 
-from bottex2.bottex import BottexHandlerMiddleware
+from bottex2.bottex import BottexMiddleware
 from bottex2.handler import Request
 from bottex2.helpers.tools import Named, state_name, state_handler
 from bottex2.router import Condition
@@ -25,7 +25,7 @@ def set_user_model(cls: Type[UserModel]):
 user_cls: Type[UserModel]
 
 
-class UserBottexHandlerMiddleware(BottexHandlerMiddleware):
+class UserBottexMiddleware(BottexMiddleware):
     @staticmethod
     async def get_or_create(platform, uid):
         return await user_cls.get_or_create(platform=platform, uid=uid)

@@ -24,4 +24,4 @@ class TgWebHookReceiver(AioHttpReceiverMixin):
         return Request(text=text, chat=chat, raw=request)
 
 
-users.UserBottexHandlerMiddleware.submiddleware(TgWebHookReceiver, TgUserHandlerMiddleware)
+users.UserBottexMiddleware.submiddleware(TgWebHookReceiver, TgUserHandlerMiddleware)
