@@ -20,7 +20,7 @@ class StartLanguageInput(inputs.BaseLanguageInput):
         super_setter = super().get_lang_setter(lang)
         async def setter(r: Request):
             await super_setter(r)
-            await PTypeInput.switch(r)
+            return await PTypeInput.switch(r)
         return setter
 
     @classmethod
@@ -34,11 +34,11 @@ class PTypeInput(inputs.PTypeInput):
 
     async def set_stutent_ptype(self, r: Request):
         await super().set_stutent_ptype(r)
-        await StartGroupInput.switch(r)
+        return await StartGroupInput.switch(r)
 
     async def set_teacher_ptype(self, r: Request):
         await super().set_teacher_ptype(r)
-        await StartNameInput.switch(r)
+        return await StartNameInput.switch(r)
 
     @classmethod
     async def switch(cls, r: Request):
@@ -56,7 +56,7 @@ class StartGroupInput(inputs.BaseGroupInput):
 
     async def set_group(self, r: Request):
         await super().set_group(r)
-        await StartSubgroupInput.switch(r)
+        return await StartSubgroupInput.switch(r)
 
     @classmethod
     async def switch(cls, r: Request):
