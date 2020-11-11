@@ -1,4 +1,5 @@
 from functools import cached_property, partial
+from typing import List
 
 from bottex2.chat import Keyboard
 from bottex2.ext.i18n import gettext, rgettext
@@ -44,7 +45,7 @@ class Settings(View):
 class BaseSettingsInput(View):
     @property
     def commands(self):
-        return [[Command(_c('Не менять'), self.back)]]
+        return [[Command(_c('Отмена'), self.back)]]
 
     @classmethod
     async def back(cls, r: Request):
