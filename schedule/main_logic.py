@@ -72,8 +72,8 @@ class SettingsLanguageInput(inputs.BaseLanguageInput, BaseSettingsInput):
     @cached_property
     def commands(self):
         commands = super().commands
-        commands.extend(super(inputs.BaseLanguageInput, self).commands)
-        return commands
+        commands2 = super(inputs.BaseLanguageInput, self).commands
+        return commands + commands2
 
     def get_lang_setter(self, lang: Lang):
         super_setter = super().get_lang_setter(lang)
@@ -99,6 +99,11 @@ class SettingsLanguageInput(inputs.BaseLanguageInput, BaseSettingsInput):
 class SettingsGroupInput(inputs.BaseGroupInput, BaseSettingsInput):
     name = 'settings_group'
 
+    def commands(self) -> List[List[Command]]:
+        commands = super().commands
+        commands2 = super(inputs.BaseGroupInput, self).commands
+        return commands + commands2
+
     async def set_group(self, r: Request):
         old = r.user.group
         await super().set_group(r)
@@ -120,8 +125,10 @@ class SettingsNameInput(inputs.BaseNameInput, BaseSettingsInput):
     name = 'settings_name'
 
     @cached_property
-    def commands(self):
-        return []
+    def commands(self) -> List[List[Command]]:
+        commands = super().commands
+        commands2 = super(inputs.BaseNameInput, self).commands
+        return commands + commands2
 
     async def set_name(self, r: Request):
         old = r.user.name
@@ -144,8 +151,8 @@ class SettingsSubgroupInput(inputs.BaseSubgroupInput, BaseSettingsInput):
     @cached_property
     def commands(self):
         commands = super().commands
-        commands.extend(super(inputs.BaseSubgroupInput, self).commands)
-        return commands
+        commands2 = super(inputs.BaseSubgroupInput, self).commands
+        return commands + commands2
 
     def get_subgroup_setter(self, subgroup_num: str):
         super_setter = super().get_subgroup_setter(subgroup_num)
@@ -178,6 +185,12 @@ class BasePTypeRequiredInput(BaseSettingsInput):
 
 class RequiredGroupInput(inputs.BaseGroupInput, BasePTypeRequiredInput):
     name = 'group_after_switching_ptype'
+
+    @cached_property
+    def commands(self):
+        commands = super().commands
+        commands2 = super(inputs.BaseGroupInput, self).commands
+        return commands + commands2
 
     async def set_group(self, r: Request):
         await super().set_group(r)
@@ -219,6 +232,12 @@ class RequiredSubGroupInput(inputs.BaseSubgroupInput, BasePTypeRequiredInput):
 
 class RequiredNameInput(inputs.BaseNameInput, BasePTypeRequiredInput):
     name = 'name_after_switching_ptype'
+
+    @cached_property
+    def commands(self):
+        commands = super().commands
+        commands2 = super(inputs.BaseNameInput, self).commands
+        return commands + commands2
 
     async def set_name(self, r: Request):
         await super().set_name(r)
