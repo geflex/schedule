@@ -90,4 +90,4 @@ class BaseNameInput(View, ABC):
         await r.user.update(name=r.text)
 
     async def default(self, r: Request):
-        return self.set_name(r)
+        return await self.set_name(r)

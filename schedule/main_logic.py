@@ -1,7 +1,6 @@
 from functools import cached_property, partial
 from typing import List
 
-from bottex2.chat import Keyboard
 from bottex2.ext.i18n import gettext, rgettext
 from bottex2.ext.users import gen_state_cases
 from bottex2.handler import Request
@@ -27,14 +26,28 @@ class Settings(View):
 
         add(_c('Изменить язык'), SettingsLanguageInput.switch)
         if self.r.user.ptype is PType.teacher:
-            add(_c('Стать студентом'), become_student)
+            add(_c('Стать студентом'), self.become_student)
             add(_c('Изменить ФИО'), SettingsNameInput.switch)
         else:
-            add(_c('Стать преподом'), become_teacher)
+            add(_c('Стать преподом'), self.become_teacher)
             add(_c('Изменить группу'), SettingsGroupInput.switch)
             add(_c('Изменить подгруппу'), SettingsSubgroupInput.switch)
         add(_c('Назад'), Schedule.switch)
         return commands
+
+    async def become_student(self, r: Request):
+        if not r.user.group:
+            return await RequiredGroupInput.switch(r)
+        if not r.user.subgroup:
+            return await RequiredSubGroupInput.switch(r)
+        else:
+            return await save_student(r)
+
+    async def become_teacher(self, r: Request):
+        if not r.user.name:
+            return await RequiredNameInput.switch(r)
+        else:
+            return await save_teacher(r)
 
     @classmethod
     async def switch(cls, r: Request):
@@ -154,32 +167,77 @@ class SettingsSubgroupInput(inputs.BaseSubgroupInput, BaseSettingsInput):
         await super().switch(r)
 
 
-async def name_after_switching_ptype(r: Request):
-    await r.user.update(name=r.text, state=state_name(Settings))
+class BasePTypeRequiredInput(BaseSettingsInput):
+    @property
+    def commands(self) -> List[List[Command]]:
+        return [[Command(_c('Отмена'), self.cancel)]]
+
+    async def cancel(self, r: Request):
+        return await Settings.switch(r)
+
+
+class RequiredGroupInput(BasePTypeRequiredInput, inputs.BaseGroupInput):
+    name = 'group_after_switching_ptype'
+
+    async def set_group(self, r: Request):
+        await super().set_group(r)
+        if not r.user.subgroup:
+            return await RequiredSubGroupInput.switch(r)
+        return await save_student(r)
+
+    @classmethod
+    async def switch(cls, r: Request):
+        await super().switch(r)
+        return r.resp(_('Введи номер группы'), cls(r).keyboard)
+
+
+class RequiredSubGroupInput(BasePTypeRequiredInput, inputs.BaseSubgroupInput):
+    name = 'subgroup_after_switching_ptype'
+
+    @property
+    def commands(self) -> List[List[Command]]:
+        commands = super().commands
+        choises = super(BasePTypeRequiredInput, self).commands
+        return choises + commands
+
+    def get_subgroup_setter(self, subgroup_num: str):
+        super_setter = super().get_subgroup_setter(subgroup_num)
+        async def setter(r: Request):
+            await super_setter(r)
+            return await save_student(r)
+        return setter
+
+    async def cancel(self, r: Request):
+        await r.user.update(ptype=PType.teacher)
+        return await Settings.switch(r)
+
+    @classmethod
+    async def switch(cls, r: Request):
+        await super().switch(r)
+        return r.resp(_('Выбери подгруппу'), cls(r).keyboard)
+
+
+class RequiredNameInput(BasePTypeRequiredInput, inputs.BaseNameInput):
+    name = 'name_after_switching_ptype'
+
+    async def set_name(self, r: Request):
+        await super().set_name(r)
+        return await save_teacher(r)
+
+    @classmethod
+    async def switch(cls, r: Request):
+        await super().switch(r)
+        return r.resp(_('Введи свои ФИО'), cls(r).keyboard)
+
+
+async def save_teacher(r: Request):
+    await r.user.update(state=state_name(Settings), ptype=PType.teacher)
     return r.resp(_('Теперь ты препод'), Settings(r).keyboard)
 
 
-async def group_after_switching_ptype(r: Request):
-    await r.user.update(group=r.text, state=state_name(Settings))
+async def save_student(r: Request):
+    await r.user.update(state=state_name(Settings), ptype=PType.student)
     return r.resp(_('Теперь ты студент'), Settings(r).keyboard)
-
-
-async def become_teacher(r: Request):
-    await r.user.update(ptype=PType.teacher)
-    if r.user.name:
-        return r.resp(_('Теперь ты препод'), Settings(r).keyboard)
-    else:
-        await r.user.update(state=state_name(name_after_switching_ptype))
-        return r.resp(_('Введи свои ФИО'), Keyboard())
-
-
-async def become_student(r: Request):
-    await r.user.update(ptype=PType.student)
-    if r.user.group:
-        return r.resp(_('Теперь ты студент'), Settings(r).keyboard)
-    else:
-        await r.user.update(state=state_name(group_after_switching_ptype))
-        return r.resp(_('Введи номер группы'), Keyboard())
 
 
 class Schedule(View):
@@ -226,8 +284,9 @@ class Schedule(View):
 cases = gen_state_cases([
     Schedule,
     Settings,
-    name_after_switching_ptype,
-    group_after_switching_ptype,
+    RequiredGroupInput,
+    RequiredSubGroupInput,
+    RequiredNameInput,
     SettingsLanguageInput,
     SettingsNameInput,
     SettingsGroupInput,
