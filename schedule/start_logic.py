@@ -1,7 +1,7 @@
 from functools import cached_property, partial
 
 from bottex2.chat import Keyboard
-from bottex2.ext.i18n import gettext
+from bottex2.ext.i18n import gettext, rgettext
 from bottex2.ext.users import gen_state_cases
 from bottex2.handler import Request
 from bottex2.helpers.tools import state_name
@@ -11,6 +11,7 @@ from . import main_logic
 from .models import Lang
 
 _ = partial(gettext, domain='schedule')
+_c = rgettext
 
 
 class StartLanguageInput(inputs.BaseLanguageInput):
@@ -20,7 +21,7 @@ class StartLanguageInput(inputs.BaseLanguageInput):
         super_setter = super().get_lang_setter(lang)
         async def setter(r: Request):
             await super_setter(r)
-            return await PTypeInput.switch(r)
+            return await StartPTypeInput.switch(r)
         return setter
 
     @classmethod
@@ -29,8 +30,17 @@ class StartLanguageInput(inputs.BaseLanguageInput):
         return r.resp(_('Выбери язык'), cls(r).keyboard)
 
 
-class PTypeInput(inputs.PTypeInput):
+class StartPTypeInput(inputs.PTypeInput, inputs.BaseInputChainStep):
     name = 'ptype_input'
+
+    @cached_property
+    def commands(self):
+        commands = super().commands
+        step_commands = super(inputs.PTypeInput, self).commands
+        return commands + step_commands
+
+    async def back(self, r: Request):
+        return await StartLanguageInput.switch(r)
 
     async def set_stutent_ptype(self, r: Request):
         await super().set_stutent_ptype(r)
@@ -46,13 +56,17 @@ class PTypeInput(inputs.PTypeInput):
         return r.resp(_('Теперь выбери тип профиля'), cls(r).keyboard)
 
 
-class StartGroupInput(inputs.BaseGroupInput):
+class StartGroupInput(inputs.BaseGroupInput, inputs.BaseInputChainStep):
     name = 'start_group_input'
 
     @cached_property
     def commands(self):
-        # return [[Command(_c('Я не знаю номер группы'), )]]
-        return []
+        commands = super().commands
+        step_commands = super(inputs.BaseGroupInput, self).commands
+        return commands + step_commands
+
+    async def back(self, r: Request):
+        return await StartPTypeInput.switch(r)
 
     async def set_group(self, r: Request):
         await super().set_group(r)
@@ -64,8 +78,17 @@ class StartGroupInput(inputs.BaseGroupInput):
         return r.resp(_('Окей, теперь введи номер своей группы'), cls(r).keyboard)
 
 
-class StartSubgroupInput(inputs.BaseSubgroupInput):
+class StartSubgroupInput(inputs.BaseSubgroupInput, inputs.BaseInputChainStep):
     name = 'start_subgroup_input'
+
+    @cached_property
+    def commands(self):
+        commands = super().commands
+        step_commands = super(inputs.BaseSubgroupInput, self).commands
+        return commands + step_commands
+
+    async def back(self, r: Request):
+        return await StartGroupInput.switch(r)
 
     def get_subgroup_setter(self, subgroup_num: str):
         super_setter = super().get_subgroup_setter(subgroup_num)
@@ -82,12 +105,17 @@ class StartSubgroupInput(inputs.BaseSubgroupInput):
         return r.resp(_('Выбери свою подгруппу'), cls(r).keyboard)
 
 
-class StartNameInput(inputs.BaseNameInput):
+class StartNameInput(inputs.BaseNameInput, inputs.BaseInputChainStep):
     name = 'start_name_input'
 
     @cached_property
     def commands(self):
-        return []
+        commands = super().commands
+        step_commands = super(inputs.BaseNameInput, self).commands
+        return commands + step_commands
+
+    async def back(self, r: Request):
+        return await StartPTypeInput.switch(r)
 
     async def set_name(self, r: Request):
         await super().set_name(r)
@@ -111,7 +139,7 @@ async def delete_me(r: Request):
 
 cases = gen_state_cases([
         StartLanguageInput,
-        PTypeInput,
+        StartPTypeInput,
         StartGroupInput,
         StartSubgroupInput,
         StartNameInput,

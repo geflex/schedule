@@ -1,5 +1,5 @@
 import re
-from abc import ABC
+from abc import ABC, abstractmethod
 from functools import cached_property, partial
 from typing import List
 
@@ -68,9 +68,13 @@ class BaseSubgroupInput(View):
         return r.resp(_('Такой подгруппы не существует'), self.keyboard)
 
 
-class BaseGroupInput(View, ABC):
+class BaseGroupInput(View):
     exp = re.compile(r'\d{8}')
     revexp = regexp.compile(exp)
+
+    @property
+    def commands(self) -> List[List[Command]]:
+        return []
 
     @cached_property
     def router(self) -> Router:
@@ -85,9 +89,23 @@ class BaseGroupInput(View, ABC):
         return r.resp(_('Номер группы должен состоять из 8 цифр'), self.keyboard)
 
 
-class BaseNameInput(View, ABC):
+class BaseNameInput(View):
+    @property
+    def commands(self) -> List[List[Command]]:
+        return []
+
     async def set_name(self, r: Request):
         await r.user.update(name=r.text)
 
     async def default(self, r: Request):
         return await self.set_name(r)
+
+
+class BaseInputChainStep(View, ABC):
+    @property
+    def commands(self) -> List[List[Command]]:
+        return [[Command(_c('Назад'), self.back)]]
+
+    @abstractmethod
+    async def back(self, r: Request):
+        pass
