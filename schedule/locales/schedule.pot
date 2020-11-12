@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2020-11-12 14:29+0300\n"
+"POT-Creation-Date: 2020-11-12 18:16+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -27,7 +27,7 @@ msgstr ""
 msgid "Такой подгруппы не существует"
 msgstr ""
 
-#: schedule\inputs.py:85
+#: schedule\inputs.py:89
 msgid "Номер группы должен состоять из 8 цифр"
 msgstr ""
 
@@ -60,6 +60,7 @@ msgid "Текущая группа: {}"
 msgstr ""
 
 #: schedule\main_logic.py:115 schedule\main_logic.py:191
+#: schedule\start_logic.py:78
 msgid "Введи номер группы"
 msgstr ""
 
@@ -87,12 +88,12 @@ msgstr ""
 msgid "Введи номер подгруппы"
 msgstr ""
 
-#: schedule\main_logic.py:217
+#: schedule\main_logic.py:217 schedule\start_logic.py:105
 msgid "Выбери подгруппу"
 msgstr ""
 
-#: schedule\main_logic.py:230
-msgid "Введи свое имя"
+#: schedule\main_logic.py:230 schedule\start_logic.py:128
+msgid "Введи имя"
 msgstr ""
 
 #: schedule\main_logic.py:235
@@ -115,31 +116,19 @@ msgstr ""
 msgid "Расписание для {} на {}"
 msgstr ""
 
-#: schedule\start_logic.py:29
+#: schedule\start_logic.py:30
 msgid "Выбери язык"
 msgstr ""
 
-#: schedule\start_logic.py:46
-msgid "Теперь выбери тип профиля"
+#: schedule\start_logic.py:56
+msgid "Выбери тип профиля"
 msgstr ""
 
-#: schedule\start_logic.py:64
-msgid "Окей, теперь введи номер своей группы"
+#: schedule\start_logic.py:132
+msgid "Профиль настроен"
 msgstr ""
 
-#: schedule\start_logic.py:82
-msgid "Выбери свою подгруппу"
-msgstr ""
-
-#: schedule\start_logic.py:100
-msgid "Хорошо, теперь введите свои ФИО"
-msgstr ""
-
-#: schedule\start_logic.py:104
-msgid "Ура, все настроили"
-msgstr ""
-
-#: schedule\start_logic.py:109
+#: schedule\start_logic.py:137
 msgid "Данные успешно удалены"
 msgstr ""
 

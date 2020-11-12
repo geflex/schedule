@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2020-11-12 14:29+0300\n"
+"POT-Creation-Date: 2020-11-12 18:16+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -31,6 +31,10 @@ msgstr "Першая"
 msgid "Вторая"
 msgstr "Другая"
 
+#: schedule\inputs.py:107 schedule\main_logic.py:35
+msgid "Назад"
+msgstr "Назад"
+
 #: schedule\main_logic.py:27
 msgid "Изменить язык"
 msgstr "Змяніць мову"
@@ -40,7 +44,7 @@ msgid "Режим студента"
 msgstr "Рэжым студэнта"
 
 #: schedule\main_logic.py:30
-msgid "Изменить ФИО"
+msgid "Изменить имя"
 msgstr "Змяніць імя"
 
 #: schedule\main_logic.py:32
@@ -54,10 +58,6 @@ msgstr "Змяніць групу"
 #: schedule\main_logic.py:34
 msgid "Изменить подгруппу"
 msgstr "Змяніць падгрупу"
-
-#: schedule\main_logic.py:35
-msgid "Назад"
-msgstr "Назад"
 
 #: schedule\main_logic.py:61 schedule\main_logic.py:173
 msgid "Отмена"
@@ -74,12 +74,3 @@ msgstr "Заўтра"
 #: schedule\main_logic.py:251
 msgid "Настройки"
 msgstr "Налады"
-
-#~ msgid "Стать студентом"
-#~ msgstr "Стаць студэнтам"
-
-#~ msgid "Стать преподом"
-#~ msgstr "Стаць выкладчыкам"
-
-#~ msgid "Не менять"
-#~ msgstr "Не мяняць"
