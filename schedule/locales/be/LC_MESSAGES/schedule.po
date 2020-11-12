@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2020-11-11 17:36+0300\n"
+"POT-Creation-Date: 2020-11-12 14:22+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -31,110 +31,114 @@ msgstr "Такі падгрупы не існуе"
 msgid "Номер группы должен состоять из 8 цифр"
 msgstr "Нумар групы павінен складацца з 8 лічбаў"
 
-#: schedule\main_logic.py:42
+#: schedule\main_logic.py:55
 msgid "Настройки"
 msgstr "Налады"
 
-#: schedule\main_logic.py:53
+#: schedule\main_logic.py:66
 msgid "Ладно"
 msgstr "Добра"
 
-#: schedule\main_logic.py:72
+#: schedule\main_logic.py:85
 msgid "Язык изменен с {} на {}"
 msgstr "Мова зменена з {} на {}"
 
-#: schedule\main_logic.py:81
+#: schedule\main_logic.py:94
 msgid "Текущий язык: {}"
 msgstr "Усталяваная мова: {}"
 
-#: schedule\main_logic.py:82
+#: schedule\main_logic.py:95
 msgid "Выбери новый язык"
 msgstr "Выберы новую мову"
 
-#: schedule\main_logic.py:94
+#: schedule\main_logic.py:107
 msgid "Группа изменена с {} на {}"
 msgstr "Група зменена з {} на {}"
 
-#: schedule\main_logic.py:101
+#: schedule\main_logic.py:114
 msgid "Текущая группа: {}"
 msgstr "Усталяваная група: {}"
 
-#: schedule\main_logic.py:102 schedule\main_logic.py:187
+#: schedule\main_logic.py:115 schedule\main_logic.py:191
 msgid "Введи номер группы"
 msgstr "Увядзі нумар групы"
 
-#: schedule\main_logic.py:117
+#: schedule\main_logic.py:130
 msgid "Имя изменено с {} на {}"
 msgstr "Імя зменена з {} на {}"
 
-#: schedule\main_logic.py:123
+#: schedule\main_logic.py:136
 msgid "Текущее имя: {}"
 msgstr "Усталяванае імя: {}"
 
-#: schedule\main_logic.py:124
+#: schedule\main_logic.py:137
 msgid "Введи новое имя"
 msgstr "Увядзі новае імя"
 
-#: schedule\main_logic.py:144
+#: schedule\main_logic.py:157
 msgid "Подгруппа изменена с {} на {}"
 msgstr "Падгрупа зменена з {} на {}"
 
-#: schedule\main_logic.py:152
+#: schedule\main_logic.py:165
 msgid "Текущая подгруппа: {}"
 msgstr "Усталяваная падгрупа"
 
-#: schedule\main_logic.py:153
+#: schedule\main_logic.py:166
 msgid "Введи номер подгруппы"
 msgstr "Увядзі нумар падгрупы"
 
-#: schedule\main_logic.py:164 schedule\main_logic.py:175
-msgid "Теперь ты препод"
-msgstr "Цяпер ты выкладчык"
+#: schedule\main_logic.py:217
+msgid "Выбери подгруппу"
+msgstr "Выберы сваю падгрупу"
 
-#: schedule\main_logic.py:169 schedule\main_logic.py:184
-msgid "Теперь ты студент"
-msgstr "Цяпер ты студэнт"
+#: schedule\main_logic.py:230
+msgid "Введи свое имя"
+msgstr "Увядзі сваё імя"
 
-#: schedule\main_logic.py:178
-msgid "Введи свои ФИО"
-msgstr "Ўвядзі свае імя"
+#: schedule\main_logic.py:235
+msgid "Включен режим преподавателя"
+msgstr "Уключпны рэжым выкладчыка"
 
-#: schedule\main_logic.py:202
+#: schedule\main_logic.py:240
+msgid "Включен режим студента"
+msgstr "Уключаны рэжым студэнта"
+
+#: schedule\main_logic.py:255
 msgid "Непонятная команда"
 msgstr "Незразумелая каманда"
 
-#: schedule\main_logic.py:207
+#: schedule\main_logic.py:260
 msgid "Главное меню"
 msgstr "Галоўнае меню"
 
-#: schedule\main_logic.py:216
+#: schedule\main_logic.py:269
 msgid "Расписание для {} на {}"
 msgstr "Расклад для {} на {}"
 
-#: schedule\start_logic.py:30
+#: schedule\start_logic.py:29
 msgid "Выбери язык"
 msgstr "Выберы мову"
 
-#: schedule\start_logic.py:47
+#: schedule\start_logic.py:46
 msgid "Теперь выбери тип профиля"
 msgstr "Цяпер выберы тып профілю"
 
-#: schedule\start_logic.py:65
+#: schedule\start_logic.py:64
 msgid "Окей, теперь введи номер своей группы"
 msgstr "Окей, цяпер увядзі нумар сваёй групы"
 
-#: schedule\start_logic.py:83
+#: schedule\start_logic.py:82
 msgid "Выбери свою подгруппу"
 msgstr "Выберы сваю падгрупу"
 
-#: schedule\start_logic.py:101
+#: schedule\start_logic.py:100
 msgid "Хорошо, теперь введите свои ФИО"
 msgstr "Добра, цяпер калі ласка, увядзіце свае імя"
 
-#: schedule\start_logic.py:105
+#: schedule\start_logic.py:104
 msgid "Ура, все настроили"
 msgstr "Ура, усё наладзілі"
 
-#: schedule\start_logic.py:110
+#: schedule\start_logic.py:109
 msgid "Данные успешно удалены"
 msgstr "Дадзеныя паспяхова выдаленыя"

@@ -26,10 +26,10 @@ class Settings(View):
 
         add(_c('Изменить язык'), SettingsLanguageInput.switch)
         if self.r.user.ptype is PType.teacher:
-            add(_c('Стать студентом'), self.become_student)
+            add(_c('Режим студента'), self.become_student)
             add(_c('Изменить ФИО'), SettingsNameInput.switch)
         else:
-            add(_c('Стать преподом'), self.become_teacher)
+            add(_c('Режим преподавателя'), self.become_teacher)
             add(_c('Изменить группу'), SettingsGroupInput.switch)
             add(_c('Изменить подгруппу'), SettingsSubgroupInput.switch)
         add(_c('Назад'), Schedule.switch)
@@ -227,17 +227,17 @@ class RequiredNameInput(BasePTypeRequiredInput, inputs.BaseNameInput):
     @classmethod
     async def switch(cls, r: Request):
         await super().switch(r)
-        return r.resp(_('Введи свои ФИО'), cls(r).keyboard)
+        return r.resp(_('Введи свое имя'), cls(r).keyboard)
 
 
 async def save_teacher(r: Request):
     await r.user.update(state=state_name(Settings), ptype=PType.teacher)
-    return r.resp(_('Теперь ты препод'), Settings(r).keyboard)
+    return r.resp(_('Включен режим преподавателя'), Settings(r).keyboard)
 
 
 async def save_student(r: Request):
     await r.user.update(state=state_name(Settings), ptype=PType.student)
-    return r.resp(_('Теперь ты студент'), Settings(r).keyboard)
+    return r.resp(_('Включен режим студента'), Settings(r).keyboard)
 
 
 class Schedule(View):
