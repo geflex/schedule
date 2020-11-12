@@ -176,7 +176,7 @@ class BasePTypeRequiredInput(BaseSettingsInput):
         return await Settings.switch(r)
 
 
-class RequiredGroupInput(BasePTypeRequiredInput, inputs.BaseGroupInput):
+class RequiredGroupInput(inputs.BaseGroupInput, BasePTypeRequiredInput):
     name = 'group_after_switching_ptype'
 
     async def set_group(self, r: Request):
@@ -191,13 +191,13 @@ class RequiredGroupInput(BasePTypeRequiredInput, inputs.BaseGroupInput):
         return r.resp(_('Введи номер группы'), cls(r).keyboard)
 
 
-class RequiredSubGroupInput(BasePTypeRequiredInput, inputs.BaseSubgroupInput):
+class RequiredSubGroupInput(inputs.BaseSubgroupInput, BasePTypeRequiredInput):
     name = 'subgroup_after_switching_ptype'
 
-    @property
+    @cached_property
     def commands(self) -> List[List[Command]]:
-        commands = super().commands
-        choises = super(BasePTypeRequiredInput, self).commands
+        choises = super().commands
+        commands = super(inputs.BaseSubgroupInput, self).commands
         return choises + commands
 
     def get_subgroup_setter(self, subgroup_num: str):
@@ -217,7 +217,7 @@ class RequiredSubGroupInput(BasePTypeRequiredInput, inputs.BaseSubgroupInput):
         return r.resp(_('Выбери подгруппу'), cls(r).keyboard)
 
 
-class RequiredNameInput(BasePTypeRequiredInput, inputs.BaseNameInput):
+class RequiredNameInput(inputs.BaseNameInput, BasePTypeRequiredInput):
     name = 'name_after_switching_ptype'
 
     async def set_name(self, r: Request):
