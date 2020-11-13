@@ -4,7 +4,7 @@ from sqlalchemy import create_engine
 
 from bottex2 import sqlalchemy as sqldb
 from bottex2.bottex import Bottex
-from bottex2.ext import users, i18n, responses
+from bottex2.ext import users, i18n
 from bottex2.platforms.tg import TgReceiver
 from bottex2.platforms.vk import VkReceiver
 from schedule import start_logic, models, configs
@@ -34,8 +34,8 @@ def setup_db():
 
 def set_middlewares(bottex):
     bottex.add_middleware(i18n.TranslateBottexMiddleware)
-    bottex.add_middleware(responses.ResponseBottexMiddleware)
     bottex.add_middleware(users.UserBottexMiddleware)
+    # bottex.add_middleware(responses.ResponseBottexMiddleware)
 
 
 def main():

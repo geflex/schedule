@@ -44,11 +44,3 @@ class AbstractChat(ABC):
     @abstractmethod
     async def send_message(self, text: Optional[str] = None, kb: Optional[Keyboard] = None):
         pass
-
-
-class ChatMiddleware(AbstractChat):
-    def __init__(self, chat: AbstractChat):
-        self.chat = chat
-
-    async def send_message(self, text: Optional[str] = None, kb: Optional[Keyboard] = None):
-        await self.chat.send_message(text=text, kb=kb)
