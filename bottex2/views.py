@@ -4,6 +4,7 @@ from typing import List, Any, Awaitable
 
 from bottex2.chat import Keyboard, Button
 from bottex2.handler import Request, Handler
+from bottex2.helpers.tools import state_name
 from bottex2.router import Router, if_text
 
 
@@ -51,5 +52,5 @@ class View(ABC):
 
     @classmethod
     async def switch(cls, r: Request) -> Awaitable[Any]:
-        await r.user.update(state=cls.name)
-        return None
+        await r.user.update(state=state_name(cls))
+        return None  # !!!

@@ -1,11 +1,4 @@
 import inspect
-from types import FunctionType
-from typing import Union, Type
-
-from bottex2.views import View
-
-
-Named = Union[Type[View], FunctionType]
 
 
 def state_name(obj):
@@ -16,7 +9,7 @@ def state_name(obj):
 
 
 def state_handler(obj):
-    if isinstance(obj, type) and issubclass(obj, View):
+    if isinstance(obj, type) and hasattr(obj, 'handle'):
         return obj.handle
     else:
         return obj
