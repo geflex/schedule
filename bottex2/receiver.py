@@ -1,9 +1,25 @@
 from abc import ABC, abstractmethod
-from typing import AsyncIterator, List, Type
+from typing import AsyncIterator, List, Type, Optional, Iterable
 
-from bottex2.handler import Handler, HandlerMiddleware, Request
+from bottex2.chat import Keyboard
+from bottex2.handler import Handler, HandlerMiddleware, Request, Message
 from bottex2.helpers import aiotools
 from bottex2.logging import logger
+
+
+def response_factory(text: Optional[str] = None, kb: Optional[Keyboard] = None):
+    return Message(text, kb)
+
+
+class ResponseBottexMiddleware(HandlerMiddleware):
+    __unified__ = True
+
+    async def __call__(self, request: Request):
+        request.resp = response_factory
+        response = await super().__call__(request)
+        if isinstance(response, Iterable):
+            for resp in response:
+                await request.chat.send_message(resp.text, resp.kb)
 
 
 class Receiver(ABC):
@@ -21,7 +37,7 @@ class Receiver(ABC):
     def wrap_handler(self, handler: Handler):
         for middleware in self.handler_middlewares:
             handler = middleware(handler)
-        return handler
+        return ResponseBottexMiddleware(handler)
 
     def set_handler(self, handler: Handler) -> Handler:
         """
