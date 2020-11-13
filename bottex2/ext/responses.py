@@ -1,18 +1,8 @@
-from dataclasses import dataclass
 from typing import Optional, Iterable
 
 from bottex2.bottex import BottexMiddleware
 from bottex2.chat import Keyboard
-from bottex2.handler import Request
-
-
-@dataclass
-class Message:
-    text: Optional[str]
-    kb: Optional[Keyboard]
-
-    def __iter__(self):
-        yield self
+from bottex2.handler import Request, Message
 
 
 def response_factory(text: Optional[str] = None, kb: Optional[Keyboard] = None):

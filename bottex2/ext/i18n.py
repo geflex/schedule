@@ -1,7 +1,7 @@
 import gettext as gettext_module
 from enum import Enum
 from functools import partial
-from typing import Optional, Any, Awaitable, Iterable
+from typing import Optional, Iterable
 
 from bottex2.bottex import BottexMiddleware
 from bottex2.chat import Keyboard
@@ -97,7 +97,7 @@ class TranslateBottexMiddleware(BottexMiddleware):
             message.kb = cls.tranlate_keyboard(message.kb, locale)
         return response
 
-    async def __call__(self, request: Request) -> Awaitable[Any]:
+    async def __call__(self, request: Request):
         user = request.user
         text = gettext(request.text, REVERSED_DOMAIN)
         request.text = translate(text, user.locale.value)

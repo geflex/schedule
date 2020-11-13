@@ -1,8 +1,9 @@
 import functools
 import inspect
-from typing import Awaitable, Any, Callable
+from dataclasses import dataclass
+from typing import Awaitable, Any, Callable, Optional, Iterable
 
-from bottex2.chat import AbstractChat
+from bottex2.chat import AbstractChat, Keyboard
 from bottex2.logging import logger
 
 
@@ -25,7 +26,16 @@ class Request(dict):
         return Request(**self)
 
 
-Handler = Callable[[Request], Awaitable[Any]]
+@dataclass
+class Message:
+    text: Optional[str]
+    kb: Optional[Keyboard]
+
+    def __iter__(self):
+        yield self
+
+
+Handler = Callable[[Request], Awaitable[Iterable[Message]]]
 
 
 def check_handler(handler: Handler):
@@ -44,11 +54,11 @@ class HandlerMiddleware(Handler):
         except AttributeError:
             pass
 
-    async def __call__(self, request: Request) -> Awaitable[Any]:  # !!! retyrn type
+    async def __call__(self, request: Request):  # !!! retyrn type
         return await self.handler(request)
 
 
-ParamsHandler = Callable[..., Awaitable]
+ParamsHandler = Callable[..., Awaitable[Any]]
 
 
 def params_handler(handler: ParamsHandler) -> Handler:
