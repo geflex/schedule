@@ -12,6 +12,13 @@ def if_text_eq(s: str) -> Condition:
     return cond
 
 
+def if_text_contains(s: str) -> Condition:
+    s = s.lower()
+    def cond(r: Request) -> bool:
+        return s in r.text.lower()
+    return cond
+
+
 def if_re_match(exp: Union[str, Pattern]) -> Condition:
     exp = re.compile(exp)
     def cond(r: Request) -> bool:
