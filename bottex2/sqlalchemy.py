@@ -1,8 +1,6 @@
-from typing import Type
-
-from sqlalchemy.ext.declarative import declarative_base, DeclarativeMeta
+from sqlalchemy import create_engine as _create_engine
+from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
-
 
 Session = sessionmaker()
 
@@ -37,9 +35,15 @@ class _Model:
 Model = declarative_base(cls=_Model)
 
 
-def set_engine(engine):
-    Model.session.bind = engine
-
-
 def create_tables(engine):
     Model.metadata.create_all(engine)
+
+
+def create_engine(*args, **kwargs):
+    engine = _create_engine(*args, **kwargs)
+    engine.create_tables = create_tables
+    return engine
+
+
+def set_engine(engine):
+    Model.session.bind = engine

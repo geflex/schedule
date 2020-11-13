@@ -1,7 +1,5 @@
 import logging
 
-from sqlalchemy import create_engine
-
 from bottex2 import sqlalchemy as sqldb
 from bottex2.bottex import Bottex
 from bottex2.ext import users, i18n
@@ -26,9 +24,9 @@ def get_bottex():
 
 
 def setup_db():
-    db = create_engine(configs.db_url)
-    sqldb.create_tables(db)
-    sqldb.set_engine(db)
+    engine = sqldb.create_engine(configs.db_url)
+    engine.create_tables()
+    sqldb.set_engine(engine)
     users.set_user_model(models.User)
 
 
