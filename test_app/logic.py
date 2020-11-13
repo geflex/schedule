@@ -24,13 +24,13 @@ async def stop(request: Request):
 
 
 async def send(request: Request):
-    await request.chat.send_message('lol', kb)
+    return request.resp('lol', kb)
 
 
 async def switch(r: Request):
     await r.user.update(state=states[r.user.state])
-    await r.chat.send_message(f'switched', kb)
     await send_settings(r)
+    return r.resp(f'switched', kb)
 
 
 async def send_settings(r: Request):
@@ -38,13 +38,13 @@ async def send_settings(r: Request):
         f'id: {r.user.uid}',
         f'state: {r.user.state}',
     ])
-    await r.chat.send_message(text, kb)
+    return r.resp(text, kb)
 
 
 async def set_state(r: Request):
     state = next(iter(states))
     await r.user.update(state=state)
-    await r.chat.send_message(f'hi, user {r.user.uid}', kb=kb)
+    return r.resp(f'hi, user {r.user.uid}', kb=kb)
 
 
 router = Router({

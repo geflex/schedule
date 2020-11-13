@@ -91,9 +91,9 @@ class SettingsLanguageInput(inputs.BaseLanguageInput, BaseSettingsInput):
     async def switch(cls, r: Request):
         kb = cls(r).keyboard
         current = r.user.locale
-        await r.chat.send_message(_('Текущий язык: {}').format(current.value), kb)
-        await r.chat.send_message(_('Выбери новый язык'), kb)
         await super().switch(r)
+        return [r.resp(_('Текущий язык: {}').format(current.value), kb),
+                r.resp(_('Выбери новый язык'), kb)]
 
 
 class SettingsGroupInput(inputs.BaseGroupInput, BaseSettingsInput):
@@ -116,9 +116,9 @@ class SettingsGroupInput(inputs.BaseGroupInput, BaseSettingsInput):
     @classmethod
     async def switch(cls, r: Request):
         kb = cls(r).keyboard
-        await r.chat.send_message(_('Текущая группа: {}').format(r.user.group), kb)
-        await r.chat.send_message(_('Введи номер группы'), kb)
         await super().switch(r)
+        return [r.resp(_('Текущая группа: {}').format(r.user.group), kb),
+                r.resp(_('Введи номер группы'), kb)]
 
 
 class SettingsNameInput(inputs.BaseNameInput, BaseSettingsInput):
@@ -140,9 +140,9 @@ class SettingsNameInput(inputs.BaseNameInput, BaseSettingsInput):
     @classmethod
     async def switch(cls, r: Request):
         kb = cls(r).keyboard
-        await r.chat.send_message(_('Текущее имя: {}').format(r.user.name), kb)
-        await r.chat.send_message(_('Введи новое имя'), kb)
         await super().switch(r)
+        return [r.resp(_('Текущее имя: {}').format(r.user.name), kb),
+                r.resp(_('Введи новое имя'), kb)]
 
 
 class SettingsSubgroupInput(inputs.BaseSubgroupInput, BaseSettingsInput):
@@ -169,9 +169,9 @@ class SettingsSubgroupInput(inputs.BaseSubgroupInput, BaseSettingsInput):
     @classmethod
     async def switch(cls, r: Request):
         kb = cls(r).keyboard
-        await r.chat.send_message(_('Текущая подгруппа: {}').format(r.user.subgroup), kb)
-        await r.chat.send_message(_('Введи номер подгруппы'), kb)
         await super().switch(r)
+        return [await r.resp(_('Текущая подгруппа: {}').format(r.user.subgroup), kb),
+                await r.resp(_('Введи номер подгруппы'), kb)]
 
 
 class BasePTypeRequiredInput(BaseSettingsInput):
