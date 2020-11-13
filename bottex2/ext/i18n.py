@@ -1,12 +1,13 @@
 import gettext as gettext_module
 from enum import Enum
 from functools import partial
-from typing import Optional, Any, Awaitable
+from typing import Optional, Any, Awaitable, Iterable
 
 from bottex2.bottex import BottexMiddleware
-from bottex2.chat import Keyboard, AbstractChat, ChatMiddleware
+from bottex2.chat import Keyboard
 from bottex2.handler import Request
 from bottex2.logging import logger
+from bottex2.messages import Message
 
 
 class LazyTranslate(str):
@@ -72,33 +73,34 @@ def translate(text: str, lang: str):
     return text
 
 
-class TranslateBottexChatMiddleware(ChatMiddleware):
-    def __init__(self, chat: AbstractChat, user: I18nUserMixin):
-        super().__init__(chat)
-        self.user = user
-
-    def translate(self, text):
-        return translate(text, self.user.locale.value)
-
-    def tranlate_keyboard(self, kb: Keyboard):
-        for line in kb.buttons:
-            for button in line:
-                button.label = self.translate(button.label)
-        return kb
-
-    async def send_message(self, text: Optional[str] = None, kb: Optional[Keyboard] = None):
-        text = self.translate(text)
-        if kb:
-            kb = self.tranlate_keyboard(kb)
-        await super().send_message(text, kb)
-
-
 class TranslateBottexMiddleware(BottexMiddleware):
     __unified__ = True
 
+    @staticmethod
+    def translate_text(text: str, locale: str):
+        return translate(text, locale)
+
+    @classmethod
+    def tranlate_keyboard(cls, kb: Keyboard, locale: str):
+        for line in kb.buttons:
+            for button in line:
+                button.label = cls.translate_text(button.label, locale)
+        return kb
+
+    @classmethod
+    def translate_response(cls, response: Iterable[Message], locale: str):
+        # !!! It's a bad idea to change an existing response
+        if response is None:
+            return
+        for message in response:
+            message.text = cls.translate_text(message.text, locale)
+            message.kb = cls.tranlate_keyboard(message.kb, locale)
+        return response
+
     async def __call__(self, request: Request) -> Awaitable[Any]:
         user = request.user
-        request.chat = TranslateBottexChatMiddleware(request.chat, user)
         text = gettext(request.text, REVERSED_DOMAIN)
         request.text = translate(text, user.locale.value)
-        return await super().__call__(request)
+
+        response = await super().__call__(request)
+        return self.translate_response(response, user.locale.value)
