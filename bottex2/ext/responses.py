@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Optional
+from typing import Optional, Iterable
 
 from bottex2.bottex import BottexMiddleware
 from bottex2.chat import AbstractChat, Keyboard, ChatMiddleware
@@ -38,7 +38,10 @@ class ResponseBottexMiddleware(BottexMiddleware):
         request.resp = response_factory
         response = await super().__call__(request)
         send = super(LazyChatMiddleware, chat).send_message
-        for resp in chat.responses:
-            await send(resp.text, resp.kb)
-        if isinstance(response, Message):
+        if response is None:
+            response = chat.responses
+        if isinstance(response, Iterable):
+            for resp in response:
+                await send(resp.text, resp.kb)
+        else:
             await send(response.text, response.kb)
