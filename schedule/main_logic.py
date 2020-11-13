@@ -99,6 +99,7 @@ class SettingsLanguageInput(inputs.BaseLanguageInput, BaseSettingsInput):
 class SettingsGroupInput(inputs.BaseGroupInput, BaseSettingsInput):
     name = 'settings_group'
 
+    @property
     def commands(self) -> List[List[Command]]:
         commands = super().commands
         commands2 = super(inputs.BaseGroupInput, self).commands
@@ -170,8 +171,8 @@ class SettingsSubgroupInput(inputs.BaseSubgroupInput, BaseSettingsInput):
     async def switch(cls, r: Request):
         kb = cls(r).keyboard
         await super().switch(r)
-        return [await r.resp(_('Текущая подгруппа: {}').format(r.user.subgroup), kb),
-                await r.resp(_('Введи номер подгруппы'), kb)]
+        return [r.resp(_('Текущая подгруппа: {}').format(r.user.subgroup), kb),
+                r.resp(_('Введи номер подгруппы'), kb)]
 
 
 class BasePTypeRequiredInput(BaseSettingsInput):
