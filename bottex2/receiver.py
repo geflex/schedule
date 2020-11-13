@@ -12,8 +12,6 @@ def response_factory(text: Optional[str] = None, kb: Optional[Keyboard] = None):
 
 
 class ResponseBottexMiddleware(HandlerMiddleware):
-    __unified__ = True
-
     async def __call__(self, request: Request):
         request.resp = response_factory
         response = await super().__call__(request)
@@ -50,7 +48,7 @@ class Receiver(ABC):
 
     @abstractmethod
     async def listen(self) -> AsyncIterator[Request]:
-        """Recieves and yields events"""
+        """Receives and yields events"""
         yield
 
     def _check(self):
