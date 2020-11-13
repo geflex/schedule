@@ -61,7 +61,7 @@ class Router(Handler):
 def if_text(s: str) -> Condition:
     s = s.lower()
     def cond(request: Request) -> bool:
-        return request.text.lower() == s.lower()
+        return request.text.lower() == s
     return cond
 
 
