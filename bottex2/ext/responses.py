@@ -11,6 +11,9 @@ class Message:
     text: Optional[str]
     kb: Optional[Keyboard]
 
+    def __iter__(self):
+        yield self
+
 
 class LazyChatMiddleware(ChatMiddleware):
     def __init__(self, chat: AbstractChat):
@@ -43,5 +46,3 @@ class ResponseBottexMiddleware(BottexMiddleware):
         if isinstance(response, Iterable):
             for resp in response:
                 await send(resp.text, resp.kb)
-        else:
-            await send(response.text, response.kb)
