@@ -1,5 +1,4 @@
 from abc import abstractmethod, ABC
-from functools import cached_property
 from typing import List, Any, Awaitable
 
 from bottex2.chat import Keyboard, Button
@@ -16,17 +15,17 @@ class Command:
 
 
 class View(ABC):
-    name: str
+    name: str  # !!!
 
     def __init__(self, request: Request):
         self.r = request
 
-    @cached_property
+    @property
     @abstractmethod
     def commands(self) -> List[List[Command]]:
         pass
 
-    @cached_property
+    @property
     def keyboard(self) -> Keyboard:
         keyboard = Keyboard()
         for line in self.commands:
@@ -35,7 +34,7 @@ class View(ABC):
                 keyboard.add_button(Button(command.text))
         return keyboard
 
-    @cached_property
+    @property
     def router(self) -> Router:
         router = Router(default=self.default)
         for line in self.commands:
