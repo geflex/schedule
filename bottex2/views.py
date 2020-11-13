@@ -51,6 +51,6 @@ class View(ABC):
         return r.resp('404: command not found', self.keyboard)
 
     @classmethod
-    async def switch(cls, r: Request) -> Awaitable[Any]:
+    async def switch(cls, r: Request):
         await r.user.update(state=state_name(cls))
         return None  # !!!
