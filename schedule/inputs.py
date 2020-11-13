@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 from functools import cached_property, partial
 from typing import List
 
-from bottex2.conditions import if_regexp
+from bottex2.conditions import if_re_match
 from bottex2.ext.i18n import gettext, rgettext
 from bottex2.handler import Request
 from bottex2.helpers import regexp
@@ -80,7 +80,7 @@ class BaseGroupInput(View):
     @cached_property
     def router(self) -> Router:
         router = super().router
-        router.add_route(if_regexp(self.exp), self.set_group)
+        router.add_route(if_re_match(self.exp), self.set_group)
         return router
 
     async def set_group(self, r: Request):

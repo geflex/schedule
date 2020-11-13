@@ -1,7 +1,7 @@
 from functools import cached_property, partial
 
 from bottex2.chat import Keyboard
-from bottex2.conditions import if_text
+from bottex2.conditions import if_text_eq
 from bottex2.ext.i18n import gettext, rgettext
 from bottex2.ext.users import gen_state_cases
 from bottex2.handler import Request
@@ -145,7 +145,7 @@ cases = gen_state_cases([
         StartSubgroupInput,
         StartNameInput,
 ])
-main = Router({if_text('delete me'): delete_me,  # works in any states
+main = Router({if_text_eq('delete me'): delete_me,  # works in any states
                **cases,
                **main_logic.cases},
               default=StartLanguageInput.switch)

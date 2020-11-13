@@ -5,29 +5,29 @@ from bottex2.handler import Request
 from bottex2.router import Condition
 
 
-def if_text(s: str) -> Condition:
+def if_text_eq(s: str) -> Condition:
     s = s.lower()
-    def cond(request: Request) -> bool:
-        return request.text.lower() == s
+    def cond(r: Request) -> bool:
+        return r.text.lower() == s
     return cond
 
 
-def if_regexp(exp: Union[str, Pattern]) -> Condition:
+def if_re_match(exp: Union[str, Pattern]) -> Condition:
     exp = re.compile(exp)
-    def cond(request: Request) -> bool:
-        m = exp.match(request.text)
+    def cond(r: Request) -> bool:
+        m = exp.match(r.text)
         return bool(m)
     return cond
 
 
 def if_text_in(*wds: str) -> Condition:
     wds = [w.lower() for w in wds]
-    def cond(request: Request) -> bool:
-        return request.text.lower() in wds
+    def cond(r: Request) -> bool:
+        return r.text.lower() in wds
     return cond
 
 
-def if_in(conditions: Iterator[Condition]) -> Condition:
-    def cond(request: Request):
-        return any(c(request) for c in conditions)
+def if_any(conditions: Iterator[Condition]) -> Condition:
+    def cond(r: Request):
+        return any(c(r) for c in conditions)
     return cond
