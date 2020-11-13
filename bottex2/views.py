@@ -2,9 +2,10 @@ from abc import abstractmethod, ABC
 from typing import List, Any, Awaitable, Optional
 
 from bottex2.chat import Keyboard, Button
+from bottex2.conditions import if_text
 from bottex2.handler import Request, Handler
 from bottex2.helpers.tools import state_name
-from bottex2.router import Router, if_text, Condition
+from bottex2.router import Router, Condition
 
 
 class Command:

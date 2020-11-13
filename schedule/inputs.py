@@ -3,10 +3,11 @@ from abc import ABC, abstractmethod
 from functools import cached_property, partial
 from typing import List
 
+from bottex2.conditions import if_regexp
 from bottex2.ext.i18n import gettext, rgettext
 from bottex2.handler import Request
 from bottex2.helpers import regexp
-from bottex2.router import Router, if_regexp
+from bottex2.router import Router
 from bottex2.views import View, Command
 from .models import PType, Lang
 
