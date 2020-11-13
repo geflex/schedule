@@ -1,17 +1,17 @@
 from abc import abstractmethod, ABC
-from typing import List, Any, Awaitable
+from typing import List, Any, Awaitable, Optional
 
 from bottex2.chat import Keyboard, Button
 from bottex2.handler import Request, Handler
 from bottex2.helpers.tools import state_name
-from bottex2.router import Router, if_text
+from bottex2.router import Router, if_text, Condition
 
 
 class Command:
-    def __init__(self, text: str, callback: Handler):
+    def __init__(self, text: str, callback: Handler, condition: Optional[Condition] = None):
         self.text = text
-        self.condition = if_text(text)
         self.callback = callback
+        self.condition = condition or if_text(text)
 
 
 class View(ABC):
