@@ -68,7 +68,7 @@ class User(UserModel, I18nUserMixin, RightsUserMixin):
     subgroup = Column(sqltypes.Enum('1', '2', name='subgroup'))  # only for student
 
 
-set_default_lang(Lang.ru.value)
+set_default_lang(Lang.ru.value)   # !!!
 
 
 class Lesson(Model):

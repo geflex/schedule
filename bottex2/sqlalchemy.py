@@ -1,3 +1,5 @@
+from functools import partial
+
 from sqlalchemy import create_engine as _create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
@@ -41,7 +43,7 @@ def create_tables(engine):
 
 def create_engine(*args, **kwargs):
     engine = _create_engine(*args, **kwargs)
-    engine.create_tables = create_tables
+    engine.create_tables = partial(create_tables, engine)
     return engine
 
 

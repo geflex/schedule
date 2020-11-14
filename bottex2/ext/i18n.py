@@ -38,12 +38,6 @@ class LazyTranslate(str):
 
 REVERSIBLE_DOMAIN = 'reversible'
 REVERSED_DOMAIN = 'reversed'
-default_lang: Optional[str] = None
-
-
-def set_default_lang(lang: str):
-    global default_lang
-    default_lang = lang
 
 
 def gettext(s, domain):
@@ -59,7 +53,7 @@ class I18nUserMixin:
     locale: Enum
 
 
-def translate(text: str, lang: str):
+def translate(text: str, lang: str, default_lang: Optional[str] = None):
     if isinstance(text, LazyTranslate) and lang != default_lang:
         domain = text.domain
         try:
@@ -71,6 +65,11 @@ def translate(text: str, lang: str):
             translated = trans.gettext(text)
             return text.enforce(translated)
     return text
+
+
+def set_default_lang(lang: str):
+    global translate
+    translate = partial(translate, default_lang=lang)
 
 
 class TranslateBottexMiddleware(BottexMiddleware):
@@ -100,7 +99,7 @@ class TranslateBottexMiddleware(BottexMiddleware):
     async def __call__(self, request: Request):
         user = request.user
         text = gettext(request.text, REVERSED_DOMAIN)
-        request.text = translate(text, user.locale.value)
+        request.text = self.translate_text(text, user.locale.value)
 
         response = await super().__call__(request)
         return self.translate_response(response, user.locale.value)
