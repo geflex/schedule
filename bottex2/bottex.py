@@ -1,5 +1,4 @@
-from functools import partial
-from typing import Type, Set, AsyncIterator, Dict, Optional, Any, Awaitable
+from typing import Type, AsyncIterator, Dict, Any, Awaitable, List
 
 from bottex2.handler import HandlerError, HandlerMiddleware, Request
 from bottex2.helpers import aiotools
@@ -11,38 +10,38 @@ from bottex2.receiver import Receiver
 class BottexMiddleware(HandlerMiddleware):
     __unified__ = False
 
-    @classmethod
-    def submiddleware(cls, receiver_cls: Type[Receiver],
-                      middleware: Optional[HandlerMiddleware] = None):
-        return specify_middleware(cls, receiver_cls, middleware)
 
+class MiddlewareManager:
+    shared: 'MiddlewareManager'
 
-def _get_submiddleware(bottex_middleware: Type[BottexMiddleware],
-                       receiver_cls: Type[Receiver]) -> Type[HandlerMiddleware]:
-    return middlewares.setdefault(bottex_middleware, {}).get(receiver_cls, bottex_middleware)
+    def __init__(self):
+        self.middlewares = {}  # type: Dict[Type[BottexMiddleware], Dict[Type[Receiver], Type[HandlerMiddleware]]]
 
-
-def get_submiddleware(middleware: Type[BottexMiddleware],
-                      receiver: Receiver) -> Type[HandlerMiddleware]:
-    submiddleware = _get_submiddleware(middleware, type(receiver))
-    if submiddleware is middleware and not middleware.__unified__:
-        logger.debug(f'No {middleware.__name__} specified for '
-                     f'{type(receiver).__name__}')
-    return submiddleware
-
-
-middlewares: Dict[Type[BottexMiddleware], Dict[Type[Receiver], HandlerMiddleware]]
-middlewares = {}
-
-
-def specify_middleware(bottex_middleware: Type[BottexMiddleware],
+    def register_child(self,
+                       parent: Type[BottexMiddleware],
                        receiver_cls: Type[Receiver],
-                       middleware: Optional[HandlerMiddleware] = None):
-    specified = middlewares.setdefault(bottex_middleware, {})
-    if middleware is None:
-        return partial(specify_middleware, bottex_middleware, receiver_cls)
-    specified[receiver_cls] = middleware
-    return middleware
+                       middleware: Type[HandlerMiddleware]):
+        children = self.get_children(parent)
+        children[receiver_cls] = middleware
+
+    def get_children(self, parent: Type[BottexMiddleware]) -> Dict[Type[Receiver], Type[HandlerMiddleware]]:
+        for registered_parent, children in self.middlewares.items():
+            if issubclass(parent, registered_parent):
+                return children
+        children = {}
+        self.middlewares[parent] = children
+        return children
+
+    def get_child(self,
+                  parent: Type[BottexMiddleware],
+                  receiver_cls: Type[Receiver]) -> Type[HandlerMiddleware]:
+        child = self.get_children(parent).get(receiver_cls)
+        if child is None:
+            return parent
+        return type(child.__name__, (child, parent), {})
+
+
+MiddlewareManager.shared = MiddlewareManager()
 
 
 class HandlerBottexMiddleware(BottexMiddleware):
@@ -61,19 +60,19 @@ class HandlerBottexMiddleware(BottexMiddleware):
 class Bottex(Receiver):
     def __init__(self, *receivers: Receiver):
         super().__init__()
-        self._receivers = set(receivers)  # type: Set[Receiver]
+        self._receivers = list(receivers)  # type: List[Receiver]
         self.add_middleware(HandlerBottexMiddleware)
 
     def add_middleware(self, middleware: Type[BottexMiddleware]):
         super().add_middleware(middleware)
         for receiver in self._receivers:
-            submiddleware = get_submiddleware(middleware, receiver)
+            submiddleware = MiddlewareManager.shared.get_child(middleware, type(receiver))
             receiver.add_middleware(submiddleware)
 
     def add_receiver(self, receiver: Receiver):
-        self._receivers.add(receiver)
+        self._receivers.append(receiver)
         for middleware in self.handler_middlewares:
-            submiddleware = get_submiddleware(middleware, receiver)
+            submiddleware = MiddlewareManager.shared.get_child(middleware, type(receiver))
             receiver.add_middleware(submiddleware)
 
     async def wrap_receiver(self, receiver: Receiver) -> AsyncIterator[Request]:

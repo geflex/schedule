@@ -4,6 +4,7 @@ import asyncio
 from dataclasses import dataclass
 from typing import AsyncIterator, Optional
 
+from bottex2.bottex import MiddlewareManager
 from bottex2.chat import AbstractChat, Keyboard
 from bottex2.ext.users import UserBottexMiddleware
 from bottex2.handler import Request
@@ -48,7 +49,9 @@ class PyReceiver(Receiver):
                           raw=message)
 
 
-@UserBottexMiddleware.submiddleware(PyReceiver)
 class PyUserHandlerMiddleware(UserBottexMiddleware):
     async def get_user(self, request: Request):
         return await self.get_or_create('py', 'default')
+
+
+MiddlewareManager.shared.register_child(UserBottexMiddleware, PyReceiver, PyUserHandlerMiddleware)

@@ -1,4 +1,4 @@
-from typing import Type, Awaitable, Any
+from typing import Type
 
 from sqlalchemy import Column, Integer, String
 

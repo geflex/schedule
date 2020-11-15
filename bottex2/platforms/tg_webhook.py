@@ -2,7 +2,8 @@ import asyncio
 
 from aiogram.bot import Bot
 
-from bottex2.ext import users
+from bottex2.bottex import MiddlewareManager
+from bottex2.ext.users import UserBottexMiddleware
 from bottex2.platforms._webhook import AioHttpReceiverMixin
 from bottex2.platforms.tg import TgChat, TgUserHandlerMiddleware
 from bottex2.receiver import Request
@@ -24,4 +25,4 @@ class TgWebHookReceiver(AioHttpReceiverMixin):
         return Request(text=text, chat=chat, raw=request)
 
 
-users.UserBottexMiddleware.submiddleware(TgWebHookReceiver, TgUserHandlerMiddleware)
+MiddlewareManager.shared.register_child(UserBottexMiddleware, TgWebHookReceiver, TgUserHandlerMiddleware)
