@@ -1,24 +1,23 @@
-from functools import cached_property, partial
+from functools import cached_property
 
 from bottex2.chat import Keyboard
 from bottex2.conditions import if_text_eq
-from bottex2.ext.i18n import gettext, rgettext
 from bottex2.ext.users import gen_state_cases
 from bottex2.handler import Request
 from bottex2.helpers.tools import state_name
 from bottex2.router import Router
+from . import env
 from . import inputs
 from . import main_logic
-from .models import Lang
 
-_ = partial(gettext, domain='schedule')
-_c = rgettext
+_ = env.i18n.gettext
+_c = env.i18n.rgettext
 
 
 class StartLanguageInput(inputs.BaseLanguageInput):
     name = 'start_setup'
 
-    def get_lang_setter(self, lang: Lang):
+    def get_lang_setter(self, lang: env.Lang):
         super_setter = super().get_lang_setter(lang)
         async def setter(r: Request):
             await super_setter(r)

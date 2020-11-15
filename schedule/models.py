@@ -1,13 +1,12 @@
 from enum import Enum, IntFlag
-from typing import List
 
-from sqlalchemy import Column
+from sqlalchemy import Column, Table, ForeignKey
 from sqlalchemy import types as sqltypes
 
-from bottex2.ext.i18n import I18nUserMixin, set_default_lang
 from bottex2.ext.rights import RightsUserMixin
 from bottex2.ext.users import UserModel
 from bottex2.sqlalchemy import Model
+from . import env
 
 
 class Department(Enum):
@@ -50,17 +49,13 @@ class Rights(IntFlag):
     notifying = 3
 
 
-class Lang(Enum):
-    ru = 'ru'
-    en = 'en'
-    be = 'be'
+subgroups = sqltypes.Enum('1', '2', name='subgroup')
 
 
-class User(UserModel, I18nUserMixin, RightsUserMixin):
+class User(UserModel, env.i18n.UserMixin, RightsUserMixin):
     notifications_time = Column(sqltypes.Time, nullable=True)
 
     rights = Column(sqltypes.Enum(Rights))
-    locale = Column(sqltypes.Enum(Lang), default=Lang.ru, nullable=False)
 
     ptype = Column(sqltypes.Enum(PType))
     name = Column(sqltypes.String)  # for teacher

@@ -2,10 +2,10 @@ import logging
 
 from bottex2 import sqlalchemy as sqldb
 from bottex2.bottex import Bottex
-from bottex2.ext import users, i18n
+from bottex2.ext import users
 from bottex2.platforms.tg import TgReceiver
 from bottex2.platforms.vk import VkReceiver
-from schedule import start_logic, models, configs
+from schedule import start_logic, models, configs, env
 
 
 def get_bottex():
@@ -27,12 +27,11 @@ def setup_db():
     engine = sqldb.create_engine(configs.db_url)
     engine.create_tables()
     sqldb.set_engine(engine)
-    users.set_user_model(models.User)
 
 
 def set_middlewares(bottex):
-    bottex.add_middleware(i18n.TranslateBottexMiddleware)
-    bottex.add_middleware(users.UserBottexMiddleware)
+    bottex.add_middleware(env.i18n.Middleware)
+    bottex.add_middleware(users.user_middleware(models.User))
 
 
 def main():

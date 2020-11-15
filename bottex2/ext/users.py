@@ -17,25 +17,26 @@ class UserModel(Model):
     state = Column(String)
 
 
-def set_user_model(cls: Type[UserModel]):
-    global user_cls
-    user_cls = cls
-
-
-user_cls: Type[UserModel]
-
-
 class UserBottexMiddleware(BottexMiddleware):
-    @staticmethod
-    async def get_or_create(platform, uid):
-        return await user_cls.get_or_create(platform=platform, uid=uid)
+    user_model: Type[UserModel]
+
+    @classmethod
+    async def get_or_create(cls, platform, uid):
+        return await cls.user_model.get_or_create(platform=platform, uid=uid)
 
     async def get_user(self, request: Request):
-        return await self.get_or_create(None, 'guest')
+        # return await self.get_or_create
+        return
 
-    async def __call__(self, request: Request) -> Awaitable[Any]:
+    async def __call__(self, request: Request):
         request.user = await self.get_user(request)
         return await self.handler(request)
+
+
+def user_middleware(user_model: Type[UserModel]):
+    return type('UserBottexMiddleware', (UserBottexMiddleware, ), {
+        'user_model': user_model,
+    })
 
 
 def state_cond(st: str) -> Condition:

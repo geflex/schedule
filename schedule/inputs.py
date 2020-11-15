@@ -1,18 +1,18 @@
 import re
 from abc import ABC, abstractmethod
-from functools import cached_property, partial
+from functools import cached_property
 from typing import List
 
 from bottex2.conditions import if_re_match
-from bottex2.ext.i18n import gettext, rgettext
 from bottex2.handler import Request
 from bottex2.helpers import regexp
 from bottex2.router import Router
 from bottex2.views import View, Command
-from .models import PType, Lang
+from . import env
+from .models import PType
 
-_ = partial(gettext, domain='schedule')
-_c = rgettext
+_ = env.i18n.gettext
+_c = env.i18n.rgettext
 
 
 class PTypeInput(View):
@@ -38,11 +38,11 @@ class BaseLanguageInput(View):
     def commands(self):
         commands = [
             [Command(lang.value, self.get_lang_setter(lang))]
-            for lang in Lang
+            for lang in env.i18n.enum
         ]
         return commands
 
-    def get_lang_setter(self, lang: Lang):
+    def get_lang_setter(self, lang: env.Lang):
         async def setter(r: Request):
             await r.user.update(locale=lang)
         return setter

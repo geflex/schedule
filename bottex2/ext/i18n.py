@@ -1,7 +1,10 @@
 import gettext as gettext_module
 from enum import Enum
 from functools import partial
-from typing import Optional, Iterable
+from typing import Optional, Iterable, Type
+
+from sqlalchemy import Column
+from sqlalchemy import types as sqltypes
 
 from bottex2.bottex import BottexMiddleware
 from bottex2.chat import Keyboard
@@ -36,17 +39,10 @@ class LazyTranslate(str):
         return s
 
 
-REVERSIBLE_DOMAIN = 'reversible'
-REVERSED_DOMAIN = 'reversed'
-
-
 def gettext(s, domain):
     s = LazyTranslate(s)
     s.domain = domain
     return s
-
-
-rgettext = partial(gettext, domain=REVERSIBLE_DOMAIN)
 
 
 class I18nUserMixin:
@@ -67,23 +63,21 @@ def translate(text: str, lang: str, default_lang: Optional[str] = None):
     return text
 
 
-def set_default_lang(lang: str):
-    global translate
-    translate = partial(translate, default_lang=lang)
-
-
-class TranslateBottexMiddleware(BottexMiddleware):
+class I18nBottexMiddleware(BottexMiddleware):
     __unified__ = True
 
-    @staticmethod
-    def translate_text(text: str, locale: str):
-        return translate(text, locale)
+    default_lang: Enum
+    reversed_domain: str
+
+    @classmethod
+    def translate(cls, text: str, locale: str):
+        return translate(text, locale, default_lang=cls.default_lang.value)
 
     @classmethod
     def tranlate_keyboard(cls, kb: Keyboard, locale: str):
         for line in kb.buttons:
             for button in line:
-                button.label = cls.translate_text(button.label, locale)
+                button.label = cls.translate(button.label, locale)
         return kb
 
     @classmethod
@@ -92,14 +86,38 @@ class TranslateBottexMiddleware(BottexMiddleware):
         if response is None:
             return
         for message in response:
-            message.text = cls.translate_text(message.text, locale)
+            message.text = cls.translate(message.text, locale)
             message.kb = cls.tranlate_keyboard(message.kb, locale)
         return response
 
     async def __call__(self, request: Request):
         user = request.user
-        text = gettext(request.text, REVERSED_DOMAIN)
-        request.text = self.translate_text(text, user.locale.value)
+        text = gettext(request.text, self.reversed_domain)
+        request.text = self.translate(text, user.locale.value)
 
         response = await super().__call__(request)
         return self.translate_response(response, user.locale.value)
+
+
+class I18nEnv:
+    def __init__(self,
+                 enum: Type[Enum],
+                 default_lang: Enum,
+                 reversed_domain='reversed',
+                 reversible_domain='reversible'):
+        self.enum = enum
+        self.default_lang = default_lang
+        self.reversed_domain = reversed_domain
+        self.reversible_domain_name = reversible_domain
+
+        self.translate = partial(translate, default_lang=default_lang)
+        self.rgettext = partial(gettext, domain=reversible_domain)
+
+        self.Middleware = type('I18nBottexMiddleware', (I18nBottexMiddleware, ), {
+            'default_lang': default_lang,
+            'reversed_domain': reversed_domain,
+        })
+
+        self.UserMixin = type('I18nUserMixin', (I18nUserMixin, ), {
+            'locale': Column(sqltypes.Enum(enum), default=default_lang, nullable=False)
+        })
