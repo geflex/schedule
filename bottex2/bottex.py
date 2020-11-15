@@ -29,21 +29,22 @@ class HandlerBottexMiddleware(BottexMiddleware):
 
 
 class Bottex(Receiver):
-    def __init__(self, *receivers: Receiver):
+    def __init__(self, *receivers: Receiver, middleware_manager=middlewares):
         super().__init__()
+        self.middleware_manager = middleware_manager
         self._receivers = list(receivers)  # type: List[Receiver]
         self.add_middleware(HandlerBottexMiddleware)
 
     def add_middleware(self, middleware: Type[BottexMiddleware]):
         super().add_middleware(middleware)
         for receiver in self._receivers:
-            submiddleware = middlewares.get_child(middleware, type(receiver))
+            submiddleware = self.middleware_manager.get_child(middleware, type(receiver))
             receiver.add_middleware(submiddleware)
 
     def add_receiver(self, receiver: Receiver):
         self._receivers.append(receiver)
         for middleware in self.handler_middlewares:
-            submiddleware = middlewares.get_child(middleware, type(receiver))
+            submiddleware = self.middleware_manager.get_child(middleware, type(receiver))
             receiver.add_middleware(submiddleware)
 
     async def wrap_receiver(self, receiver: Receiver) -> AsyncIterator[Request]:
