@@ -60,22 +60,54 @@ class User(UserModel, env.i18n.UserMixin, RightsUserMixin):
     ptype = Column(sqltypes.Enum(PType))
     name = Column(sqltypes.String)  # for teacher
     group = Column(sqltypes.String)  # only for student
+    subgroup = Column(subgroups)  # only for student
+
+
+class Group(Model):
+    __tablename__ = 'groups'
+
+    id = Column(sqltypes.Integer, primary_key=True)
+    name = Column(sqltypes.String)
+
+
+class Teacher(Model):
+    __tablename__ = 'teachers'
+
+    id = Column(sqltypes.Integer, primary_key=True)
+    last_name = Column(sqltypes.String)
+
+
+lesson_teachers = Table('lesson_teachers', Model.metadata,
+    Column('lesson_id', sqltypes.Integer, ForeignKey('lessons.id')),
+    Column('teacher_id', sqltypes.Integer, ForeignKey('teachers.id'))
+)
+
+
+class Building(Model):
+    __tablename__ = 'buildings'
     subgroup = Column(sqltypes.Enum('1', '2', name='subgroup'))  # only for student
 
+    id = Column(sqltypes.Integer, primary_key=True)
+    name = Column(sqltypes.String)
 
-set_default_lang(Lang.ru.value)   # !!!
+
+class Place(Model):
+    __tablename__ = 'places'
+
+    id = Column(sqltypes.Integer, primary_key=True)
+    building_id = Column(sqltypes.Integer, ForeignKey('buildings.id'))
+    auditory = Column(sqltypes.String)
 
 
 class Lesson(Model):
     __tablename__ = 'lessons'
 
     id = Column(sqltypes.Integer, primary_key=True)
-    groups: str
-    weeknum: int
+    group_ids = Column(sqltypes.Integer, ForeignKey('groups.id'))
+    weeknum = Column(sqltypes.Boolean)
     weekday = Column(sqltypes.Enum(Weekday))
-    subgroup = Column(sqltypes.Integer)
+    subgroup = Column(subgroups)
     time = Column(sqltypes.Time)
     name = Column(sqltypes.String)
-    teachers: List[str]
-    building = Column(sqltypes.String)
-    auditories: List[str]
+    teacher_ids = Column(sqltypes.Integer, ForeignKey('teachers.id'))
+    place_ids = Column(sqltypes.Integer, ForeignKey('places.id'))
