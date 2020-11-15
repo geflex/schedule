@@ -10,7 +10,7 @@ from aiovk.exceptions import VkAPIError
 from aiovk.longpoll import BotsLongPoll
 from aiovk.sessions import BaseSession, TokenSession
 
-from bottex2.bottex import MiddlewareManager
+from bottex2 import bottex
 from bottex2.chat import AbstractChat, Keyboard
 from bottex2.ext.users import UserBottexMiddleware
 from bottex2.handler import Request
@@ -82,4 +82,4 @@ class VkUserHandlerMiddleware(UserBottexMiddleware):
         return await self.get_or_create('vk', uid)
 
 
-MiddlewareManager.shared.register_child(UserBottexMiddleware, VkReceiver, VkUserHandlerMiddleware)
+bottex.middlewares.register_child(UserBottexMiddleware, VkReceiver, VkUserHandlerMiddleware)

@@ -12,8 +12,6 @@ class BottexMiddleware(HandlerMiddleware):
 
 
 class MiddlewareManager:
-    shared: 'MiddlewareManager'
-
     def __init__(self):
         self.middlewares = {}  # type: Dict[Type[BottexMiddleware], Dict[Type[Receiver], Type[HandlerMiddleware]]]
 
@@ -41,7 +39,7 @@ class MiddlewareManager:
         return type(child.__name__, (child, parent), {})
 
 
-MiddlewareManager.shared = MiddlewareManager()
+middlewares = MiddlewareManager()
 
 
 class HandlerBottexMiddleware(BottexMiddleware):
@@ -66,13 +64,13 @@ class Bottex(Receiver):
     def add_middleware(self, middleware: Type[BottexMiddleware]):
         super().add_middleware(middleware)
         for receiver in self._receivers:
-            submiddleware = MiddlewareManager.shared.get_child(middleware, type(receiver))
+            submiddleware = middlewares.get_child(middleware, type(receiver))
             receiver.add_middleware(submiddleware)
 
     def add_receiver(self, receiver: Receiver):
         self._receivers.append(receiver)
         for middleware in self.handler_middlewares:
-            submiddleware = MiddlewareManager.shared.get_child(middleware, type(receiver))
+            submiddleware = middlewares.get_child(middleware, type(receiver))
             receiver.add_middleware(submiddleware)
 
     async def wrap_receiver(self, receiver: Receiver) -> AsyncIterator[Request]:

@@ -4,7 +4,7 @@ from typing import Optional, AsyncIterator
 import aiogram
 import aiohttp
 
-from bottex2.bottex import MiddlewareManager
+from bottex2 import bottex
 from bottex2.chat import AbstractChat, Keyboard
 from bottex2.ext.users import UserBottexMiddleware
 from bottex2.handler import Request
@@ -76,4 +76,4 @@ class TgUserHandlerMiddleware(UserBottexMiddleware):
         return await self.get_or_create('tg', uid)
 
 
-MiddlewareManager.shared.register_child(UserBottexMiddleware, TgReceiver, TgUserHandlerMiddleware)
+bottex.middlewares.register_child(UserBottexMiddleware, TgReceiver, TgUserHandlerMiddleware)

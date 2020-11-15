@@ -3,7 +3,7 @@ import asyncio
 import aiohttp.web
 from aiovk.sessions import TokenSession
 
-from bottex2.bottex import MiddlewareManager
+from bottex2 import bottex
 from bottex2.ext.users import UserBottexMiddleware
 from bottex2.platforms._webhook import AioHttpReceiverMixin, InvalidRequest
 from bottex2.platforms.vk import VkChat, VkUserHandlerMiddleware
@@ -42,4 +42,4 @@ class VkCallbackReceiver(AioHttpReceiverMixin):
             return Request(text=text, chat=chat, raw=request)
 
 
-MiddlewareManager.shared.register_child(UserBottexMiddleware, VkCallbackReceiver, VkUserHandlerMiddleware)
+bottex.middlewares.register_child(UserBottexMiddleware, VkCallbackReceiver, VkUserHandlerMiddleware)
