@@ -9,16 +9,10 @@ from schedule import start_logic, models, configs, env
 
 
 def get_bottex():
-    bottex = Bottex(
-        TgReceiver(configs.tg.token),
-        VkReceiver(configs.vk.token, configs.vk.group_id),
-        # VkCallbackReceiver(token=configs.vk.token,
-        #                    group_id=configs.vk.group_id,
-        #                    host=configs.host,
-        #                    port=configs.vk.port,
-        #                    path='',
-        #                    secret=configs.vk.secret)
-    )
+    bottex = Bottex(receivers=[
+        TgReceiver(token=configs.tg.token),
+        VkReceiver(token=configs.vk.token, group_id=configs.vk.group_id),
+    ])
     bottex.set_handler(start_logic.main)
     return bottex
 

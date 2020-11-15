@@ -2,12 +2,12 @@ from __future__ import annotations
 
 import asyncio
 from dataclasses import dataclass
-from typing import AsyncIterator, Optional
+from typing import AsyncIterator, Optional, Type, Iterable
 
 from bottex2 import bottex
 from bottex2.chat import AbstractChat, Keyboard
 from bottex2.ext.users import UserBottexMiddleware
-from bottex2.handler import Request
+from bottex2.handler import Request, HandlerMiddleware
 from bottex2.receiver import Receiver
 
 
@@ -29,8 +29,8 @@ class PyChat(AbstractChat):
 
 
 class PyReceiver(Receiver):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, middlewares: Iterable[Type[HandlerMiddleware]] = ()):
+        super().__init__(middlewares)
         self._last_id = 0
         self._queue = asyncio.Queue()  # type: asyncio.Queue[PyMessage]
 

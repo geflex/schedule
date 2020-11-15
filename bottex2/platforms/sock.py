@@ -1,9 +1,9 @@
 import asyncio
 import json
-from typing import AsyncIterator, Optional
+from typing import AsyncIterator, Optional, Iterable, Type
 
 from bottex2.chat import AbstractChat, Keyboard
-from bottex2.handler import Request
+from bottex2.handler import Request, HandlerMiddleware
 from bottex2.helpers import aiotools
 from bottex2.receiver import Receiver
 
@@ -21,8 +21,10 @@ class SockChat(AbstractChat):
 
 
 class SockReciever(Receiver):
-    def __init__(self, host='127.0.0.1', port='8888'):
-        super().__init__()
+    def __init__(self,
+                 middlewares: Iterable[Type[HandlerMiddleware]] = (),
+                 *, host='127.0.0.1', port='8888'):
+        super().__init__(middlewares)
         self._host = host
         self._port = port
         self._queue = asyncio.Queue()

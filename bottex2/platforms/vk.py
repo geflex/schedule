@@ -2,7 +2,7 @@ import asyncio
 import json
 import sys
 from random import randint
-from typing import Union, Optional, AsyncIterator
+from typing import Union, Optional, AsyncIterator, Iterable, Type
 
 import aiohttp
 from aiovk import API
@@ -13,7 +13,7 @@ from aiovk.sessions import BaseSession, TokenSession
 from bottex2 import bottex
 from bottex2.chat import AbstractChat, Keyboard
 from bottex2.ext.users import UserBottexMiddleware
-from bottex2.handler import Request
+from bottex2.handler import Request, HandlerMiddleware
 from bottex2.logging import logger
 from bottex2.receiver import Receiver
 
@@ -55,8 +55,8 @@ class VkChat(AbstractChat):
 
 
 class VkReceiver(Receiver):
-    def __init__(self, token: str, group_id: str):
-        super().__init__()
+    def __init__(self, middlewares: Iterable[Type[HandlerMiddleware]] = (), *, token: str, group_id: str):
+        super().__init__(middlewares)
         self._session = TokenSession(access_token=token)
         self._longpoll = BotsLongPoll(self._session, mode=0, group_id=group_id)
 

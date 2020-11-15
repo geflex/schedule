@@ -1,10 +1,9 @@
-from abc import abstractmethod, ABC
-from typing import AsyncIterator, Optional
-
 import asyncio
+from abc import abstractmethod, ABC
+from typing import AsyncIterator, Optional, Type, Iterable
 
 from bottex2.chat import AbstractChat, Keyboard
-from bottex2.handler import Request
+from bottex2.handler import Request, HandlerMiddleware
 from bottex2.receiver import Receiver
 
 
@@ -31,8 +30,8 @@ class WsgiChat(ServerChat):
 
 
 class WsgiReceiver(Receiver):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, middlewares: Iterable[Type[HandlerMiddleware]] = ()):
+        super().__init__(middlewares)
         self._requests = asyncio.Queue()
 
     async def web_handler(self, environ, start_response):

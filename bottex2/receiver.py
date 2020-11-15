@@ -24,9 +24,9 @@ class Receiver(ABC):
     _handler: Handler = None
     _wrapped_handler: Handler = None
 
-    def __init__(self):
+    def __init__(self, middlewares: Iterable[Type[HandlerMiddleware]] = ()):
         super().__init__()
-        self.handler_middlewares = []  # type: List[Type[HandlerMiddleware]]
+        self.handler_middlewares = list(middlewares)  # type: List[Type[HandlerMiddleware]]
 
     def add_middleware(self, middleware: Type[HandlerMiddleware]):
         self.handler_middlewares.append(middleware)

@@ -1,4 +1,4 @@
-from typing import Type, AsyncIterator, Any, Awaitable, List
+from typing import Type, AsyncIterator, Any, Awaitable, List, Iterable
 
 from bottex2.handler import HandlerError, HandlerMiddleware, Request
 from bottex2.helpers import aiotools
@@ -29,8 +29,11 @@ class HandlerBottexMiddleware(BottexMiddleware):
 
 
 class Bottex(Receiver):
-    def __init__(self, *receivers: Receiver, middleware_manager=middlewares):
-        super().__init__()
+    def __init__(self,
+                 middlewares: Iterable[Type[HandlerMiddleware]] = (),
+                 receivers: Iterable[Receiver] = (),
+                 middleware_manager=middlewares):
+        super().__init__(middlewares)
         self.middleware_manager = middleware_manager
         self._receivers = list(receivers)  # type: List[Receiver]
         self.add_middleware(HandlerBottexMiddleware)

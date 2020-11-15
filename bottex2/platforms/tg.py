@@ -1,5 +1,5 @@
 import asyncio
-from typing import Optional, AsyncIterator
+from typing import Optional, AsyncIterator, Type, Iterable
 
 import aiogram
 import aiohttp
@@ -7,7 +7,7 @@ import aiohttp
 from bottex2 import bottex
 from bottex2.chat import AbstractChat, Keyboard
 from bottex2.ext.users import UserBottexMiddleware
-from bottex2.handler import Request
+from bottex2.handler import Request, HandlerMiddleware
 from bottex2.logging import logger
 from bottex2.receiver import Receiver
 
@@ -47,8 +47,10 @@ class TgChat(AbstractChat):
 
 
 class TgReceiver(Receiver):
-    def __init__(self, token: str):
-        super().__init__()
+    def __init__(self,
+                 middlewares: Iterable[Type[HandlerMiddleware]] = (), *,
+                 token: str):
+        super().__init__(middlewares)
         self.bot = aiogram.Bot(token)
 
     async def listen(self) -> AsyncIterator[Request]:

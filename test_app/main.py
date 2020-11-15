@@ -12,10 +12,10 @@ from schedule import configs
 
 
 def get_bottex():
-    bottex = Bottex(
-        TgReceiver(configs.tg.token),
-        VkReceiver(configs.vk.token, configs.vk.group_id),
-    )
+    bottex = Bottex(receivers=[
+        TgReceiver(token=configs.tg.token),
+        VkReceiver(token=configs.vk.token, group_id=configs.vk.group_id),
+    ])
     bottex.set_handler(logic.router)
     return bottex
 
