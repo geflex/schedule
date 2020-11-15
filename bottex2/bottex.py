@@ -1,42 +1,15 @@
-from typing import Type, AsyncIterator, Dict, Any, Awaitable, List
+from typing import Type, AsyncIterator, Any, Awaitable, List
 
 from bottex2.handler import HandlerError, HandlerMiddleware, Request
 from bottex2.helpers import aiotools
 from bottex2.helpers.aiotools import merge_async_iterators
 from bottex2.logging import logger
+from bottex2.middlewares import MiddlewareManager
 from bottex2.receiver import Receiver
 
 
 class BottexMiddleware(HandlerMiddleware):
     __unified__ = False
-
-
-class MiddlewareManager:
-    def __init__(self):
-        self.middlewares = {}  # type: Dict[Type[BottexMiddleware], Dict[Type[Receiver], Type[HandlerMiddleware]]]
-
-    def register_child(self,
-                       parent: Type[BottexMiddleware],
-                       receiver_cls: Type[Receiver],
-                       middleware: Type[HandlerMiddleware]):
-        children = self.get_children(parent)
-        children[receiver_cls] = middleware
-
-    def get_children(self, parent: Type[BottexMiddleware]) -> Dict[Type[Receiver], Type[HandlerMiddleware]]:
-        for registered_parent, children in self.middlewares.items():
-            if issubclass(parent, registered_parent):
-                return children
-        children = {}
-        self.middlewares[parent] = children
-        return children
-
-    def get_child(self,
-                  parent: Type[BottexMiddleware],
-                  receiver_cls: Type[Receiver]) -> Type[HandlerMiddleware]:
-        child = self.get_children(parent).get(receiver_cls)
-        if child is None:
-            return parent
-        return type(child.__name__, (child, parent), {})
 
 
 middlewares = MiddlewareManager()
