@@ -66,3 +66,8 @@ def params_handler(handler: ParamsHandler) -> Handler:
     async def wrapper(request):
         await handler(**request)
     return wrapper
+
+
+def check_middleware(middleware):
+    if not callable(middleware):
+        raise TypeError('middleware must be callable')
