@@ -21,12 +21,14 @@ class ResponseBottexMiddleware(HandlerMiddleware):
 
 
 class Receiver(ABC):
-    _handler: Handler = None
-    _wrapped_handler: Handler = None
-
-    def __init__(self, middlewares: Iterable[Type[HandlerMiddleware]] = ()):
-        super().__init__()
-        self.handler_middlewares = list(middlewares)  # type: List[Type[HandlerMiddleware]]
+    def __init__(self, handler: Handler,
+                 middlewares: Iterable[Type[HandlerMiddleware]] = ()):
+        self.handler_middlewares = []  # type: List[Type[HandlerMiddleware]]
+        self._handler = None
+        self._wrapped_handler = None
+        for middleware in middlewares:
+            self.add_middleware(middleware)
+        self.set_handler(handler)
 
     def add_middleware(self, middleware: Type[HandlerMiddleware]):
         self.handler_middlewares.append(middleware)
@@ -38,10 +40,6 @@ class Receiver(ABC):
         return ResponseBottexMiddleware(handler)
 
     def set_handler(self, handler: Handler) -> Handler:
-        """
-        Sets handler for this reseiver
-        Can be used as a decorator
-        """
         self._handler = handler
         self._wrapped_handler = self.wrap_handler(handler)
         return handler

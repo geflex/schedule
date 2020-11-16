@@ -12,23 +12,21 @@ from schedule import configs
 
 
 def get_bottex():
-    bottex = Bottex(receivers=[
-        TgReceiver(token=configs.tg.token),
-        VkReceiver(token=configs.vk.token, group_id=configs.vk.group_id),
-    ])
-    bottex.set_handler(logic.router)
+    receivers = [
+        TgReceiver(None, token=configs.tg.token),
+        VkReceiver(None, token=configs.vk.token, group_id=configs.vk.group_id),
+    ]
+    middlewares = [
+        users.UserBottexMiddleware,
+        logging_ext.BottexLoggingMiddleware
+    ]
+    bottex = Bottex(logic.router, middlewares, receivers)
     return bottex
-
-
-def set_middlewares(bottex):
-    bottex.add_middleware(users.UserBottexMiddleware)
-    bottex.add_middleware(logging_ext.BottexLoggingMiddleware)
 
 
 def main():
     set_sql_user_model()
     bottex = get_bottex()
-    set_middlewares(bottex)
     bottex.serve_forever()
 
 

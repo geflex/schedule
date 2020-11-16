@@ -9,12 +9,15 @@ from schedule import start_logic, models, configs, env
 
 
 def get_bottex():
-    bottex = Bottex(receivers=[
-        TgReceiver(token=configs.tg.token),
-        VkReceiver(token=configs.vk.token, group_id=configs.vk.group_id),
-    ])
-    bottex.set_handler(start_logic.main)
-    return bottex
+    middlewares = [
+        env.i18n.Middleware,
+        users.user_middleware(models.User),
+    ]
+    receivers = [
+        TgReceiver(None, token=configs.tg.token),
+        VkReceiver(None, token=configs.vk.token, group_id=configs.vk.group_id),
+    ]
+    return Bottex(start_logic.main, middlewares, receivers)
 
 
 def setup_db():
@@ -23,15 +26,9 @@ def setup_db():
     sqldb.set_engine(engine)
 
 
-def set_middlewares(bottex):
-    bottex.add_middleware(env.i18n.Middleware)
-    bottex.add_middleware(users.user_middleware(models.User))
-
-
 def main():
     setup_db()
     bottex = get_bottex()
-    set_middlewares(bottex)
     bottex.serve_forever()
 
 

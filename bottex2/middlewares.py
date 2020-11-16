@@ -1,22 +1,21 @@
 from typing import Type, Dict
 
-from bottex2.bottex import BottexMiddleware
 from bottex2.handler import HandlerMiddleware
 from bottex2.receiver import Receiver
 
 
 class MiddlewareManager:
     def __init__(self):
-        self.middlewares = {}  # type: Dict[Type[BottexMiddleware], Dict[Type[Receiver], Type[HandlerMiddleware]]]
+        self.middlewares = {}  # type: Dict[Type[HandlerMiddleware], Dict[Type[Receiver], Type[HandlerMiddleware]]]
 
     def register_child(self,
-                       parent: Type[BottexMiddleware],
+                       parent: Type[HandlerMiddleware],
                        receiver_cls: Type[Receiver],
                        middleware: Type[HandlerMiddleware]):
         children = self.get_children(parent)
         children[receiver_cls] = middleware
 
-    def get_children(self, parent: Type[BottexMiddleware]) -> Dict[Type[Receiver], Type[HandlerMiddleware]]:
+    def get_children(self, parent: Type[HandlerMiddleware]) -> Dict[Type[Receiver], Type[HandlerMiddleware]]:
         for registered_parent, children in self.middlewares.items():
             if issubclass(parent, registered_parent):
                 return children
@@ -25,7 +24,7 @@ class MiddlewareManager:
         return children
 
     def get_child(self,
-                  parent: Type[BottexMiddleware],
+                  parent: Type[HandlerMiddleware],
                   receiver_cls: Type[Receiver]) -> Type[HandlerMiddleware]:
         child = self.get_children(parent).get(receiver_cls)
         if child is None:

@@ -1,6 +1,6 @@
 from typing import Type, AsyncIterator, Any, Awaitable, List, Iterable
 
-from bottex2.handler import HandlerError, HandlerMiddleware, Request
+from bottex2.handler import HandlerError, HandlerMiddleware, Request, Handler
 from bottex2.helpers import aiotools
 from bottex2.helpers.aiotools import merge_async_iterators
 from bottex2.logging import logger
@@ -30,13 +30,14 @@ class HandlerBottexMiddleware(BottexMiddleware):
 
 class Bottex(Receiver):
     def __init__(self,
+                 handler: Handler,
                  middlewares: Iterable[Type[HandlerMiddleware]] = (),
                  receivers: Iterable[Receiver] = (),
                  middleware_manager=middlewares):
-        super().__init__(middlewares)
         self.middleware_manager = middleware_manager
         self._receivers = list(receivers)  # type: List[Receiver]
-        self.add_middleware(HandlerBottexMiddleware)
+        middlewares = [HandlerBottexMiddleware] + list(middlewares)
+        super().__init__(handler, middlewares)
 
     def add_middleware(self, middleware: Type[BottexMiddleware]):
         super().add_middleware(middleware)
