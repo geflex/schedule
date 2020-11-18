@@ -106,7 +106,7 @@ class I18nEnv:
                  domain: str,
                  reversed_domain='reversed',
                  reversible_domain='reversible'):
-        self.enum = enum
+        self.Lang = enum
         self.default_lang = default_lang
         self.reversed_domain = reversed_domain
         self.reversible_domain_name = reversible_domain
