@@ -1,8 +1,8 @@
 from functools import partial
 
-from sqlalchemy import create_engine as _create_engine
-from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.ext.declarative import declarative_base as _declarative_base
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.sql.schema import MetaData
 
 Session = sessionmaker()
 
@@ -10,7 +10,16 @@ Session = sessionmaker()
 # noinspection PyArgumentList
 class _Model:
     session = Session()
+    metadata: MetaData
     __tablename__: str
+
+    @classmethod
+    def set_engine(cls, engine):
+        cls.session.bind = engine
+
+    @classmethod
+    def create_tables(cls):
+        cls.metadata.create_all(cls.session.bind)
 
     @classmethod
     async def get_or_create(cls, **kwargs):
@@ -34,18 +43,5 @@ class _Model:
         self.session.commit()
 
 
-Model = declarative_base(cls=_Model)
-
-
-def create_tables(engine):
-    Model.metadata.create_all(engine)
-
-
-def create_engine(*args, **kwargs):
-    engine = _create_engine(*args, **kwargs)
-    engine.create_tables = partial(create_tables, engine)
-    return engine
-
-
-def set_engine(engine):
-    Model.session.bind = engine
+declarative_base = partial(_declarative_base, cls=_Model)
+Model = declarative_base()

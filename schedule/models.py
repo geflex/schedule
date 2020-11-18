@@ -1,12 +1,16 @@
 from enum import Enum, IntFlag
 
-from sqlalchemy import Column, Table, ForeignKey
+from sqlalchemy import Column, Table, ForeignKey, create_engine
 from sqlalchemy import types as sqltypes
 
 from bottex2.ext.rights import RightsUserMixin
 from bottex2.ext.users import UserModel
 from bottex2.sqlalchemy import Model
-from . import env
+from . import env, configs
+
+engine = create_engine(configs.db_url)
+Model.set_engine(engine)
+Model.create_tables()
 
 
 class Department(Enum):

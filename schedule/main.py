@@ -1,6 +1,5 @@
 import logging
 
-from bottex2 import sqlalchemy as sqldb
 from bottex2.bottex import Bottex
 from bottex2.ext import users
 from bottex2.platforms.tg import TgReceiver
@@ -20,14 +19,7 @@ def get_bottex():
     return Bottex(start_logic.main, middlewares, receivers)
 
 
-def setup_db():
-    engine = sqldb.create_engine(configs.db_url)
-    engine.create_tables()
-    sqldb.set_engine(engine)
-
-
 def main():
-    setup_db()
     bottex = get_bottex()
     bottex.serve_forever()
 
