@@ -103,6 +103,7 @@ class I18nEnv:
     def __init__(self,
                  enum: Type[Enum],
                  default_lang: Enum,
+                 domain: str,
                  reversed_domain='reversed',
                  reversible_domain='reversible'):
         self.enum = enum
@@ -111,6 +112,7 @@ class I18nEnv:
         self.reversible_domain_name = reversible_domain
 
         self.translate = partial(translate, default_lang=default_lang)
+        self.gettext = partial(gettext, domain=domain)
         self.rgettext = partial(gettext, domain=reversible_domain)
 
         self.Middleware = type('I18nBottexMiddleware', (I18nBottexMiddleware, ), {

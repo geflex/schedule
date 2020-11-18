@@ -3,10 +3,11 @@ from enum import Enum, IntFlag
 from sqlalchemy import Column, Table, ForeignKey, create_engine
 from sqlalchemy import types as sqltypes
 
+from bottex2.ext.i18n import I18nEnv
 from bottex2.ext.rights import RightsUserMixin
 from bottex2.ext.users import UserModel
 from bottex2.sqlalchemy import Model
-from . import env, configs
+from . import configs
 
 engine = create_engine(configs.db_url)
 Model.set_engine(engine)
@@ -53,10 +54,17 @@ class Rights(IntFlag):
     notifying = 3
 
 
+class Lang(Enum):
+    ru = 'ru'
+    en = 'en'
+    be = 'be'
+
+
+i18n = I18nEnv(Lang, default_lang=Lang.ru, domain='schedule')
 subgroups = sqltypes.Enum('1', '2', name='subgroup')
 
 
-class User(UserModel, env.i18n.UserMixin, RightsUserMixin):
+class User(UserModel, i18n.UserMixin, RightsUserMixin):
     notifications_time = Column(sqltypes.Time, nullable=True)
 
     rights = Column(sqltypes.Enum(Rights))

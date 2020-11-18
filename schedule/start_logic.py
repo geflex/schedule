@@ -6,18 +6,16 @@ from bottex2.ext.users import gen_state_cases
 from bottex2.handler import Request
 from bottex2.helpers.tools import state_name
 from bottex2.router import Router
-from . import env
-from . import inputs
-from . import main_logic
+from . import inputs, models, main_logic
 
-_ = env.i18n.gettext
-_c = env.i18n.rgettext
+_ = models.i18n.gettext
+_c = models.i18n.rgettext
 
 
 class StartLanguageInput(inputs.BaseLanguageInput):
     name = 'start_setup'
 
-    def get_lang_setter(self, lang: env.Lang):
+    def get_lang_setter(self, lang: models.Lang):
         super_setter = super().get_lang_setter(lang)
         async def setter(r: Request):
             await super_setter(r)

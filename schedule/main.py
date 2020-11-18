@@ -4,12 +4,12 @@ from bottex2.bottex import Bottex
 from bottex2.ext import users
 from bottex2.platforms.tg import TgReceiver
 from bottex2.platforms.vk import VkReceiver
-from schedule import start_logic, models, configs, env
+from schedule import start_logic, models, configs
 
 
 def get_bottex():
     middlewares = [
-        env.i18n.Middleware,
+        models.i18n.Middleware,
         users.user_middleware(models.User),
     ]
     receivers = [

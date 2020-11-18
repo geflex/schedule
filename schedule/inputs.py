@@ -8,11 +8,10 @@ from bottex2.handler import Request
 from bottex2.helpers import regexp
 from bottex2.router import Router
 from bottex2.views import View, Command
-from . import env
-from .models import PType
+from . import models
 
-_ = env.i18n.gettext
-_c = env.i18n.rgettext
+_ = models.i18n.gettext
+_c = models.i18n.rgettext
 
 
 class PTypeInput(View):
@@ -24,10 +23,10 @@ class PTypeInput(View):
         ]]
 
     async def set_stutent_ptype(self, r: Request):
-        await self.r.user.update(ptype=PType.student)
+        await self.r.user.update(ptype=models.PType.student)
 
     async def set_teacher_ptype(self, r: Request):
-        await self.r.user.update(ptype=PType.teacher)
+        await self.r.user.update(ptype=models.PType.teacher)
 
     async def default(self, r: Request):
         return r.resp(_('Неизвестный тип профиля'), self.keyboard)
@@ -38,11 +37,11 @@ class BaseLanguageInput(View):
     def commands(self):
         commands = [
             [Command(lang.value, self.get_lang_setter(lang))]
-            for lang in env.i18n.enum
+            for lang in models.i18n.enum
         ]
         return commands
 
-    def get_lang_setter(self, lang: env.Lang):
+    def get_lang_setter(self, lang: models.Lang):
         async def setter(r: Request):
             await r.user.update(locale=lang)
         return setter

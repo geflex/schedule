@@ -5,13 +5,12 @@ from bottex2.ext.users import gen_state_cases
 from bottex2.handler import Request
 from bottex2.helpers.tools import state_name
 from bottex2.views import View, Command
-from schedule.dateutils import Date
-from schedule.models import PType
-from . import env
 from . import inputs
+from .dateutils import Date
+from .models import PType, i18n, Lang
 
-_ = env.i18n.gettext
-_c = env.i18n.rgettext
+_ = i18n.gettext
+_c = i18n.rgettext
 
 
 class Settings(View):
@@ -74,7 +73,7 @@ class SettingsLanguageInput(inputs.BaseLanguageInput, BaseSettingsInput):
         commands2 = super(inputs.BaseLanguageInput, self).commands
         return commands + commands2
 
-    def get_lang_setter(self, lang: env.Lang):
+    def get_lang_setter(self, lang: Lang):
         super_setter = super().get_lang_setter(lang)
         async def setter(r: Request):
             old = r.user.locale
