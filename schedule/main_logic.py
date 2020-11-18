@@ -56,12 +56,7 @@ class Settings(View):
 class BaseSettingsInput(View):
     @property
     def commands(self):
-        return [[Command(_c('Отмена'), self.back)]]
-
-    @classmethod
-    async def back(cls, r: Request):
-        await r.user.update(state=state_name(Settings))
-        return r.resp(_('Ладно'), Settings(r).keyboard)
+        return [[Command(_c('Отмена'), Settings.switch)]]
 
 
 class SettingsLanguageInput(inputs.BaseLanguageInput, BaseSettingsInput):
