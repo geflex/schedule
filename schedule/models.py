@@ -107,6 +107,7 @@ class Place(Model):
 
     id = Column(sqltypes.Integer, primary_key=True)
     building_id = Column(sqltypes.Integer, ForeignKey('buildings.id'))
+    building = relationship(Building)
     auditory = Column(sqltypes.String)
 
 
