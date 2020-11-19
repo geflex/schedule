@@ -98,8 +98,6 @@ lesson_teachers = Table('lesson_teachers', Model.metadata,
 
 class Building(Model):
     __tablename__ = 'buildings'
-    subgroup = Column(sqltypes.Enum('1', '2', name='subgroup'))  # only for student
-
     id = Column(sqltypes.Integer, primary_key=True)
     name = Column(sqltypes.String)
 
