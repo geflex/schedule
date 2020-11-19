@@ -47,4 +47,4 @@ class VkCallbackReceiver(AioHttpReceiverMixin):
             return Request(text=text, chat=chat, raw=request)
 
 
-bottex.middlewares.register_child(UserBottexMiddleware, VkCallbackReceiver, VkUserHandlerMiddleware)
+bottex.manager.register_child(UserBottexMiddleware, VkCallbackReceiver, VkUserHandlerMiddleware)

@@ -84,4 +84,4 @@ class VkUserHandlerMiddleware(UserBottexMiddleware):
         return await self.get_or_create('vk', uid)
 
 
-bottex.middlewares.register_child(UserBottexMiddleware, VkReceiver, VkUserHandlerMiddleware)
+bottex.manager.register_child(UserBottexMiddleware, VkReceiver, VkUserHandlerMiddleware)

@@ -54,4 +54,4 @@ class PyUserHandlerMiddleware(UserBottexMiddleware):
         return await self.get_or_create('py', 'default')
 
 
-bottex.middlewares.register_child(UserBottexMiddleware, PyReceiver, PyUserHandlerMiddleware)
+bottex.manager.register_child(UserBottexMiddleware, PyReceiver, PyUserHandlerMiddleware)

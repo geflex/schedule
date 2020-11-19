@@ -30,4 +30,4 @@ class TgWebHookReceiver(AioHttpReceiverMixin):
         return Request(text=text, chat=chat, raw=request)
 
 
-bottex.middlewares.register_child(UserBottexMiddleware, TgWebHookReceiver, TgUserHandlerMiddleware)
+bottex.manager.register_child(UserBottexMiddleware, TgWebHookReceiver, TgUserHandlerMiddleware)

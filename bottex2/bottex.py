@@ -12,7 +12,7 @@ class BottexMiddleware(HandlerMiddleware):
     __unified__ = False
 
 
-middlewares = MiddlewareManager()
+manager = MiddlewareManager()
 
 
 class HandlerBottexMiddleware(BottexMiddleware):
@@ -33,7 +33,7 @@ class Bottex(Receiver):
                  handler: Handler,
                  middlewares: Iterable[Type[HandlerMiddleware]] = (),
                  receivers: Iterable[Receiver] = (),
-                 middleware_manager=middlewares):
+                 middleware_manager=manager):
         self.middleware_manager = middleware_manager
         self._receivers = list(receivers)  # type: List[Receiver]
         middlewares = [HandlerBottexMiddleware] + list(middlewares)

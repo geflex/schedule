@@ -78,4 +78,4 @@ class TgUserHandlerMiddleware(UserBottexMiddleware):
         return await self.get_or_create('tg', uid)
 
 
-bottex.middlewares.register_child(UserBottexMiddleware, TgReceiver, TgUserHandlerMiddleware)
+bottex.manager.register_child(UserBottexMiddleware, TgReceiver, TgUserHandlerMiddleware)
