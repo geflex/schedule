@@ -1,11 +1,11 @@
-import re
 import os
+import re
 from itertools import zip_longest, chain
 from typing import Match
 
 import xlrd
-from schedule import models
 
+from schedule import models
 
 WEEKDAYS = [
     'понедельник',
@@ -183,21 +183,21 @@ exceptions = {
 
 class LessonArea(BaseArea):
     def save(self):
-        # !!!
-        doc = models.Lesson.get(
-            groups=self.groups,
-            weeknum=self.weeknum,
-            weekday=self.weekday,
-            subgroup=self.subgroup,
-            time=self.time,
-            name=self.name,
-            teachers=self.teachers,
-            building=self.building,
-            auditories=self.auditories
-        )
-        if hasattr(self, '_doc_id'):
-            doc['_id'] = self._doc_id
-        self._doc_id = collection.insert_one(doc)
+        lesson = models.Lesson()
+        lesson.weeknum = self.weeknum
+        lesson.weekday = self.weekday
+        lesson.subgroup = self.subgroup
+        lesson.time = self.time
+        lesson.name = self.name
+
+        building = models.Building(name=self.building)
+
+        lesson.groups = [models.Group(name=g) for g in self.groups]
+        lesson.teachers = [models.Teacher(last_name=name) for name in self.teachers]
+        lesson.places = [models.Place(building=building, auditory=a) for a in self.auditories]
+
+        lesson.session.add(lesson)
+        lesson.sessiion.commit()
 
     def parse(self):
         self.name = None  # строка, которая останется после удаления совпадений
