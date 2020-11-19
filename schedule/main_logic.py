@@ -103,7 +103,7 @@ class SettingsGroupInput(inputs.BaseGroupInput, BaseSettingsInput):
         await super().set_group(r)
         await r.user.update(state=state_name(Settings))
         return r.resp(
-            _('Группа изменена с {} на {}').format(old, r.user.group),
+            _('Группа изменена с {} на {}').format(old.name, r.user.group.name),
             Settings(r).keyboard
         )
 
@@ -111,7 +111,7 @@ class SettingsGroupInput(inputs.BaseGroupInput, BaseSettingsInput):
     async def switch(cls, r: Request):
         kb = cls(r).keyboard
         await super().switch(r)
-        return [r.resp(_('Текущая группа: {}').format(r.user.group), kb),
+        return [r.resp(_('Текущая группа: {}').format(r.user.group.name), kb),
                 r.resp(_('Введи номер группы'), kb)]
 
 
@@ -274,7 +274,7 @@ class Schedule(View):
 
     async def _schedule(self, date: Date, r: Request):
         if r.user.ptype is PType.student:
-            who = r.user.group
+            who = r.user.group.name
         else:
             who = r.user.name
 

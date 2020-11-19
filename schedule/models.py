@@ -1,7 +1,7 @@
 from enum import Enum, IntFlag
 
 from sqlalchemy import Column, Table, ForeignKey, create_engine
-from sqlalchemy import types as sqltypes
+from sqlalchemy import types as satypes
 from sqlalchemy.orm import relationship
 
 from bottex2.ext.i18n import I18nEnv
@@ -62,68 +62,70 @@ class Lang(Enum):
 
 
 i18n = I18nEnv(Lang, default_lang=Lang.ru, domain='schedule')
-subgroups = sqltypes.Enum('1', '2', name='subgroup')
+subgroups = satypes.Enum('1', '2', name='subgroup')
 
 
 class User(UserModel, i18n.UserMixin, RightsUserMixin):
-    notifications_time = Column(sqltypes.Time, nullable=True)
+    notifications_time = Column(satypes.Time, nullable=True)
 
-    rights = Column(sqltypes.Enum(Rights))
+    rights = Column(satypes.Enum(Rights))
 
-    ptype = Column(sqltypes.Enum(PType))
-    name = Column(sqltypes.String)  # for teacher
-    group = Column(sqltypes.String)  # only for student
+    ptype = Column(satypes.Enum(PType))
+    name = Column(satypes.String)  # for teacher
+    group_id = Column(satypes.Integer, ForeignKey('groups.id'))
     subgroup = Column(subgroups)  # only for student
+
+    group = relationship("Group")
 
 
 class Group(Model):
     __tablename__ = 'groups'
 
-    id = Column(sqltypes.Integer, primary_key=True)
-    name = Column(sqltypes.String)
+    id = Column(satypes.Integer, primary_key=True)
+    name = Column(satypes.String)
 
 
 class Teacher(Model):
     __tablename__ = 'teachers'
 
-    id = Column(sqltypes.Integer, primary_key=True)
-    last_name = Column(sqltypes.String)
+    id = Column(satypes.Integer, primary_key=True)
+    last_name = Column(satypes.String)
 
 
 lesson_teachers = Table('lesson_teachers', Model.metadata,
-    Column('lesson_id', sqltypes.Integer, ForeignKey('lessons.id')),
-    Column('teacher_id', sqltypes.Integer, ForeignKey('teachers.id'))
-)
+                        Column('lesson_id', satypes.Integer, ForeignKey('lessons.id')),
+                        Column('teacher_id', satypes.Integer, ForeignKey('teachers.id'))
+                        )
 
 
 class Building(Model):
     __tablename__ = 'buildings'
-    id = Column(sqltypes.Integer, primary_key=True)
-    name = Column(sqltypes.String)
+    id = Column(satypes.Integer, primary_key=True)
+    name = Column(satypes.String)
 
 
 class Place(Model):
     __tablename__ = 'places'
 
-    id = Column(sqltypes.Integer, primary_key=True)
-    building_id = Column(sqltypes.Integer, ForeignKey('buildings.id'))
+    id = Column(satypes.Integer, primary_key=True)
+    building_id = Column(satypes.Integer, ForeignKey('buildings.id'))
     building = relationship(Building)
-    auditory = Column(sqltypes.String)
+    auditory = Column(satypes.String)
 
 
 class Lesson(Model):
     __tablename__ = 'lessons'
 
-    id = Column(sqltypes.Integer, primary_key=True)
-    weeknum = Column(sqltypes.Boolean)
-    weekday = Column(sqltypes.Enum(Weekday))
+    id = Column(satypes.Integer, primary_key=True)
+    weeknum = Column(satypes.Boolean)
+    weekday = Column(satypes.Enum(Weekday))
     subgroup = Column(subgroups)
-    time = Column(sqltypes.Time)
-    name = Column(sqltypes.String)
+    time = Column(satypes.Time)
+    name = Column(satypes.String)
 
-    group_ids = Column(sqltypes.Integer, ForeignKey('groups.id'))
-    teacher_ids = Column(sqltypes.Integer, ForeignKey('teachers.id'))
-    place_ids = Column(sqltypes.Integer, ForeignKey('places.id'))
+    group_ids = Column(satypes.Integer, ForeignKey('groups.id'))
+    teacher_ids = Column(satypes.Integer, ForeignKey('teachers.id'))
+    place_ids = Column(satypes.Integer, ForeignKey('places.id'))
 
     groups = relationship(Group)
     teachers = relationship(Teacher, secondary=lesson_teachers)
