@@ -2,6 +2,7 @@ from enum import Enum, IntFlag
 
 from sqlalchemy import Column, Table, ForeignKey, create_engine
 from sqlalchemy import types as sqltypes
+from sqlalchemy.orm import relationship
 
 from bottex2.ext.i18n import I18nEnv
 from bottex2.ext.rights import RightsUserMixin
@@ -115,11 +116,16 @@ class Lesson(Model):
     __tablename__ = 'lessons'
 
     id = Column(sqltypes.Integer, primary_key=True)
-    group_ids = Column(sqltypes.Integer, ForeignKey('groups.id'))
     weeknum = Column(sqltypes.Boolean)
     weekday = Column(sqltypes.Enum(Weekday))
     subgroup = Column(subgroups)
     time = Column(sqltypes.Time)
     name = Column(sqltypes.String)
+
+    group_ids = Column(sqltypes.Integer, ForeignKey('groups.id'))
     teacher_ids = Column(sqltypes.Integer, ForeignKey('teachers.id'))
     place_ids = Column(sqltypes.Integer, ForeignKey('places.id'))
+
+    groups = relationship(Group)
+    teachers = relationship(Teacher, secondary=lesson_teachers)
+    places = relationship(Place)
