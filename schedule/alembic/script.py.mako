@@ -5,6 +5,9 @@ Revises: ${down_revision | comma,n}
 Create Date: ${create_date}
 
 """
+
+import pathlib
+import sys; sys.path.append(str(pathlib.Path().absolute()))
 from alembic import op
 import sqlalchemy as sa
 ${imports if imports else ""}

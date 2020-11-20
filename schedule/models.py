@@ -72,7 +72,7 @@ class User(UserModel, i18n.UserMixin, RightsUserMixin):
 
     ptype = Column(satypes.Enum(PType))
     name = Column(satypes.String)  # for teacher
-    group_id = Column(satypes.Integer, ForeignKey('groups.id'))
+    group_name = Column(satypes.String, ForeignKey('groups.name'))
     subgroup = Column(subgroups)  # only for student
 
     group = relationship("Group")
@@ -80,9 +80,7 @@ class User(UserModel, i18n.UserMixin, RightsUserMixin):
 
 class Group(Model):
     __tablename__ = 'groups'
-
-    id = Column(satypes.Integer, primary_key=True)
-    name = Column(satypes.String)
+    name = Column(satypes.String, primary_key=True)
 
 
 class Teacher(Model):
@@ -100,15 +98,14 @@ lesson_teachers = Table('lesson_teachers', Model.metadata,
 
 class Building(Model):
     __tablename__ = 'buildings'
-    id = Column(satypes.Integer, primary_key=True)
-    name = Column(satypes.String)
+    name = Column(satypes.String, primary_key=True)
 
 
 class Place(Model):
     __tablename__ = 'places'
 
     id = Column(satypes.Integer, primary_key=True)
-    building_id = Column(satypes.Integer, ForeignKey('buildings.id'))
+    building_name = Column(satypes.String, ForeignKey('buildings.name'))
     building = relationship(Building)
     auditory = Column(satypes.String)
 
@@ -123,7 +120,7 @@ class Lesson(Model):
     time = Column(satypes.Time)
     name = Column(satypes.String)
 
-    group_ids = Column(satypes.Integer, ForeignKey('groups.id'))
+    group_names = Column(satypes.String, ForeignKey('groups.name'))
     teacher_ids = Column(satypes.Integer, ForeignKey('teachers.id'))
     place_ids = Column(satypes.Integer, ForeignKey('places.id'))
 

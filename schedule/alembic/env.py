@@ -1,8 +1,5 @@
 import pathlib
-import sys;
-sys.path.extend([
-    str(pathlib.Path().absolute()),
-])
+import sys; sys.path.append(str(pathlib.Path().absolute()))
 
 from logging.config import fileConfig
 
