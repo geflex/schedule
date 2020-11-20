@@ -13,6 +13,10 @@ _ = i18n.gettext
 _c = i18n.rgettext
 
 
+def group_str(group):
+    return group.name if group else ''
+
+
 class Settings(View):
     name = 'settings'
     
@@ -103,7 +107,7 @@ class SettingsGroupInput(inputs.BaseGroupInput, BaseSettingsInput):
         await super().set_group(r)
         await r.user.update(state=state_name(Settings))
         return r.resp(
-            _('Группа изменена с {} на {}').format(old.name, r.user.group.name),
+            _('Группа изменена с {} на {}').format(group_str(old), group_str(r.user.group)),
             Settings(r).keyboard
         )
 
@@ -111,7 +115,7 @@ class SettingsGroupInput(inputs.BaseGroupInput, BaseSettingsInput):
     async def switch(cls, r: Request):
         kb = cls(r).keyboard
         await super().switch(r)
-        return [r.resp(_('Текущая группа: {}').format(r.user.group.name), kb),
+        return [r.resp(_('Текущая группа: {}').format(group_str(r.user.group)), kb),
                 r.resp(_('Введи номер группы'), kb)]
 
 
