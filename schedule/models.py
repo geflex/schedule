@@ -83,12 +83,18 @@ class Group(Model):
     __tablename__ = 'groups'
     name = Column(satypes.String, unique=True, primary_key=True)
 
+    def __init__(self, name, **kwargs):
+        super().__init__(name=name, **kwargs)
+
 
 class Teacher(Model):
     __tablename__ = 'teachers'
 
     id = Column(satypes.Integer, primary_key=True)
     last_name = Column(satypes.String)
+
+    def __init__(self, last_name, **kwargs):
+        super().__init__(last_name=last_name, **kwargs)
 
 
 lesson_teachers = Table('lesson_teachers', Model.metadata,
@@ -113,6 +119,9 @@ class Building(Model):
     __tablename__ = 'buildings'
     name = Column(satypes.String, unique=True, primary_key=True)
 
+    def __init__(self, name, **kwargs):
+        super().__name__(name=name, **kwargs)
+
 
 class Place(Model):
     __tablename__ = 'places'
@@ -121,6 +130,9 @@ class Place(Model):
     building_name = Column(satypes.String, ForeignKey('buildings.name'))
     building = relationship(Building)
     auditory = Column(satypes.String)
+
+    def __init__(self, building, auditory, **kwargs):
+        super().__name__(building_name=building.name, auditory=auditory, **kwargs)
 
 
 class Lesson(Model):
