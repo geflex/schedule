@@ -126,8 +126,6 @@ class Lesson(Model):
     time = Column(satypes.Time)
     name = Column(satypes.String)
 
-    group_names = Column(satypes.String, ForeignKey('groups.name'))
-    teacher_ids = Column(satypes.Integer, ForeignKey('teachers.id'))
     place_ids = Column(satypes.Integer, ForeignKey('places.id'))
 
     groups = relationship(Group, secondary=lesson_groups)
