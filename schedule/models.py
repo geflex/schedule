@@ -13,6 +13,7 @@ from . import configs
 engine = create_engine(configs.db_url)
 Model.set_engine(engine)
 Model.create_tables()
+session = Model.session
 
 
 class Department(Enum):
