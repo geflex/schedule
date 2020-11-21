@@ -74,7 +74,9 @@ class I18nBottexMiddleware(BottexMiddleware):
         return translate(text, locale, default_lang=cls.default_lang.value)
 
     @classmethod
-    def tranlate_keyboard(cls, kb: Keyboard, locale: str):
+    def tranlate_keyboard(cls, kb: Optional[Keyboard], locale: str):
+        if kb is None:
+            return kb
         for line in kb.buttons:
             for button in line:
                 button.label = cls.translate(button.label, locale)
