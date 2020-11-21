@@ -1,3 +1,10 @@
+try:
+    from .setupenv import setupenv
+    setupenv()
+except ImportError:
+    def setupenv():
+        pass
+
 import datetime
 import os
 
