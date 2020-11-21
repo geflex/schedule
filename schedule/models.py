@@ -86,6 +86,9 @@ class Group(Model):
     def __init__(self, name, **kwargs):
         super().__init__(name=name, **kwargs)
 
+    def __repr__(self):
+        return f'Group({self.name!r})'
+
 
 class Teacher(Model):
     __tablename__ = 'teachers'
@@ -95,6 +98,9 @@ class Teacher(Model):
 
     def __init__(self, last_name, **kwargs):
         super().__init__(last_name=last_name, **kwargs)
+
+    def __repr__(self):
+        return f'Teacher({self.last_name!r})'
 
 
 lesson_teachers = Table('lesson_teachers', Model.metadata,
@@ -122,6 +128,9 @@ class Building(Model):
     def __init__(self, name, **kwargs):
         super().__name__(name=name, **kwargs)
 
+    def __repr__(self):
+        return f'Building({self.name!r})'
+
 
 class Place(Model):
     __tablename__ = 'places'
@@ -133,6 +142,9 @@ class Place(Model):
 
     def __init__(self, building, auditory, **kwargs):
         super().__name__(building_name=building.name, auditory=auditory, **kwargs)
+
+    def __repr__(self):
+        return f'Group({self.building!r}, {self.auditory!r})'
 
 
 class Lesson(Model):
