@@ -22,6 +22,10 @@ class _Model:
         cls.metadata.create_all(cls.session.bind)
 
     @classmethod
+    def query(cls):
+        return cls.session.query(cls)
+
+    @classmethod
     async def get_or_create(cls, **kwargs):
         user = cls.session.query(cls).filter_by(**kwargs).one_or_none()
         if user is None:
