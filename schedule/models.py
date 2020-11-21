@@ -80,7 +80,7 @@ class User(UserModel, i18n.UserMixin, RightsUserMixin):
 
 class Group(Model):
     __tablename__ = 'groups'
-    name = Column(satypes.String, primary_key=True)
+    name = Column(satypes.String, unique=True, primary_key=True)
 
 
 class Teacher(Model):
@@ -102,9 +102,15 @@ lesson_groups = Table('lesson_groups', Model.metadata,
                       )
 
 
+lesson_places = Table('lesson_places', Model.metadata,
+                      Column('lesson_id', satypes.Integer, ForeignKey('lessons.id')),
+                      Column('place_id', satypes.Integer, ForeignKey('places.id'))
+                      )
+
+
 class Building(Model):
     __tablename__ = 'buildings'
-    name = Column(satypes.String, primary_key=True)
+    name = Column(satypes.String, unique=True, primary_key=True)
 
 
 class Place(Model):
