@@ -134,4 +134,4 @@ class Lesson(Model):
 
     groups = relationship(Group, secondary=lesson_groups)
     teachers = relationship(Teacher, secondary=lesson_teachers)
-    places = relationship(Place)
+    places = relationship(Place, secondary=lesson_places)
