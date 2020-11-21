@@ -96,6 +96,12 @@ lesson_teachers = Table('lesson_teachers', Model.metadata,
                         )
 
 
+lesson_groups = Table('lesson_groups', Model.metadata,
+                      Column('lesson_id', satypes.Integer, ForeignKey('lessons.id')),
+                      Column('group_name', satypes.String, ForeignKey('groups.name'))
+                      )
+
+
 class Building(Model):
     __tablename__ = 'buildings'
     name = Column(satypes.String, primary_key=True)
@@ -124,6 +130,6 @@ class Lesson(Model):
     teacher_ids = Column(satypes.Integer, ForeignKey('teachers.id'))
     place_ids = Column(satypes.Integer, ForeignKey('places.id'))
 
-    groups = relationship(Group)
+    groups = relationship(Group, secondary=lesson_groups)
     teachers = relationship(Teacher, secondary=lesson_teachers)
     places = relationship(Place)
