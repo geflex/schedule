@@ -26,10 +26,11 @@ def course_start(dt: date) -> Date:
     return Date(year, 9, 1)
 
 
-def get_week_num(dt: date) -> int:
+def is_second_weeknum(dt: date) -> int:
     delta = dt - course_start(dt)
     total_weeks = delta // timedelta(weeks=1)
-    return total_weeks % 2 + 1
+    num = total_weeks % 2
+    return num == 1
 
 
 def get_week_range(dt: date) -> Tuple[date, date]:
