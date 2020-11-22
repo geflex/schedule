@@ -155,7 +155,7 @@ class Lesson(Model):
     __tablename__ = 'lessons'
 
     id = Column(satypes.Integer, primary_key=True)
-    weeknum = Column(satypes.Boolean)
+    second_weeknum = Column(satypes.Boolean)
     weekday = Column(satypes.Enum(Weekday))
     subgroup = Column(subgroups)
     time = Column(satypes.Time)
