@@ -126,7 +126,7 @@ class Building(Model):
     name = Column(satypes.String, unique=True, primary_key=True)
 
     def __init__(self, name, **kwargs):
-        super().__name__(name=name, **kwargs)
+        super().__init__(name=name, **kwargs)
 
     def __repr__(self):
         return f'Building({self.name!r})'
@@ -141,7 +141,11 @@ class Place(Model):
     auditory = Column(satypes.String)
 
     def __init__(self, building, auditory, **kwargs):
-        super().__name__(building_name=building.name, auditory=auditory, **kwargs)
+        if building is None:
+            building_name = None
+        else:
+            building_name = building.name
+        super().__init__(building_name=building_name, auditory=auditory, **kwargs)
 
     def __repr__(self):
         return f'Group({self.building!r}, {self.auditory!r})'
