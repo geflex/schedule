@@ -26,7 +26,7 @@ class _Model:
         return cls.session.query(cls)
 
     @classmethod
-    async def get_or_create(cls, **kwargs):
+    def get_or_create(cls, **kwargs):
         instance = cls.query().filter_by(**kwargs).one_or_none()
         if instance is None:
             instance = cls(**kwargs)

@@ -22,7 +22,7 @@ class UserBottexMiddleware(BottexMiddleware):
 
     @classmethod
     async def get_or_create(cls, platform, uid):
-        user = await cls.user_model.get_or_create(platform=platform, uid=uid)
+        user = cls.user_model.get_or_create(platform=platform, uid=uid)
         cls.user_model.session.commit()
         return user
 
