@@ -1,10 +1,12 @@
 import re
 from abc import ABC, abstractmethod
 from functools import cached_property
-from typing import List
+from typing import List, Iterable, Optional
+
+from sqlalchemy.orm.exc import NoResultFound
 
 from bottex2.conditions import if_re_match
-from bottex2.handler import Request
+from bottex2.handler import Request, Message
 from bottex2.helpers import regexp
 from bottex2.router import Router
 from bottex2.views import View, Command
@@ -12,6 +14,15 @@ from . import models
 
 _ = models.i18n.gettext
 _c = models.i18n.rgettext
+
+
+class ErrorResponse(Exception):
+    def __init__(self, resp: Optional[Iterable[Message]] = None
+                 ):
+        self.resp = resp
+
+    def __str__(self):
+        return f'{[m.text for m in self.resp]}'
 
 
 class PTypeInput(View):
@@ -83,9 +94,12 @@ class BaseGroupInput(View):
         return router
 
     async def set_group(self, r: Request):
-        group = models.Group(name=r.text)
-        group.session.commit()
-        await r.user.update(group=group)
+        try:
+            group = models.Group.query().filter(models.Group.name == r.text).one()
+        except NoResultFound:
+            raise ErrorResponse(r.resp(_('Такой группы не существует'), self.keyboard))
+        else:
+            await r.user.update(group=group)
 
     async def default(self, r: Request):
         return r.resp(_('Номер группы должен состоять из 8 цифр'), self.keyboard)
