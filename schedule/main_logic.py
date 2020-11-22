@@ -6,6 +6,7 @@ from bottex2.handler import Request
 from bottex2.helpers.tools import state_name
 from bottex2.views import View, Command
 from . import inputs
+from . import models
 from .dateutils import Date
 from .models import PType, i18n, Lang
 
@@ -277,15 +278,29 @@ class Schedule(View):
         return r.resp(_('Главное меню'), cls(r).keyboard)
 
     async def _schedule(self, date: Date, r: Request):
-        if r.user.ptype is PType.student:
-            who = r.user.group.name
-        else:
-            who = r.user.name
+        def auditories(places):
+            return ''.join(p.auditory for p in places)
 
-        return r.resp(
-            _('Расписание для {} на {}').format(who, date.strftime("%d.%m.%Y")),
-            self.keyboard
-        )
+        user = r.user
+        if user.ptype is PType.student:
+            who = f'{group_str(user.group)}({r.user.subgroup})'
+            lessons = models.Lesson.query().filter(
+                models.Lesson.groups.any(name=user.group.name),
+                models.Lesson.subgroup == user.subgroup
+            ).all()
+        else:
+            who = user.name
+            lessons = models.Lesson.query().filter(
+                models.Lesson.teachers.any(last_name=user.name)
+            ).all()
+
+        lessons_str = '\n'.join(f'{l.time.strftime("%H:%M")} {l.name} {auditories(l.places)}'
+                                for l in lessons)
+
+        response = [r.resp(_('Расписание для {} на {}').format(who, date.strftime("%d.%m.%Y")))]
+        if lessons_str:
+            response.append(r.resp(lessons_str, self.keyboard))
+        return response
 
     @classmethod
     async def today(cls, r: Request):
