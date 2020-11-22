@@ -105,7 +105,10 @@ class SettingsGroupInput(inputs.BaseGroupInput, BaseSettingsInput):
 
     async def set_group(self, r: Request):
         old = r.user.group
-        await super().set_group(r)
+        try:
+            await super().set_group(r)
+        except inputs.ErrorResponse as e:
+            return e.resp
         await r.user.update(state=state_name(Settings))
         return r.resp(
             _('Группа изменена с {} на {}').format(group_str(old), group_str(r.user.group)),
@@ -192,7 +195,10 @@ class RequiredGroupInput(inputs.BaseGroupInput, BasePTypeRequiredInput):
         return commands + commands2
 
     async def set_group(self, r: Request):
-        await super().set_group(r)
+        try:
+            result = await super().set_group(r)
+        except inputs.ErrorResponse as e:
+            return e.resp
         if not r.user.subgroup:
             return await RequiredSubGroupInput.switch(r)
         return await save_student(r)

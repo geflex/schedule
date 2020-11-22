@@ -7,6 +7,7 @@ from bottex2.handler import Request
 from bottex2.helpers.tools import state_name
 from bottex2.router import Router
 from . import inputs, models, main_logic
+from .inputs import ErrorResponse
 
 _ = models.i18n.gettext
 _c = models.i18n.rgettext
@@ -67,7 +68,10 @@ class StartGroupInput(inputs.BaseGroupInput, inputs.BaseInputChainStep):
         return await StartPTypeInput.switch(r)
 
     async def set_group(self, r: Request):
-        await super().set_group(r)
+        try:
+            await super().set_group(r)
+        except ErrorResponse as e:
+            return e.resp
         return await StartSubgroupInput.switch(r)
 
     @classmethod
