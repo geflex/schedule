@@ -27,12 +27,11 @@ class _Model:
 
     @classmethod
     async def get_or_create(cls, **kwargs):
-        user = cls.session.query(cls).filter_by(**kwargs).one_or_none()
-        if user is None:
-            user = cls(**kwargs)
-            cls.session.add(user)
-            cls.session.commit()
-        return user
+        instance = cls.query().filter_by(**kwargs).one_or_none()
+        if instance is None:
+            instance = cls(**kwargs)
+            cls.session.add(instance)
+        return instance
 
     async def update(self, **kwargs):
         for field, value in kwargs.items():
