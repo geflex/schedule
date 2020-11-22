@@ -1,12 +1,15 @@
 from functools import cached_property
 from typing import List
 
+import sqlalchemy as sa
+
 from bottex2.ext.users import gen_state_cases
 from bottex2.handler import Request
 from bottex2.helpers.tools import state_name
 from bottex2.views import View, Command
+from . import dateutils
 from . import inputs
-from . import models
+from . import models as m
 from .dateutils import Date
 from .models import PType, i18n, Lang
 
@@ -288,20 +291,31 @@ class Schedule(View):
             return ''.join(p.auditory for p in places)
 
         user = r.user
+        week_cond = sa.or_(m.Lesson.second_weeknum == dateutils.is_second_weeknum(date),
+                           m.Lesson.second_weeknum == None)
+        weekday_cond = m.Lesson.weekday == m.Weekday(date.weekday())
+
         if user.ptype is PType.student:
             who = f'{group_str(user.group)}({r.user.subgroup})'
-            lessons = models.Lesson.query().filter(
-                models.Lesson.groups.any(name=user.group.name),
-                models.Lesson.subgroup == user.subgroup
-            ).all()
+            lessons = m.Lesson.query().filter(
+                m.Lesson.groups.any(name=user.group.name),
+                sa.or_(
+                    m.Lesson.subgroup == user.subgroup,
+                    m.Lesson.subgroup == None,
+                ),
+                week_cond,
+                weekday_cond
+            )
         else:
             who = user.name
-            lessons = models.Lesson.query().filter(
-                models.Lesson.teachers.any(last_name=user.name)
-            ).all()
-
-        lessons_str = '\n'.join(f'{l.time.strftime("%H:%M")} {l.name} {auditories(l.places)}'
-                                for l in lessons)
+            lessons = m.Lesson.query().filter(
+                m.Lesson.teachers.any(last_name=user.name),
+                week_cond,
+                weekday_cond
+            )
+        # l.time.strftime("%H:%M")}
+        lessons_str = '\n'.join(f'{l.name} {auditories(l.places)}'
+                                for l in lessons.all())
 
         response = [r.resp(_('Расписание для {} на {}').format(who, date.strftime("%d.%m.%Y")))]
         if lessons_str:
