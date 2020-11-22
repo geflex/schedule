@@ -1,11 +1,12 @@
 import os
 import re
+from datetime import time
 from itertools import zip_longest, chain
 from typing import Match
 
 import xlrd
 
-from schedule import models
+from schedule import models as m
 
 WEEKDAYS = [
     'понедельник',
@@ -15,6 +16,9 @@ WEEKDAYS = [
     'пятница',
     'суббота',
 ]
+
+def weekday_to_db(s):
+    return m.Weekday(WEEKDAYS.index(s))
 
 
 re_multispace = re.compile(r'\s+')
@@ -183,21 +187,34 @@ exceptions = {
 
 class LessonArea(BaseArea):
     def save(self):
-        lesson = models.Lesson()
-        lesson.weeknum = self.weeknum
-        lesson.weekday = self.weekday
-        lesson.subgroup = self.subgroup
-        lesson.time = self.time
-        lesson.name = self.name
-
-        building = models.Building(name=self.building)
-
-        lesson.groups = [models.Group(name=g) for g in self.groups]
-        lesson.teachers = [models.Teacher(last_name=name) for name in self.teachers]
-        lesson.places = [models.Place(building=building, auditory=a) for a in self.auditories]
-
-        lesson.session.add(lesson)
-        lesson.sessiion.commit()
+        if self.building is not None:
+            building = m.Building.get_or_create(name=self.building)
+        else:
+            building = None
+        groups = [m.Group.get_or_create(name=group)
+                  for group in self.groups]
+        teachers = [m.Teacher.get_or_create(last_name=teacher)
+                    for teacher in self.teachers]
+        places = [m.Place.get_or_create(building=building, auditory=aud)
+                  for aud in self.auditories]
+        is_second_weeknum = self.weeknum or (self.weeknum == '2')
+        if self.time:
+            hours, minutes = self.time.split('.')
+            t = time(int(hours), int(minutes))
+        else:
+            t = None
+        lesson = m.Lesson(
+            second_weeknum=is_second_weeknum,
+            weekday=weekday_to_db(self.weekday),
+            subgroup=self.subgroup,
+            time=t,
+            name=self.name,
+            groups=groups,
+            teachers=teachers,
+            places=places,
+        )
+        m.session.add(lesson)
+        m.session.commit()
 
     def parse(self):
         self.name = None  # строка, которая останется после удаления совпадений
@@ -219,7 +236,7 @@ class LessonArea(BaseArea):
 
                 halfgroup = cell.search(re_halfgroup).group()
                 if halfgroup and not self.subgroup:
-                    self.subgroup = 1  # номер подгруппы обычно не указан явно в тексте
+                    self.subgroup = '1'  # номер подгруппы обычно не указан явно в тексте
 
                 if not self.lenght:  # длительность занятия
                     self.lenght = cell.search(re_length).group('len')
@@ -374,27 +391,26 @@ class SheetParser(BaseSheetParser):
             if lesson.xlen() < self._curr_group.xlen():
                 # находится ли блок слева
                 if lesson.start.x == self._curr_group.start.x:
-                    lesson.subgroup = 1
+                    lesson.subgroup = '1'
                 # или справа
                 elif lesson.end.x == self._curr_group.end.x:
-                    lesson.subgroup = 2
+                    lesson.subgroup = '2'
 
     def _set_lesson_weekday(self, lesson: LessonArea):
-        """Устанавливает номер дня недели объекта lesson"""
+        """Устанавливает день недели"""
         if self._curr_weekday:
-            wd = lesson.text
-            lesson.weekday = WEEKDAYS.index(wd)
+            lesson.weekday = self._curr_weekday.text
 
     def _set_lesson_time(self, lesson: LessonArea):
         """
-        Устанавливает время начала занятия для lesson,
+        Устанавливает время начала занятия,
         если оно не было определено в тексте
         """
         if self._curr_time and not lesson.time:
             lesson.time = self._curr_time.tstart
 
     def _set_lesson_weeknum(self, lesson: LessonArea):
-        """Устанавливает номер недели для lesson"""
+        """Устанавливает номер недели"""
         if self._curr_time:
             if lesson.ylen() < self._curr_time.ylen():
                 # находится ли блок сверху
@@ -436,7 +452,7 @@ class SheetParser(BaseSheetParser):
 
 
 def bntu_books():
-    root = '.\\parsers\\data'  # папка с документами
+    root = '.\\parsers\\data'
     paths = [
         '1krs_2sem_19-20.xls',
         '2krs_2sem_19-20.xls',
@@ -446,7 +462,7 @@ def bntu_books():
 
 
 def main():
-    print('started')
+    print('filling database')
     for book in bntu_books():
         for sheet in book.sheets():
             sheet = SheetParser(sheet, book)
@@ -455,6 +471,18 @@ def main():
                 lesson.save()
 
 
+def clear_db():
+    print('clearing database')
+    m.session.execute(m.lesson_teachers.delete())
+    m.session.execute(m.lesson_groups.delete())
+    m.session.execute(m.lesson_places.delete())
+    m.Place.query().delete()
+    m.Building.query().delete()
+    m.Teacher.query().delete()
+    m.Lesson.query().delete()
+    m.session.commit()
+
+
 if __name__ == '__main__':
-    # collection.drop()
+    clear_db()
     main()
