@@ -1,13 +1,12 @@
-import tracemalloc
 import asyncio
 import time
+import tracemalloc
 from typing import Union, List
 
-from bottex2.platforms.py import PyMessage, PyReceiver, PyUserHandlerMiddleware
 from bottex2.helpers import aiotools
-
-from test_app import logic
+from bottex2.platforms.py import PyMessage, PyServer, PyUserHandlerMiddleware
 from schedule.main import setup_db
+from test_app import logic
 
 
 def rps(repeats, t):
@@ -22,22 +21,22 @@ def rps(repeats, t):
     return 60 * repeats / t / 1000
 
 
-py_receiver = PyReceiver()
-py_receiver.set_handler(logic.router)
+py_server = PyServer()
+py_server.set_handler(logic.router)
 
 
 class Benchmark:
     def __init__(self,
-                 receiver: PyReceiver,
+                 server: PyServer,
                  repeats: Union[int, float] = 1E5):
         self.repeats = int(repeats)
-        self.receiver = receiver
+        self.server = server
         self.queue = asyncio.Queue()  # type: asyncio.Queue[PyMessage]
         self.snapshots = []  # type: List[tracemalloc.Snapshot]
         self._last_id = 0
 
     async def send(self, text):
-        self.receiver.recv_nowait(PyMessage(text, self.queue, self._last_id))
+        self.server.recv_nowait(PyMessage(text, self.queue, self._last_id))
         self._last_id += 1
 
     async def serve(self):
@@ -66,8 +65,8 @@ class Benchmark:
 if __name__ == '__main__':
     setup_db()
     tracemalloc.start()
-    benchmark = Benchmark(py_receiver, 1e3)
-    py_receiver.add_handler_middleware(PyUserHandlerMiddleware)
-    aiotools.run_async(py_receiver.serve_async(),
+    benchmark = Benchmark(py_server, 1e3)
+    py_server.add_handler_middleware(PyUserHandlerMiddleware)
+    aiotools.run_async(py_server.serve_async(),
                        benchmark.serve(),
                        benchmark.bench())

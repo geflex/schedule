@@ -14,7 +14,7 @@ class ResponseBottexMiddleware(HandlerMiddleware):
                 await request.chat.send_message(resp.text, resp.kb)
 
 
-class Receiver(ABC):
+class Server(ABC):
     def __init__(self, handler: Handler,
                  middlewares: Iterable[Type[HandlerMiddleware]] = ()):
         self.handler_middlewares = []  # type: List[Type[HandlerMiddleware]]

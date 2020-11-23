@@ -4,7 +4,7 @@ from typing import AsyncIterator, Optional, Type, Iterable
 
 from bottex2.chat import AbstractChat, Keyboard
 from bottex2.handler import Request, HandlerMiddleware, Handler
-from bottex2.receiver import Receiver
+from bottex2.server import Server
 
 
 class AbstractServerChat(AbstractChat, ABC):
@@ -29,7 +29,7 @@ class WsgiChat(ServerChat):
         self._response.append(text)
 
 
-class WsgiReceiver(Receiver):
+class WsgiServer(Server):
     def __init__(self, handler: Handler, middlewares: Iterable[Type[HandlerMiddleware]] = ()):
         super().__init__(handler, middlewares)
         self._requests = asyncio.Queue()

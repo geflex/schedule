@@ -5,7 +5,7 @@ from bottex2.helpers import aiotools
 from bottex2.helpers.aiotools import merge_async_iterators
 from bottex2.logging import logger
 from bottex2.middlewares import MiddlewareManager
-from bottex2.receiver import Receiver
+from bottex2.server import Server
 
 
 class BottexMiddleware(HandlerMiddleware):
@@ -19,7 +19,7 @@ class HandlerBottexMiddleware(BottexMiddleware):
     __unified__ = False
 
     async def __call__(self, request: Request) -> Awaitable[Any]:
-        handler = request.__receiver__._handler
+        handler = request.__server__._handler
         if handler is not None:
             try:
                 return await handler(request)
@@ -28,39 +28,39 @@ class HandlerBottexMiddleware(BottexMiddleware):
         return await super().__call__(request)
 
 
-class Bottex(Receiver):
+class Bottex(Server):
     def __init__(self,
                  handler: Handler,
                  middlewares: Iterable[Type[HandlerMiddleware]] = (),
-                 receivers: Iterable[Receiver] = (),
+                 servers: Iterable[Server] = (),
                  middleware_manager=manager):
         self.middleware_manager = middleware_manager
-        self._receivers = list(receivers)  # type: List[Receiver]
+        self._servers = list(servers)  # type: List[Server]
         middlewares = [HandlerBottexMiddleware] + list(middlewares)
         super().__init__(handler, middlewares)
 
     def add_middleware(self, middleware: Type[BottexMiddleware]):
         super().add_middleware(middleware)
-        for receiver in self._receivers:
-            submiddleware = self.middleware_manager.get_child(middleware, type(receiver))
-            receiver.add_middleware(submiddleware)
+        for server in self._servers:
+            submiddleware = self.middleware_manager.get_child(middleware, type(server))
+            server.add_middleware(submiddleware)
 
-    def add_receiver(self, receiver: Receiver):
-        self._receivers.append(receiver)
+    def add_server(self, server: Server):
+        self._servers.append(server)
         for middleware in self.handler_middlewares:
-            submiddleware = self.middleware_manager.get_child(middleware, type(receiver))
-            receiver.add_middleware(submiddleware)
+            submiddleware = self.middleware_manager.get_child(middleware, type(server))
+            server.add_middleware(submiddleware)
 
-    async def wrap_receiver(self, receiver: Receiver) -> AsyncIterator[Request]:
-        handler = receiver.wrap_handler(self._handler)
-        async for request in receiver.listen():
+    async def wrap_server(self, server: Server) -> AsyncIterator[Request]:
+        handler = server.wrap_handler(self._handler)
+        async for request in server.listen():
             request = request.copy()
-            request.__receiver__ = receiver
+            request.__server__ = server
             request.__handler__ = handler
             yield request
 
     async def listen(self) -> AsyncIterator[Request]:
-        aiters = [self.wrap_receiver(rcvr) for rcvr in self._receivers]
+        aiters = [self.wrap_server(rcvr) for rcvr in self._servers]
         logger.info('Bottex listening started')
         async for message in merge_async_iterators(aiters):
             yield message

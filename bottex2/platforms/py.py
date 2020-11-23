@@ -8,7 +8,7 @@ from bottex2 import bottex
 from bottex2.chat import AbstractChat, Keyboard
 from bottex2.ext.users import UserBottexMiddleware
 from bottex2.handler import Request, HandlerMiddleware, Handler
-from bottex2.receiver import Receiver
+from bottex2.server import Server
 
 
 @dataclass
@@ -28,7 +28,7 @@ class PyChat(AbstractChat):
         await self._callback_queue.put(PyMessage(text, self._recv_queue, self._message_id))
 
 
-class PyReceiver(Receiver):
+class PyServer(Server):
     def __init__(self, handler: Handler, middlewares: Iterable[Type[HandlerMiddleware]] = ()):
         super().__init__(handler, middlewares)
         self._last_id = 0
@@ -54,4 +54,4 @@ class PyUserHandlerMiddleware(UserBottexMiddleware):
         return await self.get_or_create('py', 'default')
 
 
-bottex.manager.register_child(UserBottexMiddleware, PyReceiver, PyUserHandlerMiddleware)
+bottex.manager.register_child(UserBottexMiddleware, PyServer, PyUserHandlerMiddleware)

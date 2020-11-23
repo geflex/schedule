@@ -15,7 +15,7 @@ from bottex2.chat import AbstractChat, Keyboard
 from bottex2.ext.users import UserBottexMiddleware
 from bottex2.handler import Request, HandlerMiddleware, Handler
 from bottex2.logging import logger
-from bottex2.receiver import Receiver
+from bottex2.server import Server
 
 
 class VkChat(AbstractChat):
@@ -54,7 +54,7 @@ class VkChat(AbstractChat):
             logger.error(repr(e))
 
 
-class VkReceiver(Receiver):
+class VkServer(Server):
     def __init__(self, handler: Handler,
                  middlewares: Iterable[Type[HandlerMiddleware]] = (),
                  *, token: str, group_id: str):
@@ -84,4 +84,4 @@ class VkUserHandlerMiddleware(UserBottexMiddleware):
         return await self.get_or_create('vk', uid)
 
 
-bottex.manager.register_child(UserBottexMiddleware, VkReceiver, VkUserHandlerMiddleware)
+bottex.manager.register_child(UserBottexMiddleware, VkServer, VkUserHandlerMiddleware)

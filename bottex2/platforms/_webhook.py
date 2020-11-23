@@ -7,14 +7,14 @@ import aiohttp.web
 from bottex2.handler import Request
 from bottex2.helpers import aiotools
 from bottex2.logging import logger
-from bottex2.receiver import Receiver
+from bottex2.server import Server
 
 
 class InvalidRequest(ValueError):
     pass
 
 
-class AioHttpReceiverMixin(Receiver, ABC):
+class AioHttpServerMixin(Server, ABC):
     headers = {
         'Content-Type': 'application/json'
     }

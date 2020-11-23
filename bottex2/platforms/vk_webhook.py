@@ -8,12 +8,12 @@ from aiovk.sessions import TokenSession
 from bottex2 import bottex
 from bottex2.ext.users import UserBottexMiddleware
 from bottex2.handler import HandlerMiddleware, Handler
-from bottex2.platforms._webhook import AioHttpReceiverMixin, InvalidRequest
+from bottex2.platforms._webhook import AioHttpServerMixin, InvalidRequest
 from bottex2.platforms.vk import VkChat, VkUserHandlerMiddleware
-from bottex2.receiver import Request
+from bottex2.server import Request
 
 
-class VkCallbackReceiver(AioHttpReceiverMixin):
+class VkCallbackReceiver(AioHttpServerMixin):
     def __init__(self, handler: Handler,
                  middlewares: Iterable[Type[HandlerMiddleware]] = (), *,
                  token: str, group_id: str, host: str, port: int, path: str, secret: str, confirmation: str):

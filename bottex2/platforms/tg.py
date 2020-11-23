@@ -9,7 +9,7 @@ from bottex2.chat import AbstractChat, Keyboard
 from bottex2.ext.users import UserBottexMiddleware
 from bottex2.handler import Request, HandlerMiddleware, Handler
 from bottex2.logging import logger
-from bottex2.receiver import Receiver
+from bottex2.server import Server
 
 
 class TgChat(AbstractChat):
@@ -46,7 +46,7 @@ class TgChat(AbstractChat):
             pass
 
 
-class TgReceiver(Receiver):
+class TgServer(Server):
     def __init__(self, handler: Handler,
                  middlewares: Iterable[Type[HandlerMiddleware]] = (),
                  *, token: str):
@@ -78,4 +78,4 @@ class TgUserHandlerMiddleware(UserBottexMiddleware):
         return await self.get_or_create('tg', uid)
 
 
-bottex.manager.register_child(UserBottexMiddleware, TgReceiver, TgUserHandlerMiddleware)
+bottex.manager.register_child(UserBottexMiddleware, TgServer, TgUserHandlerMiddleware)
