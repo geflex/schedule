@@ -30,7 +30,7 @@ async def send(request: Request):
 async def switch(r: Request):
     await r.user.update(state=states[r.user.state])
     await send_settings(r)
-    return r.resp(f'switched', kb)
+    return Message(f'switched', kb)
 
 
 async def send_settings(r: Request):
@@ -38,13 +38,13 @@ async def send_settings(r: Request):
         f'id: {r.user.uid}',
         f'state: {r.user.state}',
     ])
-    return r.resp(text, kb)
+    return Message(text, kb)
 
 
 async def set_state(r: Request):
     state = next(iter(states))
     await r.user.update(state=state)
-    return r.resp(f'hi, user {r.user.uid}', kb=kb)
+    return Message(f'hi, user {r.user.uid}', kb=kb)
 
 
 router = Router({

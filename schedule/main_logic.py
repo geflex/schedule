@@ -5,7 +5,7 @@ from typing import List, Type
 import sqlalchemy as sa
 
 from bottex2.ext.users import gen_state_cases
-from bottex2.handler import Request
+from bottex2.handler import Request, Message
 from bottex2.helpers.tools import state_name
 from bottex2.router import Router
 from bottex2.views import View, Command
@@ -69,7 +69,7 @@ class Settings(View):
     @classmethod
     async def switch(cls, r: Request):
         await super().switch(r)
-        return r.resp(_('Настройки'), Settings(r).keyboard)
+        return Message(_('Настройки'), Settings(r).keyboard)
 
 
 class BaseSettingsInput(View):
@@ -93,7 +93,7 @@ class SettingsLanguageInput(inputs.BaseLanguageInput, BaseSettingsInput):
             old = r.user.locale
             await super_setter(r)
             await r.user.update(state=state_name(Settings))
-            return r.resp(
+            return Message(
                 _('Язык изменен с {} на {}').format(old.value, lang.value),
                 Settings(r).keyboard
             )
@@ -104,8 +104,8 @@ class SettingsLanguageInput(inputs.BaseLanguageInput, BaseSettingsInput):
         kb = cls(r).keyboard
         current = r.user.locale
         await super().switch(r)
-        return [r.resp(_('Текущий язык: {}').format(current.value), kb),
-                r.resp(_('Выбери новый язык'), kb)]
+        return [Message(_('Текущий язык: {}').format(current.value), kb),
+                Message(_('Выбери новый язык'), kb)]
 
 
 class SettingsGroupInput(inputs.BaseGroupInput, BaseSettingsInput):
@@ -124,7 +124,7 @@ class SettingsGroupInput(inputs.BaseGroupInput, BaseSettingsInput):
         except inputs.ErrorResponse as e:
             return e.resp
         await r.user.update(state=state_name(Settings))
-        return r.resp(
+        return Message(
             _('Группа изменена с {} на {}').format(group_str(old), group_str(r.user.group)),
             Settings(r).keyboard
         )
@@ -133,8 +133,8 @@ class SettingsGroupInput(inputs.BaseGroupInput, BaseSettingsInput):
     async def switch(cls, r: Request):
         kb = cls(r).keyboard
         await super().switch(r)
-        return [r.resp(_('Текущая группа: {}').format(group_str(r.user.group)), kb),
-                r.resp(_('Введи номер группы'), kb)]
+        return [Message(_('Текущая группа: {}').format(group_str(r.user.group)), kb),
+                Message(_('Введи номер группы'), kb)]
 
 
 class SettingsNameInput(inputs.BaseNameInput, BaseSettingsInput):
@@ -150,15 +150,15 @@ class SettingsNameInput(inputs.BaseNameInput, BaseSettingsInput):
         old = r.user.name
         await super().set_name(r)
         await r.user.update(state=state_name(Settings))
-        return r.resp(_('Имя изменено с {} на {}').format(old, r.text),
+        return Message(_('Имя изменено с {} на {}').format(old, r.text),
                         Settings(r).keyboard)
 
     @classmethod
     async def switch(cls, r: Request):
         kb = cls(r).keyboard
         await super().switch(r)
-        return [r.resp(_('Текущее имя: {}').format(r.user.name), kb),
-                r.resp(_('Введи новое имя'), kb)]
+        return [Message(_('Текущее имя: {}').format(r.user.name), kb),
+                Message(_('Введи новое имя'), kb)]
 
 
 class SettingsSubgroupInput(inputs.BaseSubgroupInput, BaseSettingsInput):
@@ -176,7 +176,7 @@ class SettingsSubgroupInput(inputs.BaseSubgroupInput, BaseSettingsInput):
             old = r.user.subgroup
             await super_setter(r)
             await r.user.update(state=state_name(Settings))
-            return r.resp(
+            return Message(
                 _('Подгруппа изменена с {} на {}').format(old, subgroup_num),
                 Settings(r).keyboard
             )
@@ -186,8 +186,8 @@ class SettingsSubgroupInput(inputs.BaseSubgroupInput, BaseSettingsInput):
     async def switch(cls, r: Request):
         kb = cls(r).keyboard
         await super().switch(r)
-        return [r.resp(_('Текущая подгруппа: {}').format(r.user.subgroup), kb),
-                r.resp(_('Введи номер подгруппы'), kb)]
+        return [Message(_('Текущая подгруппа: {}').format(r.user.subgroup), kb),
+                Message(_('Введи номер подгруппы'), kb)]
 
 
 class BasePTypeRequiredInput(BaseSettingsInput):
@@ -220,7 +220,7 @@ class RequiredGroupInput(inputs.BaseGroupInput, BasePTypeRequiredInput):
     @classmethod
     async def switch(cls, r: Request):
         await super().switch(r)
-        return r.resp(_('Введи номер группы'), cls(r).keyboard)
+        return Message(_('Введи номер группы'), cls(r).keyboard)
 
 
 class RequiredSubGroupInput(inputs.BaseSubgroupInput, BasePTypeRequiredInput):
@@ -246,7 +246,7 @@ class RequiredSubGroupInput(inputs.BaseSubgroupInput, BasePTypeRequiredInput):
     @classmethod
     async def switch(cls, r: Request):
         await super().switch(r)
-        return r.resp(_('Выбери подгруппу'), cls(r).keyboard)
+        return Message(_('Выбери подгруппу'), cls(r).keyboard)
 
 
 class RequiredNameInput(inputs.BaseNameInput, BasePTypeRequiredInput):
@@ -265,17 +265,17 @@ class RequiredNameInput(inputs.BaseNameInput, BasePTypeRequiredInput):
     @classmethod
     async def switch(cls, r: Request):
         await super().switch(r)
-        return r.resp(_('Введи имя'), cls(r).keyboard)
+        return Message(_('Введи имя'), cls(r).keyboard)
 
 
 async def save_teacher(r: Request):
     await r.user.update(state=state_name(Settings), ptype=PType.teacher)
-    return r.resp(_('Включен режим преподавателя'), Settings(r).keyboard)
+    return Message(_('Включен режим преподавателя'), Settings(r).keyboard)
 
 
 async def save_student(r: Request):
     await r.user.update(state=state_name(Settings), ptype=PType.student)
-    return r.resp(_('Включен режим студента'), Settings(r).keyboard)
+    return Message(_('Включен режим студента'), Settings(r).keyboard)
 
 
 class LessonFormatter(ABC):
@@ -338,12 +338,12 @@ class Schedule(View, ABC):
         ]
 
     async def default(self, r: Request):
-        return r.resp(_('Непонятная команда'), self.keyboard)
+        return Message(_('Непонятная команда'), self.keyboard)
 
     @classmethod
     async def switch(cls, r: Request):
         await super().switch(r)
-        return r.resp(_('Главное меню'), cls(r).keyboard)
+        return Message(_('Главное меню'), cls(r).keyboard)
 
     def query_conditions(self, date):
         week_cond = sa.or_(m.Lesson.second_weeknum == dateutils.is_second_weeknum(date),
@@ -365,7 +365,7 @@ class Schedule(View, ABC):
         return cls(r)._schedule(date, r)
 
     def no_lessons(self):
-        return self.r.resp(_('Занятий нет)'), self.keyboard)
+        return self.Message(_('Занятий нет)'), self.keyboard)
 
 
 def datefmt(date):
@@ -376,7 +376,7 @@ class TeacherSchedule(Schedule):
     formatter_cls = TeacherFormatter
 
     def _schedule(self, date: Date, r: Request):
-        resp = partial(r.resp, kb=self.keyboard)
+        resp = partial(Message, kb=self.keyboard)
         user = r.user
 
         query = m.Lesson.query().filter(
@@ -396,7 +396,7 @@ class StudentSchedule(Schedule):
     formatter_cls = StudentFormatter
 
     def _schedule(self, date: Date, r: Request):
-        resp = partial(r.resp, kb=self.keyboard)
+        resp = partial(Message, kb=self.keyboard)
         user = r.user
 
         query = m.Lesson.query().filter(

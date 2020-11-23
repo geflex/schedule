@@ -1,19 +1,13 @@
 from abc import ABC, abstractmethod
-from typing import AsyncIterator, List, Type, Optional, Iterable
+from typing import AsyncIterator, List, Type, Iterable
 
-from bottex2.chat import Keyboard
-from bottex2.handler import Handler, HandlerMiddleware, Request, Message
+from bottex2.handler import Handler, HandlerMiddleware, Request
 from bottex2.helpers import aiotools
 from bottex2.logging import logger
 
 
-def response_factory(text: Optional[str] = None, kb: Optional[Keyboard] = None):
-    return Message(text, kb)
-
-
 class ResponseBottexMiddleware(HandlerMiddleware):
     async def __call__(self, request: Request):
-        request.resp = response_factory
         response = await super().__call__(request)
         if isinstance(response, Iterable):
             for resp in response:

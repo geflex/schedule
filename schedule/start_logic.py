@@ -3,7 +3,7 @@ from functools import cached_property
 from bottex2.chat import Keyboard
 from bottex2.conditions import if_text_eq
 from bottex2.ext.users import gen_state_cases
-from bottex2.handler import Request
+from bottex2.handler import Request, Message
 from bottex2.helpers.tools import state_name
 from bottex2.router import Router
 from . import inputs, models, main_logic
@@ -26,7 +26,7 @@ class StartLanguageInput(inputs.BaseLanguageInput):
     @classmethod
     async def switch(cls, r: Request):
         await super().switch(r)
-        return r.resp(_('Выбери язык'), cls(r).keyboard)
+        return Message(_('Выбери язык'), cls(r).keyboard)
 
 
 class StartPTypeInput(inputs.PTypeInput, inputs.BaseInputChainStep):
@@ -52,7 +52,7 @@ class StartPTypeInput(inputs.PTypeInput, inputs.BaseInputChainStep):
     @classmethod
     async def switch(cls, r: Request):
         await super().switch(r)
-        return r.resp(_('Выбери тип профиля'), cls(r).keyboard)
+        return Message(_('Выбери тип профиля'), cls(r).keyboard)
 
 
 class StartGroupInput(inputs.BaseGroupInput, inputs.BaseInputChainStep):
@@ -77,7 +77,7 @@ class StartGroupInput(inputs.BaseGroupInput, inputs.BaseInputChainStep):
     @classmethod
     async def switch(cls, r: Request):
         await super().switch(r)
-        return r.resp(_('Введи номер группы'), cls(r).keyboard)
+        return Message(_('Введи номер группы'), cls(r).keyboard)
 
 
 class StartSubgroupInput(inputs.BaseSubgroupInput, inputs.BaseInputChainStep):
@@ -104,7 +104,7 @@ class StartSubgroupInput(inputs.BaseSubgroupInput, inputs.BaseInputChainStep):
     @classmethod
     async def switch(cls, r: Request):
         await super().switch(r)
-        return r.resp(_('Выбери подгруппу'), cls(r).keyboard)
+        return Message(_('Выбери подгруппу'), cls(r).keyboard)
 
 
 class StartNameInput(inputs.BaseNameInput, inputs.BaseInputChainStep):
@@ -127,16 +127,16 @@ class StartNameInput(inputs.BaseNameInput, inputs.BaseInputChainStep):
     @classmethod
     async def switch(cls, r: Request):
         await super().switch(r)
-        return r.resp(_('Введи имя'), cls(r).keyboard)
+        return Message(_('Введи имя'), cls(r).keyboard)
 
 
 def end_registration_message(r: Request):
-    return r.resp(_('Профиль настроен'), main_logic.Schedule(r).keyboard)
+    return Message(_('Профиль настроен'), main_logic.Schedule(r).keyboard)
 
 
 async def delete_me(r: Request):
     await r.user.delete()
-    return r.resp(_('Данные успешно удалены'), Keyboard())
+    return Message(_('Данные успешно удалены'), Keyboard())
 
 
 cases = gen_state_cases([

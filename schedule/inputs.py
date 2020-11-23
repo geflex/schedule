@@ -17,8 +17,7 @@ _c = models.i18n.rgettext
 
 
 class ErrorResponse(Exception):
-    def __init__(self, resp: Optional[Iterable[Message]] = None
-                 ):
+    def __init__(self, resp: Optional[Iterable[Message]] = None):
         self.resp = resp
 
     def __str__(self):
@@ -40,7 +39,7 @@ class PTypeInput(View):
         await self.r.user.update(ptype=models.PType.teacher)
 
     async def default(self, r: Request):
-        return r.resp(_('Неизвестный тип профиля'), self.keyboard)
+        return Message(_('Неизвестный тип профиля'), self.keyboard)
 
 
 class BaseLanguageInput(View):
@@ -58,7 +57,7 @@ class BaseLanguageInput(View):
         return setter
 
     async def default(self, r: Request):
-        return r.resp(_('Выбранный язык не поддерживается'), self.keyboard)
+        return Message(_('Выбранный язык не поддерживается'), self.keyboard)
 
 
 class BaseSubgroupInput(View):
@@ -76,7 +75,7 @@ class BaseSubgroupInput(View):
         return setter
 
     async def default(self, r: Request):
-        return r.resp(_('Такой подгруппы не существует'), self.keyboard)
+        return Message(_('Такой подгруппы не существует'), self.keyboard)
 
 
 class BaseGroupInput(View):
@@ -97,12 +96,12 @@ class BaseGroupInput(View):
         try:
             group = models.Group.query().filter(models.Group.name == r.text).one()
         except NoResultFound:
-            raise ErrorResponse(r.resp(_('Такой группы не существует'), self.keyboard))
+            raise ErrorResponse(Message(_('Такой группы не существует'), self.keyboard))
         else:
             await r.user.update(group=group)
 
     async def default(self, r: Request):
-        return r.resp(_('Номер группы должен состоять из 8 цифр'), self.keyboard)
+        return Message(_('Номер группы должен состоять из 8 цифр'), self.keyboard)
 
 
 class BaseNameInput(View):
