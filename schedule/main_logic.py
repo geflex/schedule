@@ -1,11 +1,13 @@
-from functools import cached_property
-from typing import List
+from abc import abstractmethod, ABC
+from functools import cached_property, partial
+from typing import List, Type
 
 import sqlalchemy as sa
 
 from bottex2.ext.users import gen_state_cases
 from bottex2.handler import Request
 from bottex2.helpers.tools import state_name
+from bottex2.router import Router
 from bottex2.views import View, Command
 from . import dateutils
 from . import inputs
@@ -19,6 +21,15 @@ _c = i18n.rgettext
 
 def group_str(group):
     return group.name if group else ''
+
+
+def ptype_cond(ptype: PType):
+    def cond(r):
+        return r.user.ptype is ptype
+    return cond
+
+is_student = ptype_cond(PType.student)
+is_teacher = ptype_cond(PType.teacher)
 
 
 class Settings(View):
@@ -267,10 +278,58 @@ async def save_student(r: Request):
     return r.resp(_('Включен режим студента'), Settings(r).keyboard)
 
 
-class Schedule(View):
+class LessonFormatter(ABC):
+    def __init__(self, lesson: m.Lesson):
+        self.lesson = lesson
+
+    def auditories(self):
+        return ', '.join(a.auditory for a in self.lesson.places)
+
+    def time(self):
+        t = self.lesson.time
+        return t.strftime("%H:%M") if t else '--:--'
+
+    def group(self):
+        return ', '.join(g.name for g in self.lesson.groups)
+
+    def subgroup(self):
+        return self.lesson.subgroup
+
+    def name(self):
+        return self.lesson.name
+
+    def building(self):
+        if self.lesson.places:
+            return self.lesson.places[0].building.name
+        return '?'
+
+    def auditory(self):
+        return ''.join(a.auditory for a in self.lesson.places) or '?'
+
+    def teacher(self):
+        return ', '.join(t.last_name for t in self.lesson.teachers)
+
+    @abstractmethod
+    def __str__(self):
+        pass
+
+
+class TeacherFormatter(LessonFormatter):
+    def __str__(self):
+        subgroup = f' ({self.subgroup()})'
+        return f'{self.time()} {self.name()} {self.building()} {self.auditory()} {self.group()}{subgroup}'
+
+
+class StudentFormatter(LessonFormatter):
+    def __str__(self):
+        return f'{self.time()} {self.name()} {self.building()} {self.auditory()} {self.teacher()}'
+
+
+class Schedule(View, ABC):
+    formatter_cls: Type[LessonFormatter]
     name = 'schedule'
 
-    @cached_property
+    @property
     def commands(self):
         return [
             [Command(_c('Сегодня'), self.today),
@@ -286,55 +345,86 @@ class Schedule(View):
         await super().switch(r)
         return r.resp(_('Главное меню'), cls(r).keyboard)
 
-    async def _schedule(self, date: Date, r: Request):
-        def auditories(places):
-            return ''.join(p.auditory for p in places)
-
-        user = r.user
+    def query_conditions(self, date):
         week_cond = sa.or_(m.Lesson.second_weeknum == dateutils.is_second_weeknum(date),
                            m.Lesson.second_weeknum == None)
         weekday_cond = m.Lesson.weekday == m.Weekday(date.weekday())
+        return week_cond, weekday_cond
 
-        if user.ptype is PType.student:
-            who = f'{group_str(user.group)}({r.user.subgroup})'
-            lessons = m.Lesson.query().filter(
-                m.Lesson.groups.any(name=user.group.name),
-                sa.or_(
-                    m.Lesson.subgroup == user.subgroup,
-                    m.Lesson.subgroup == None,
-                ),
-                week_cond,
-                weekday_cond
-            )
-        else:
-            who = user.name
-            lessons = m.Lesson.query().filter(
-                m.Lesson.teachers.any(last_name=user.name),
-                week_cond,
-                weekday_cond
-            )
-        # l.time.strftime("%H:%M")}
-        lessons_str = '\n'.join(f'{l.name} {auditories(l.places)}'
-                                for l in lessons.all())
-
-        response = [r.resp(_('Расписание для {} на {}').format(who, date.strftime("%d.%m.%Y")))]
-        if lessons_str:
-            response.append(r.resp(lessons_str, self.keyboard))
-        return response
+    async def _schedule(self, date: Date, r: Request):
+        pass
 
     @classmethod
     async def today(cls, r: Request):
         date = Date.today()
-        return await cls(r)._schedule(date, r)
+        return cls(r)._schedule(date, r)
 
     @classmethod
     async def tomorrow(cls, r: Request):
         date = Date.tomorrow()
-        return await cls(r)._schedule(date, r)
+        return cls(r)._schedule(date, r)
+
+    def no_lessons(self):
+        return self.r.resp(_('Занятий нет)'), self.keyboard)
+
+
+def datefmt(date):
+    return date.strftime("%d.%m.%Y")
+
+
+class TeacherSchedule(Schedule):
+    formatter_cls = TeacherFormatter
+
+    def _schedule(self, date: Date, r: Request):
+        resp = partial(r.resp, kb=self.keyboard)
+        user = r.user
+
+        query = m.Lesson.query().filter(
+            m.Lesson.teachers.any(last_name=user.name),
+            *self.query_conditions(date),
+        ).all()
+        if query:
+            message_str = _('Преподаватель {}\n'
+                            'День {}').format(user.name, datefmt(date))
+            lessons_str = '\n'.join(str(self.formatter_cls(l)) for l in query)
+            return [resp(message_str),
+                    resp(lessons_str)]
+        return self.no_lessons()
+
+
+class StudentSchedule(Schedule):
+    formatter_cls = StudentFormatter
+
+    def _schedule(self, date: Date, r: Request):
+        resp = partial(r.resp, kb=self.keyboard)
+        user = r.user
+
+        query = m.Lesson.query().filter(
+            m.Lesson.groups.any(name=user.group.name),
+            sa.or_(
+                m.Lesson.subgroup == user.subgroup,
+                m.Lesson.subgroup == None,
+            ),
+            *self.query_conditions(date),
+        ).all()
+        if query:
+            message_str = _('Группа {}\n'
+                            'Подгруппа {}\n'
+                            'День {}').format(user.group.name, user.subgroup, datefmt(date))
+            lessons_str = '\n'.join(str(self.formatter_cls(l)) for l in query)
+            return [resp(message_str),
+                    resp(lessons_str)]
+        return self.no_lessons()
+
+
+schedule = Router({
+    is_student: StudentSchedule.handle,
+    is_teacher: TeacherSchedule.handle,
+}, name=state_name(Schedule))
 
 
 cases = gen_state_cases([
-    Schedule,
+    schedule,
     Settings,
     RequiredGroupInput,
     RequiredSubGroupInput,
