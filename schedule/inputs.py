@@ -1,12 +1,12 @@
 import re
 from abc import ABC, abstractmethod
 from functools import cached_property
-from typing import List, Iterable, Optional
+from typing import List
 
 from sqlalchemy.orm.exc import NoResultFound
 
 from bottex2.conditions import if_re_match
-from bottex2.handler import Request, Message
+from bottex2.handler import Request, Message, ErrorResponse
 from bottex2.helpers import regexp
 from bottex2.router import Router
 from bottex2.views import View, Command
@@ -14,14 +14,6 @@ from . import models
 
 _ = models.i18n.gettext
 _c = models.i18n.rgettext
-
-
-class ErrorResponse(Exception):
-    def __init__(self, resp: Optional[Iterable[Message]] = None):
-        self.resp = resp
-
-    def __str__(self):
-        return f'{[m.text for m in self.resp]}'
 
 
 class PTypeInput(View):

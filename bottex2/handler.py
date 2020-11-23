@@ -8,6 +8,7 @@ from bottex2.logging import logger
 
 
 class HandlerError(Exception):
+    # !!!
     pass
 
 
@@ -33,6 +34,14 @@ class Message:
 
     def __iter__(self):
         yield self
+
+
+class ErrorResponse(Exception):
+    def __init__(self, resp: Optional[Iterable[Message]] = None):
+        self.resp = resp
+
+    def __str__(self):
+        return f'{[m.text for m in self.resp]}'
 
 
 Handler = Callable[[Request], Awaitable[Iterable[Message]]]

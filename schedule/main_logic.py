@@ -5,7 +5,7 @@ from typing import List, Type
 import sqlalchemy as sa
 
 from bottex2.ext.users import gen_state_cases
-from bottex2.handler import Request, Message
+from bottex2.handler import Request, Message, ErrorResponse
 from bottex2.helpers.tools import state_name
 from bottex2.router import Router
 from bottex2.views import View, Command
@@ -121,7 +121,7 @@ class SettingsGroupInput(inputs.BaseGroupInput, BaseSettingsInput):
         old = r.user.group
         try:
             await super().set_group(r)
-        except inputs.ErrorResponse as e:
+        except ErrorResponse as e:
             return e.resp
         await r.user.update(state=state_name(Settings))
         return Message(
@@ -211,7 +211,7 @@ class RequiredGroupInput(inputs.BaseGroupInput, BasePTypeRequiredInput):
     async def set_group(self, r: Request):
         try:
             result = await super().set_group(r)
-        except inputs.ErrorResponse as e:
+        except ErrorResponse as e:
             return e.resp
         if not r.user.subgroup:
             return await RequiredSubGroupInput.switch(r)
@@ -365,7 +365,7 @@ class Schedule(View, ABC):
         return cls(r)._schedule(date, r)
 
     def no_lessons(self):
-        return self.Message(_('Занятий нет)'), self.keyboard)
+        return Message(_('Занятий нет)'), self.keyboard)
 
 
 def datefmt(date):
