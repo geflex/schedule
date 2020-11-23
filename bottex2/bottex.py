@@ -66,7 +66,6 @@ class Bottex(Server):
             yield message
 
     async def serve_async(self):
-        self._check()
         async for request in self.listen():
             handler = request.__handler__
             coro = handler(request)

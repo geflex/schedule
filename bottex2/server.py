@@ -3,15 +3,15 @@ from typing import AsyncIterator, List, Type, Iterable
 
 from bottex2.handler import Handler, HandlerMiddleware, Request
 from bottex2.helpers import aiotools
-from bottex2.logging import logger
 
 
-class ResponseBottexMiddleware(HandlerMiddleware):
-    async def __call__(self, request: Request):
-        response = await super().__call__(request)
+def sender(handler: Handler) -> Handler:
+    async def wrapper(self, request: Request):
+        response = await handler(request)
         if isinstance(response, Iterable):
             for resp in response:
                 await request.chat.send_message(resp.text, resp.kb)
+    return wrapper
 
 
 class Server(ABC):
@@ -31,7 +31,7 @@ class Server(ABC):
     def wrap_handler(self, handler: Handler):
         for middleware in self.handler_middlewares:
             handler = middleware(handler)
-        return ResponseBottexMiddleware(handler)
+        return sender(handler)
 
     def set_handler(self, handler: Handler) -> Handler:
         self._handler = handler
@@ -43,18 +43,11 @@ class Server(ABC):
         """Receives and yields events"""
         yield
 
-    def _check(self):
-        if self._handler is None:
-            logger.warning('Attribute `_handler` was not set. '
-                           'You must call `set_handler` or override '
-                           '`_handler` in a subclass.')
-
     async def serve_async(self):
         """
         Receives events from `listen` and handles it in `_handler`.
         Also uses extensions for process events.
         """
-        self._check()
         async for request in self.listen():
             handler = self._wrapped_handler
             coro = handler(request)
