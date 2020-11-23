@@ -14,7 +14,7 @@ _c = models.i18n.rgettext
 
 
 class StartLanguageInput(inputs.BaseLanguageInput):
-    name = 'start_setup'
+    state_name = 'start_setup'
 
     def get_lang_setter(self, lang: models.Lang):
         super_setter = super().get_lang_setter(lang)
@@ -30,7 +30,7 @@ class StartLanguageInput(inputs.BaseLanguageInput):
 
 
 class StartPTypeInput(inputs.PTypeInput, inputs.BaseInputChainStep):
-    name = 'ptype_input'
+    state_name = 'ptype_input'
 
     @cached_property
     def commands(self):
@@ -56,7 +56,7 @@ class StartPTypeInput(inputs.PTypeInput, inputs.BaseInputChainStep):
 
 
 class StartGroupInput(inputs.BaseGroupInput, inputs.BaseInputChainStep):
-    name = 'start_group_input'
+    state_name = 'start_group_input'
 
     @cached_property
     def commands(self):
@@ -81,7 +81,7 @@ class StartGroupInput(inputs.BaseGroupInput, inputs.BaseInputChainStep):
 
 
 class StartSubgroupInput(inputs.BaseSubgroupInput, inputs.BaseInputChainStep):
-    name = 'start_subgroup_input'
+    state_name = 'start_subgroup_input'
 
     @cached_property
     def commands(self):
@@ -108,7 +108,7 @@ class StartSubgroupInput(inputs.BaseSubgroupInput, inputs.BaseInputChainStep):
 
 
 class StartNameInput(inputs.BaseNameInput, inputs.BaseInputChainStep):
-    name = 'start_name_input'
+    state_name = 'start_name_input'
 
     @cached_property
     def commands(self):

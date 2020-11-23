@@ -16,7 +16,7 @@ class Command:
 
 
 class View(ABC):
-    name: str  # !!!
+    state_name: str
 
     def __init__(self, request: Request):
         self.r = request

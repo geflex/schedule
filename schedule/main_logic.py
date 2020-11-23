@@ -33,7 +33,7 @@ is_teacher = ptype_cond(PType.teacher)
 
 
 class Settings(View):
-    name = 'settings'
+    state_name = 'settings'
     
     @cached_property
     def commands(self):
@@ -79,7 +79,7 @@ class BaseSettingsInput(View):
 
 
 class SettingsLanguageInput(inputs.BaseLanguageInput, BaseSettingsInput):
-    name = 'settings_lang'
+    state_name = 'settings_lang'
 
     @cached_property
     def commands(self):
@@ -109,7 +109,7 @@ class SettingsLanguageInput(inputs.BaseLanguageInput, BaseSettingsInput):
 
 
 class SettingsGroupInput(inputs.BaseGroupInput, BaseSettingsInput):
-    name = 'settings_group'
+    state_name = 'settings_group'
 
     @property
     def commands(self) -> List[List[Command]]:
@@ -138,7 +138,7 @@ class SettingsGroupInput(inputs.BaseGroupInput, BaseSettingsInput):
 
 
 class SettingsNameInput(inputs.BaseNameInput, BaseSettingsInput):
-    name = 'settings_name'
+    state_name = 'settings_name'
 
     @cached_property
     def commands(self) -> List[List[Command]]:
@@ -162,7 +162,7 @@ class SettingsNameInput(inputs.BaseNameInput, BaseSettingsInput):
 
 
 class SettingsSubgroupInput(inputs.BaseSubgroupInput, BaseSettingsInput):
-    name = 'settings_subgroup'
+    state_name = 'settings_subgroup'
 
     @cached_property
     def commands(self):
@@ -200,7 +200,7 @@ class BasePTypeRequiredInput(BaseSettingsInput):
 
 
 class RequiredGroupInput(inputs.BaseGroupInput, BasePTypeRequiredInput):
-    name = 'group_after_switching_ptype'
+    state_name = 'group_after_switching_ptype'
 
     @cached_property
     def commands(self):
@@ -224,7 +224,7 @@ class RequiredGroupInput(inputs.BaseGroupInput, BasePTypeRequiredInput):
 
 
 class RequiredSubGroupInput(inputs.BaseSubgroupInput, BasePTypeRequiredInput):
-    name = 'subgroup_after_switching_ptype'
+    state_name = 'subgroup_after_switching_ptype'
 
     @cached_property
     def commands(self) -> List[List[Command]]:
@@ -250,7 +250,7 @@ class RequiredSubGroupInput(inputs.BaseSubgroupInput, BasePTypeRequiredInput):
 
 
 class RequiredNameInput(inputs.BaseNameInput, BasePTypeRequiredInput):
-    name = 'name_after_switching_ptype'
+    state_name = 'name_after_switching_ptype'
 
     @cached_property
     def commands(self):
@@ -327,7 +327,7 @@ class StudentFormatter(LessonFormatter):
 
 class Schedule(View, ABC):
     formatter_cls: Type[LessonFormatter]
-    name = 'schedule'
+    state_name = 'schedule'
 
     @property
     def commands(self):

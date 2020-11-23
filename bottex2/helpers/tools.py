@@ -2,8 +2,8 @@ import inspect
 
 
 def state_name(obj):
-    if hasattr(obj, 'name'):
-        return obj.name
+    if hasattr(obj, 'state_name'):
+        return obj.state_name
     else:
         return obj.__name__
 
