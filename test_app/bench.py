@@ -21,8 +21,7 @@ def rps(repeats, t):
     return 60 * repeats / t / 1000
 
 
-py_server = PyServer()
-py_server.set_handler(logic.router)
+py_server = PyServer(logic.router)
 
 
 class Benchmark:

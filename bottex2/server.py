@@ -22,7 +22,16 @@ class Server(ABC):
         self._wrapped_handler = None
         for middleware in middlewares:
             self.add_middleware(middleware)
-        self.set_handler(handler)
+        self.handler = handler
+
+    @property
+    def handler(self):
+        return self._wrapped_handler
+
+    @handler.setter
+    def handler(self, value):
+        self._handler = value
+        self._wrapped_handler = self.wrap_handler(value)
 
     def add_middleware(self, middleware: Type[HandlerMiddleware]):
         self.handler_middlewares.append(middleware)
@@ -32,11 +41,6 @@ class Server(ABC):
         for middleware in self.handler_middlewares:
             handler = middleware(handler)
         return sender(handler)
-
-    def set_handler(self, handler: Handler) -> Handler:
-        self._handler = handler
-        self._wrapped_handler = self.wrap_handler(handler)
-        return handler
 
     @abstractmethod
     async def listen(self) -> AsyncIterator[Request]:
@@ -49,8 +53,7 @@ class Server(ABC):
         Also uses extensions for process events.
         """
         async for request in self.listen():
-            handler = self._wrapped_handler
-            coro = handler(request)
+            coro = self.handler(request)
             aiotools.create_task(coro)
 
     def serve_forever(self):
