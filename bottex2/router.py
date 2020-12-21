@@ -1,4 +1,4 @@
-from typing import Optional, MutableMapping, Callable, Awaitable
+from typing import Optional, Callable, Awaitable, Dict
 
 from bottex2.handler import Handler, Request, TResponse
 
@@ -10,45 +10,29 @@ class NoHandlerFoundError:
 TCondition = Callable[[Request], bool]
 
 
-class Router(Handler):
+class Router(dict, Dict[TCondition, Handler], Handler):
     def __init__(self,
-                 routes: MutableMapping[TCondition, Handler] = None,
+                 routes: Optional[Dict[TCondition, Handler]] = None,
                  default: Optional[Handler] = None,
-                 name: str = None):
+                 name: Optional[str] = None):
+        super().__init__(routes or {})
         self.default_handler = default
-        self._routes = routes or {}
         if name:
             self.state_name = name
-
-    @property
-    def routes(self):
-        return self._routes
-
-    def __repr__(self):
-        return f'{self.__class__.__name__}(default={self.default_handler}, {self._routes})'
-
-    def __getitem__(self, condition: TCondition):
-        return self._routes[condition]
-
-    def __setitem___(self, condition: TCondition, handler: Handler):
-        self._routes[condition] = handler
-
-    def __delitem__(self, condition):
-        del self._routes[condition]
-
-    def __len__(self):
-        return len(self._routes)
 
     def find_handler(self, request: Request) -> Handler:
         """Searches and returns handler matching registered conditions"""
         handler = self.default_handler
-        for cond, h in self._routes.items():
+        for cond, h in self.items():
             if cond(request):
                 handler = h
                 break
         if handler is None:
             raise NoHandlerFoundError
         return handler
+
+    def __repr__(self):
+        return f'{self.__class__.__name__}(default={self.default_handler}, {super().__repr__()})'
 
     def __call__(self, request: Request) -> Awaitable[TResponse]:
         handler = self.find_handler(request)
