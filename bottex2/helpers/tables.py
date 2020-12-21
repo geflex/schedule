@@ -46,6 +46,9 @@ class Column:
     def all(self) -> List[Any]:
         return [row[self._index] for row in self._cls.__values__]
 
+    def __iter__(self):
+        return iter(self.all())
+
     def __get__(self, instance: TableMeta, owner):
         if instance is None:
             return self

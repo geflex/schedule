@@ -39,6 +39,10 @@ def test_column_all(cls):
     assert cls.b.all() == ['1', '2', '3']
 
 
+def test_column_iter(cls):
+    assert list(cls.a) == cls.a.all()
+
+
 def test_column_get(cls):
     with pytest.raises(KeyError):
         obj = cls.a[99]
