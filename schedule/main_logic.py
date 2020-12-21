@@ -13,7 +13,7 @@ from . import dateutils
 from . import inputs
 from . import models as m
 from .dateutils import Date
-from .models import PTypeEnum, i18n, Lang, Weekday, Subgroup
+from .models import i18n, Lang, Weekday, Subgroup, PType
 
 _ = i18n.gettext
 _c = i18n.rgettext
@@ -23,13 +23,13 @@ def group_str(group):
     return group.name if group else ''
 
 
-def ptype_cond(ptype: PTypeEnum):
+def ptype_cond(ptype: PType):
     def cond(r):
         return r.user.ptype is ptype
     return cond
 
-is_student = ptype_cond(PTypeEnum.student)
-is_teacher = ptype_cond(PTypeEnum.teacher)
+is_student = ptype_cond(PType['student'])
+is_teacher = ptype_cond(PType['teacher'])
 
 
 class Settings(View):
@@ -42,7 +42,7 @@ class Settings(View):
             commands.append([Command(text, cb)])
 
         add(_c('Изменить язык'), SettingsLanguageInput.switch)
-        if self.r.user.ptype is PTypeEnum.teacher:
+        if self.r.user.ptype is PType['teacher']:
             add(_c('Режим студента'), self.become_student)
             add(_c('Изменить имя'), SettingsNameInput.switch)
         else:
@@ -234,7 +234,7 @@ class RequiredSubGroupInput(inputs.BaseSubgroupInput, BasePTypeRequiredInput):
         return setter
 
     async def cancel(self, r: Request):
-        await r.user.update(ptype=PTypeEnum.teacher)
+        await r.user.update(ptype=PType['teacher'])
         return await Settings.switch(r)
 
     @classmethod
@@ -263,12 +263,12 @@ class RequiredNameInput(inputs.BaseNameInput, BasePTypeRequiredInput):
 
 
 async def save_teacher(r: Request):
-    await r.user.update(state=state_name(Settings), ptype=PTypeEnum.teacher)
+    await r.user.update(state=state_name(Settings), ptype=PType['teacher'])
     return Response(_('Включен режим преподавателя'), Settings(r).keyboard)
 
 
 async def save_student(r: Request):
-    await r.user.update(state=state_name(Settings), ptype=PTypeEnum.student)
+    await r.user.update(state=state_name(Settings), ptype=PType['student'])
     return Response(_('Включен режим студента'), Settings(r).keyboard)
 
 

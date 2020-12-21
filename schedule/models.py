@@ -37,9 +37,14 @@ class DepartmentEnum(Enum):
     mido = 'mido'
 
 
-class PTypeEnum(Enum):
-    student = 0
-    teacher = 1
+class PType(tables.Table):
+    name = tables.Column(primary=True)
+    num = tables.Column()
+
+    __values__ = (
+        ('student', 0),
+        ('teacher', 1),
+    )
 
 
 class RightsEnum(IntFlag):
@@ -89,7 +94,7 @@ class Subgroup(tables.Table):
 class UserMixin(i18n.UserMixin, rights.UserMixin):
     notifications_time = Column(satypes.Time, nullable=True)
 
-    ptype = Column(satypes.Enum(PTypeEnum))
+    ptype = Column(satypes.Enum(PType))
     name = Column(satypes.String)  # for teacher
 
     subgroup = Column(satypes.Enum(Subgroup))  # only for student

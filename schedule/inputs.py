@@ -25,10 +25,10 @@ class PTypeInput(View):
         ]]
 
     async def set_stutent_ptype(self, r: Request):
-        await self.r.user.update(ptype=models.PTypeEnum.student)
+        await self.r.user.update(ptype=models.PType['student'])
 
     async def set_teacher_ptype(self, r: Request):
-        await self.r.user.update(ptype=models.PTypeEnum.teacher)
+        await self.r.user.update(ptype=models.PType['teacher'])
 
     async def default(self, r: Request):
         return Response(_('Неизвестный тип профиля'), self.keyboard)
