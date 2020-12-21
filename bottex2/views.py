@@ -30,9 +30,9 @@ class View(ABC):
     def keyboard(self) -> Keyboard:
         keyboard = Keyboard()
         for line in self.commands:
-            keyboard.add_line()
+            keyboard.append_line()
             for command in line:
-                keyboard.add_button(Button(command.text))
+                keyboard.append_button(Button(command.text))
         return keyboard
 
     @property

@@ -1,4 +1,3 @@
-from abc import ABC
 from typing import Optional, List
 
 
@@ -11,30 +10,27 @@ class Button:
 Buttons = List[List[Button]]
 
 
-class Keyboard(ABC):
+class Keyboard(list, Buttons):
     def __init__(self, buttons: Buttons = None, one_time=False, inline=False):
+        super().__init__(buttons or [])
         self.one_time = one_time
         self.inline = inline
-        self.buttons = buttons or []
 
-    def add_line(self, *buttons: Button):
-        self.buttons.append(list(buttons))
-
-    def add_button(self, button: Button):
-        if not self.buttons:
-            self.buttons.append([])
-        self.buttons[-1].append(button)
+    def append_line(self, *buttons: Button):
+        self.append(list(buttons))
 
     def insert_line(self, *buttons: Button):
-        self.buttons.insert(0, list(buttons))
+        self.insert(0, list(buttons))
+
+    def append_button(self, button: Button):
+        if not self:
+            self.append([])
+        self[-1].append(button)
 
     def insert_button(self, button: Button):
-        if not self.buttons:
-            self.buttons.append([])
-        self.buttons[0].append(button)
+        if not self:
+            self.append([])
+        self[0].append(button)
 
     def empty(self):
-        return not bool(self.buttons)
-
-    def __iter__(self):
-        yield from self.buttons
+        return not bool(self)
