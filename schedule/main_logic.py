@@ -273,6 +273,12 @@ async def save_student(r: Request):
 
 
 class LessonFormatter(ABC):
+    @staticmethod
+    def datefmt(date: Date):
+        dt = date.strftime('%d.%m.%Y')
+        weekday = Weekday.num[date.weekday()]
+        return f'{dt}, {weekday.full_name.capitalize()}'
+
     def __init__(self, lesson: m.Lesson):
         self.lesson = lesson
 
@@ -372,12 +378,6 @@ class Schedule(View, ABC):
         return Response(_('Занятий нет)'), self.keyboard)
 
 
-def datefmt(date: Date):
-    dt = date.strftime('%d.%m.%Y')
-    weekday = Weekday.num[date.weekday()]
-    return f'{dt}, {weekday.full_name.capitalize()}'
-
-
 class TeacherSchedule(Schedule):
     formatter_cls = TeacherFormatter
 
@@ -392,7 +392,7 @@ class TeacherSchedule(Schedule):
         query = query.all()
         if query:
             message_str = _('Преподаватель {}\n'
-                            '{}').format(user.name, datefmt(date))
+                            '{}').format(user.name, self.formatter_cls.datefmt(date))
             lessons_str = '\n'.join(str(self.formatter_cls(l)) for l in query)
             return [resp(message_str),
                     resp(lessons_str)]
@@ -419,7 +419,9 @@ class StudentSchedule(Schedule):
         if query:
             message_str = _('Группа {}\n'
                             '{} подгруппа\n'
-                            '{}').format(user.group.name, user.subgroup.name, datefmt(date))
+                            '{}').format(user.group.name,
+                                         user.subgroup.name,
+                                         self.formatter_cls.datefmt(date))
             lessons_str = '\n'.join(str(self.formatter_cls(l)) for l in query)
             return [resp(message_str),
                     resp(lessons_str)]
