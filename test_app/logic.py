@@ -1,7 +1,7 @@
-from bottex2.chat import Keyboard, Button
 from bottex2.conditions import if_text_eq, if_any
 from bottex2.ext.users import state_cond
 from bottex2.handler import Request
+from bottex2.keyboard import Keyboard, Button
 from bottex2.router import Router
 
 kb = Keyboard([

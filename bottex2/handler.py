@@ -1,24 +1,14 @@
-import functools
-import inspect
-from dataclasses import dataclass
 from typing import Awaitable, Any, Callable, Optional, Iterable
 
-from bottex2.chat import AbstractChat, Keyboard
-from bottex2.logging import logger
-
-
-class HandlerError(Exception):
-    # !!!
-    pass
+from bottex2.keyboard import Keyboard
 
 
 class Request(dict):
     text: str
-    chat: AbstractChat
     raw: Any
 
-    def __init__(self, *, text: str, chat: AbstractChat, raw: Any, **params):
-        super().__init__(text=text, chat=chat, raw=raw, **params)
+    def __init__(self, *, text: str, raw: Any, **params):
+        super().__init__(text=text, raw=raw, **params)
 
     def __getattr__(self, attr):
         return self[attr]
@@ -27,56 +17,24 @@ class Request(dict):
         return Request(**self)
 
 
-@dataclass
-class Message:
-    text: Optional[str]
-    kb: Optional[Keyboard]
+class Response:
+    def __init__(self, text: Optional[str] = None, kb: Optional[Keyboard] = None):
+        self.text = text
+        self.kb = kb
 
     def __iter__(self):
         yield self
 
 
+TResponse = Optional[Iterable[Response]]
+
+
 class ErrorResponse(Exception):
-    def __init__(self, resp: Optional[Iterable[Message]] = None):
+    def __init__(self, resp: TResponse = None):
         self.resp = resp
 
     def __str__(self):
         return f'{[m.text for m in self.resp]}'
 
 
-Handler = Callable[[Request], Awaitable[Iterable[Message]]]
-
-
-def check_handler(handler: Handler):
-    if not callable(handler):
-        raise TypeError('Handler must be callable')
-    sig = inspect.signature(handler)
-    if len(sig.parameters) > 1:
-        logger.warning('Handler must accept only one argument')
-
-
-class HandlerMiddleware(Handler):
-    def __init__(self, handler: Handler):
-        self.handler = handler
-        try:
-            self.__name__ = handler.__name__
-        except AttributeError:
-            pass
-
-    async def __call__(self, request: Request):  # !!! retyrn type
-        return await self.handler(request)
-
-
-ParamsHandler = Callable[..., Awaitable[Any]]
-
-
-def params_handler(handler: ParamsHandler) -> Handler:
-    @functools.wraps(handler)
-    async def wrapper(request):
-        await handler(**request)
-    return wrapper
-
-
-def check_middleware(middleware):
-    if not callable(middleware):
-        raise TypeError('middleware must be callable')
+Handler = Callable[[Request], Awaitable[TResponse]]

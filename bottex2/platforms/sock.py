@@ -1,30 +1,15 @@
 import asyncio
 import json
-from typing import AsyncIterator, Optional, Iterable, Type
+from typing import AsyncIterator, Optional
 
-from bottex2.chat import AbstractChat, Keyboard
-from bottex2.handler import Request, HandlerMiddleware, Handler
+from bottex2.handler import Request
 from bottex2.helpers import aiotools
-from bottex2.server import Server
+from bottex2.keyboard import Keyboard
+from bottex2.server import Transport
 
 
-class SockChat(AbstractChat):
-    async def send_message(self,
-                           text: Optional[str] = None,
-                           kb: Optional[Keyboard] = None):
-        sep, sym = '\n\r', '| '
-        text = sym + text.replace('\n', sep+sym) + sep
-        self._writer.write(text.encode())
-
-    def __init__(self, writer: asyncio.StreamWriter):
-        self._writer = writer
-
-
-class SockReciever(Server):
-    def __init__(self, handler: Handler,
-                 middlewares: Iterable[Type[HandlerMiddleware]] = (),
-                 *, host='127.0.0.1', port='8888'):
-        super().__init__(handler, middlewares)
+class SockTransport(Transport):
+    def __init__(self, host='127.0.0.1', port='8888'):
         self._host = host
         self._port = port
         self._queue = asyncio.Queue()
@@ -45,7 +30,11 @@ class SockReciever(Server):
         aiotools.create_task(server.serve_forever())
         while True:
             event, writer = await self._queue.get()
-            chat = SockChat(writer)
-            yield Request(text=event,
-                          chat=chat,
-                          raw=event)
+            yield Request(text=event, raw=event, __writer__=writer)
+
+    async def send(self, request: Request,
+                   text: Optional[str] = None,
+                   kb: Optional[Keyboard] = None):
+        sep, sym = '\n\r', '| '
+        text = sym + text.replace('\n', sep+sym) + sep
+        request.__writer__.write(text.encode())

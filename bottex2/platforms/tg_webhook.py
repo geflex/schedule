@@ -1,20 +1,20 @@
 import asyncio
 from collections import Iterable
-from typing import Type
 
 from aiogram.bot import Bot
 
-from bottex2 import bottex
-from bottex2.ext.users import UserBottexMiddleware
-from bottex2.handler import HandlerMiddleware, Handler
-from bottex2.platforms._webhook import AioHttpServerMixin
-from bottex2.platforms.tg import TgChat, TgUserHandlerMiddleware
+from bottex2 import multiplatform
+from bottex2.ext.users import UserMiddleware
+from bottex2.handler import Handler
+from bottex2.middlewares import THandlerMiddleware
+from bottex2.platforms._webhook import AioHttpTransportMixin
+from bottex2.platforms.tg import TgUserMiddleware
 from bottex2.server import Request
 
 
-class TgWebHookReceiver(AioHttpServerMixin):
+class TgWebHookReceiver(AioHttpTransportMixin):
     def __init__(self, handler: Handler,
-                 middlewares: Iterable[Type[HandlerMiddleware]] = (), *,
+                 middlewares: Iterable[THandlerMiddleware] = (), *,
                  token: str, host: str, port: int, path: str, ssl):
         super().__init__(handler, middlewares)
         self._token = token
@@ -30,4 +30,4 @@ class TgWebHookReceiver(AioHttpServerMixin):
         return Request(text=text, chat=chat, raw=request)
 
 
-bottex.manager.register_child(UserBottexMiddleware, TgWebHookReceiver, TgUserHandlerMiddleware)
+multiplatform.manager.register_child(UserMiddleware, TgWebHookReceiver, TgUserMiddleware)

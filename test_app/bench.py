@@ -4,7 +4,7 @@ import tracemalloc
 from typing import Union, List
 
 from bottex2.helpers import aiotools
-from bottex2.platforms.py import PyMessage, PyServer, PyUserHandlerMiddleware
+from bottex2.platforms.py import PyMessage, PyServer, PyUserMiddleware
 from schedule.main import setup_db
 from test_app import logic
 
@@ -65,7 +65,7 @@ if __name__ == '__main__':
     setup_db()
     tracemalloc.start()
     benchmark = Benchmark(py_server, 1e3)
-    py_server.add_handler_middleware(PyUserHandlerMiddleware)
+    py_server.add_handler_middleware(PyUserMiddleware)
     aiotools.run_async(py_server.serve_async(),
                        benchmark.serve(),
                        benchmark.bench())

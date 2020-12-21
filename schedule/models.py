@@ -2,21 +2,22 @@ from enum import Enum, IntFlag
 
 from sqlalchemy import Column, Table, ForeignKey, create_engine
 from sqlalchemy import types as satypes
+from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import relationship
 
-from bottex2.ext.i18n import I18nEnv
-from bottex2.ext.rights import RightsUserMixin
-from bottex2.ext.users import UserModel
-from bottex2.sqlalchemy import Model
+from bottex2.ext.i18n import I18n, BaseLang
+from bottex2.ext.rights import Rights as RightsEnv
+from bottex2.ext.users import Users
+from bottex2.helpers import tables
+from bottex2.sqlalchemy import SQLAlchemy
 from . import configs
 
+_ = lambda s: s
 engine = create_engine(configs.db_url)
-Model.set_engine(engine)
-Model.create_tables()
-session = Model.session
+db = SQLAlchemy(engine)
 
 
-class Department(Enum):
+class DepartmentEnum(Enum):
     atf = 'atf'
     fgde = 'fgde'
     msf = 'msf'
@@ -35,51 +36,75 @@ class Department(Enum):
     mido = 'mido'
 
 
-class Weekday(Enum):
-    mon = 0
-    tue = 1
-    wed = 2
-    thu = 3
-    fri = 4
-    sat = 5
-    sun = 6
-
-
-class PType(Enum):
+class PTypeEnum(Enum):
     student = 0
     teacher = 1
 
 
-class Rights(IntFlag):
+class RightsEnum(IntFlag):
     view = 1
     edit = 2
     notifying = 3
 
 
-class Lang(Enum):
-    ru = 'ru'
-    en = 'en'
-    be = 'be'
+class Lang(BaseLang):
+    __values__ = (
+        ('ru', 'Русский'),
+        ('en', 'English'),
+        ('be', 'Беларусская'),
+    )
 
 
-i18n = I18nEnv(Lang, default_lang=Lang.ru, domain='schedule')
-subgroups = satypes.Enum('1', '2', name='subgroup')
+i18n = I18n(Lang, default_lang=Lang['ru'], domain='schedule')
+rights = RightsEnv(RightsEnum)
 
 
-class User(UserModel, i18n.UserMixin, RightsUserMixin):
+class Weekday(tables.Table):
+    num = tables.Column(primary=True)
+    short_name = tables.Column()
+    full_name = tables.Column()
+
+    __values__ = (
+        (0, _('пн'), _('понедельник')),
+        (1, _('вт'), _('вторник')),
+        (2, _('ср'), _('среда')),
+        (3, _('чт'), _('четверг')),
+        (4, _('пт'), _('пятница')),
+        (5, _('сб'), _('суббота')),
+        (6, _('вс'), _('воскресенье')),
+    )
+
+
+class Subgroup(tables.Table):
+    num = tables.Column(primary=True)
+    name = tables.Column()
+    __values__ = (
+        ('1', _('Первая')),
+        ('2', _('Вторая')),
+    )
+
+
+class UserMixin(i18n.UserMixin, rights.UserMixin):
     notifications_time = Column(satypes.Time, nullable=True)
 
-    rights = Column(satypes.Enum(Rights))
-
-    ptype = Column(satypes.Enum(PType))
+    ptype = Column(satypes.Enum(PTypeEnum))
     name = Column(satypes.String)  # for teacher
-    group_name = Column(satypes.String, ForeignKey('groups.name'))
-    subgroup = Column(subgroups)  # only for student
 
-    group = relationship("Group")
+    subgroup = Column(satypes.Enum(Subgroup))  # only for student
+
+    @declared_attr
+    def group_name(cls):
+        return Column(satypes.String, ForeignKey('groups.name'))
+
+    @declared_attr
+    def group(cls):
+        return relationship("Group")
 
 
-class Group(Model):
+users = Users(db, UserMixin)
+
+
+class Group(db.Model):
     __tablename__ = 'groups'
     name = Column(satypes.String, unique=True, primary_key=True)
 
@@ -90,7 +115,7 @@ class Group(Model):
         return f'Group({self.name!r})'
 
 
-class Teacher(Model):
+class Teacher(db.Model):
     __tablename__ = 'teachers'
 
     id = Column(satypes.Integer, primary_key=True)
@@ -103,25 +128,25 @@ class Teacher(Model):
         return f'Teacher({self.last_name!r})'
 
 
-lesson_teachers = Table('lesson_teachers', Model.metadata,
+lesson_teachers = Table('lesson_teachers', db.metadata,
                         Column('lesson_id', satypes.Integer, ForeignKey('lessons.id')),
                         Column('teacher_id', satypes.Integer, ForeignKey('teachers.id'))
                         )
 
 
-lesson_groups = Table('lesson_groups', Model.metadata,
+lesson_groups = Table('lesson_groups', db.metadata,
                       Column('lesson_id', satypes.Integer, ForeignKey('lessons.id')),
                       Column('group_name', satypes.String, ForeignKey('groups.name'))
                       )
 
 
-lesson_places = Table('lesson_places', Model.metadata,
+lesson_places = Table('lesson_places', db.metadata,
                       Column('lesson_id', satypes.Integer, ForeignKey('lessons.id')),
                       Column('place_id', satypes.Integer, ForeignKey('places.id'))
                       )
 
 
-class Building(Model):
+class Building(db.Model):
     __tablename__ = 'buildings'
     name = Column(satypes.String, unique=True, primary_key=True)
 
@@ -132,7 +157,7 @@ class Building(Model):
         return f'Building({self.name!r})'
 
 
-class Place(Model):
+class Place(db.Model):
     __tablename__ = 'places'
 
     id = Column(satypes.Integer, primary_key=True)
@@ -151,16 +176,19 @@ class Place(Model):
         return f'Group({self.building!r}, {self.auditory!r})'
 
 
-class Lesson(Model):
+class Lesson(db.Model):
     __tablename__ = 'lessons'
 
     id = Column(satypes.Integer, primary_key=True)
     second_weeknum = Column(satypes.Boolean)
-    weekday = Column(satypes.Enum(Weekday))
-    subgroup = Column(subgroups)
+    weekday_num = Column(satypes.Integer)
+    subgroup = Column(satypes.Enum(Subgroup))
     time = Column(satypes.Time)
     name = Column(satypes.String)
 
     groups = relationship(Group, secondary=lesson_groups)
     teachers = relationship(Teacher, secondary=lesson_teachers)
     places = relationship(Place, secondary=lesson_places)
+
+
+db.create_all()

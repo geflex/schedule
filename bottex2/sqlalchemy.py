@@ -1,33 +1,26 @@
-from functools import partial
-
-from sqlalchemy.ext.declarative import declarative_base as _declarative_base
+from sqlalchemy.engine import Engine
+from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.sql.schema import MetaData
 
 Session = sessionmaker()
 
 
+class _QueryProperty:
+    def __get__(self, instance, owner):
+        return owner.session.query(owner)
+
+
 # noinspection PyArgumentList
-class _Model:
-    session = Session()
+class BaseModel:
+    session: Session
     metadata: MetaData
+    query = _QueryProperty()
     __tablename__: str
 
     @classmethod
-    def set_engine(cls, engine):
-        cls.session.bind = engine
-
-    @classmethod
-    def create_tables(cls):
-        cls.metadata.create_all(cls.session.bind)
-
-    @classmethod
-    def query(cls):
-        return cls.session.query(cls)
-
-    @classmethod
     def get_or_create(cls, **kwargs):
-        instance = cls.query().filter_by(**kwargs).one_or_none()
+        instance = cls.query.filter_by(**kwargs).one_or_none()
         if instance is None:
             instance = cls(**kwargs)
             cls.session.add(instance)
@@ -46,5 +39,19 @@ class _Model:
         self.session.commit()
 
 
-declarative_base = partial(_declarative_base, cls=_Model)
-Model = declarative_base()
+class SQLAlchemy:
+    def __init__(self, engine: Engine, metadata=None, session=None):
+        self.metadata = metadata
+        self.session = session or Session()
+        self.engine = engine
+        self.Model = self.make_declarative_base()
+        self.metadata = self.Model.metadata
+
+    def make_declarative_base(self):
+        Model = declarative_base(metadata=self.metadata, cls=BaseModel)
+        Model.session = self.session
+        Model.session.bind = self.engine
+        return Model
+
+    def create_all(self):
+        self.metadata.create_all(self.session.bind)

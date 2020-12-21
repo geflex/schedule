@@ -6,7 +6,7 @@ from typing import List
 from sqlalchemy.orm.exc import NoResultFound
 
 from bottex2.conditions import if_re_match
-from bottex2.handler import Request, Message, ErrorResponse
+from bottex2.handler import Request, Response, ErrorResponse
 from bottex2.helpers import regexp
 from bottex2.router import Router
 from bottex2.views import View, Command
@@ -25,49 +25,49 @@ class PTypeInput(View):
         ]]
 
     async def set_stutent_ptype(self, r: Request):
-        await self.r.user.update(ptype=models.PType.student)
+        await self.r.user.update(ptype=models.PTypeEnum.student)
 
     async def set_teacher_ptype(self, r: Request):
-        await self.r.user.update(ptype=models.PType.teacher)
+        await self.r.user.update(ptype=models.PTypeEnum.teacher)
 
     async def default(self, r: Request):
-        return Message(_('Неизвестный тип профиля'), self.keyboard)
+        return Response(_('Неизвестный тип профиля'), self.keyboard)
 
 
 class BaseLanguageInput(View):
     @property
     def commands(self):
         commands = [
-            [Command(lang.value, self.get_lang_setter(lang))]
+            [Command(lang.name, self.get_lang_setter(lang))]
             for lang in models.i18n.Lang
         ]
         return commands
 
-    def get_lang_setter(self, lang: models.i18n.Lang):
+    def get_lang_setter(self, lang: models.Lang):
         async def setter(r: Request):
             await r.user.update(locale=lang)
         return setter
 
     async def default(self, r: Request):
-        return Message(_('Выбранный язык не поддерживается'), self.keyboard)
+        return Response(_('Выбранный язык не поддерживается'), self.keyboard)
 
 
 class BaseSubgroupInput(View):
     @property
     def commands(self):
         commands = [[
-            Command(_c('Первая'), self.get_subgroup_setter('1')),
-            Command(_c('Вторая'), self.get_subgroup_setter('2')),
+            Command(_c(sg.name), self.get_subgroup_setter(sg))
+            for sg in models.Subgroup
         ]]
         return commands
 
-    def get_subgroup_setter(self, subgroup_num: str):
+    def get_subgroup_setter(self, subgroup: models.Subgroup):
         async def setter(r: Request):
-            await r.user.update(subgroup=subgroup_num)
+            await r.user.update(subgroup=subgroup)
         return setter
 
     async def default(self, r: Request):
-        return Message(_('Такой подгруппы не существует'), self.keyboard)
+        return Response(_('Такой подгруппы не существует'), self.keyboard)
 
 
 class BaseGroupInput(View):
@@ -86,14 +86,14 @@ class BaseGroupInput(View):
 
     async def set_group(self, r: Request):
         try:
-            group = models.Group.query().filter(models.Group.name == r.text).one()
+            group = models.Group.query.filter(models.Group.name == r.text).one()
         except NoResultFound:
-            raise ErrorResponse(Message(_('Такой группы не существует'), self.keyboard))
+            raise ErrorResponse(Response(_('Такой группы не существует'), self.keyboard))
         else:
             await r.user.update(group=group)
 
     async def default(self, r: Request):
-        return Message(_('Номер группы должен состоять из 8 цифр'), self.keyboard)
+        return Response(_('Номер группы должен состоять из 8 цифр'), self.keyboard)
 
 
 class BaseNameInput(View):
@@ -104,8 +104,8 @@ class BaseNameInput(View):
     async def set_name(self, r: Request):
         await r.user.update(name=r.text)
 
-    async def default(self, r: Request):
-        return await self.set_name(r)
+    def default(self, r: Request):
+        return self.set_name(r)
 
 
 class BaseInputChainStep(View, ABC):

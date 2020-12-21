@@ -2,13 +2,13 @@ from __future__ import annotations
 
 import asyncio
 from dataclasses import dataclass
-from typing import AsyncIterator, Optional, Type, Iterable
+from typing import AsyncIterator, Optional
 
-from bottex2 import bottex
-from bottex2.chat import AbstractChat, Keyboard
-from bottex2.ext.users import UserBottexMiddleware
-from bottex2.handler import Request, HandlerMiddleware, Handler
-from bottex2.server import Server
+from bottex2 import multiplatform
+from bottex2.ext.users import UserMiddleware
+from bottex2.handler import Request
+from bottex2.keyboard import Keyboard
+from bottex2.server import Transport
 
 
 @dataclass
@@ -18,19 +18,8 @@ class PyMessage:
     response_id: int = None
 
 
-class PyChat(AbstractChat):
-    def __init__(self, callback_queue, recv_queue, message_id):
-        self._callback_queue = callback_queue  # type: asyncio.Queue[PyMessage]
-        self._recv_queue = recv_queue  # type: asyncio.Queue[PyMessage]
-        self._message_id = message_id
-
-    async def send_message(self, text: Optional[str] = None, kb: Optional[Keyboard] = None):
-        await self._callback_queue.put(PyMessage(text, self._recv_queue, self._message_id))
-
-
-class PyServer(Server):
-    def __init__(self, handler: Handler, middlewares: Iterable[Type[HandlerMiddleware]] = ()):
-        super().__init__(handler, middlewares)
+class PyTransport(Transport):
+    def __init__(self):
         self._last_id = 0
         self._queue = asyncio.Queue()  # type: asyncio.Queue[PyMessage]
 
@@ -43,15 +32,17 @@ class PyServer(Server):
     async def listen(self) -> AsyncIterator[Request]:
         while True:
             message = await self._queue.get()
-            chat = PyChat(message.queue, self._queue, message.response_id)
-            yield Request(text=message.text,
-                          chat=chat,
-                          raw=message)
+            yield Request(text=message.text, raw=message, )
+
+    async def send(self, request: Request,
+                   text: Optional[str] = None,
+                   kb: Optional[Keyboard] = None):
+        await request.raw.queue.put(PyMessage(text, self._queue, request.raw.response_id))
 
 
-class PyUserHandlerMiddleware(UserBottexMiddleware):
-    async def get_user(self, request: Request):
-        return await self.get_or_create('py', 'default')
+class PyUserMiddleware(UserMiddleware):
+    def get_user(self, request: Request):
+        return self.get_or_create('py', 'default')
 
 
-bottex.manager.register_child(UserBottexMiddleware, PyServer, PyUserHandlerMiddleware)
+multiplatform.manager.register_child(UserMiddleware, PyTransport, PyUserMiddleware)

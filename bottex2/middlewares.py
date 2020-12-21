@@ -1,32 +1,34 @@
-from typing import Type, Dict
+from typing import Awaitable, Iterable, Callable
 
-from bottex2.handler import HandlerMiddleware
-from bottex2.server import Server
+from bottex2.handler import Handler, Request, TResponse
 
 
-class MiddlewareManager:
-    def __init__(self):
-        self.middlewares = {}  # type: Dict[Type[HandlerMiddleware], Dict[Type[Server], Type[HandlerMiddleware]]]
+class HandlerMiddleware(Handler):
+    def __init__(self, handler: Handler):
+        self._handler = handler
+        try:
+            self.__name__ = handler.__name__
+        except AttributeError:
+            pass
 
-    def register_child(self,
-                       parent: Type[HandlerMiddleware],
-                       server_cls: Type[Server],
-                       middleware: Type[HandlerMiddleware]):
-        children = self.get_children(parent)
-        children[server_cls] = middleware
+    def __call__(self, request: Request) -> Awaitable[TResponse]:
+        return self._handler(request)
 
-    def get_children(self, parent: Type[HandlerMiddleware]) -> Dict[Type[Server], Type[HandlerMiddleware]]:
-        for registered_parent, children in self.middlewares.items():
-            if issubclass(parent, registered_parent):
-                return children
-        children = {}
-        self.middlewares[parent] = children
-        return children
 
-    def get_child(self,
-                  parent: Type[HandlerMiddleware],
-                  server_cls: Type[Server]) -> Type[HandlerMiddleware]:
-        child = self.get_children(parent).get(server_cls)
-        if child is None:
-            return parent
-        return type(child.__name__, (child, parent), {})
+THandlerMiddleware = Callable[[Handler], Handler]
+
+
+def check_middleware(middleware):
+    if not callable(middleware):
+        raise TypeError('middleware must be callable')
+
+
+class WrappedHandler(HandlerMiddleware):
+    def __init__(self, handler: Handler, middlewares: Iterable[THandlerMiddleware]):
+        super().__init__(handler)
+        self._wrapped_handler = handler
+        for middleware in middlewares:
+            self._wrapped_handler = middleware(handler)
+
+    def __call__(self, request: Request) -> Awaitable[TResponse]:
+        return self._wrapped_handler(request)

@@ -1,64 +1,47 @@
-from typing import Optional, MutableMapping, Callable
+from typing import Optional, MutableMapping, Callable, Awaitable
 
-from bottex2.handler import Handler, check_handler, HandlerError, Request
-from bottex2.helpers import tools
-from bottex2.logging import logger
+from bottex2.handler import Handler, Request, TResponse
 
 
-class NoHandlerError(HandlerError):
+class NoHandlerFoundError:
     pass
 
 
-Condition = Callable[[Request], bool]
+TCondition = Callable[[Request], bool]
 
 
 class Router(Handler):
     def __init__(self,
-                 routes: MutableMapping[Condition, Handler] = None,
+                 routes: MutableMapping[TCondition, Handler] = None,
                  default: Optional[Handler] = None,
                  name: str = None):
         super().__init__()
-        self.default = default
-        self.routes = routes or {}
+        self.default_handler = default
+        self._routes = routes or {}
         if name:
-            self.__name__ = name
+            self.state_name = name
 
-    def set_default(self, handler: Handler) -> Handler:
-        check_handler(handler)
-        self.default = handler
-        return handler
+    @property
+    def routes(self):
+        return self._routes
 
-    def register(self, *conditions: Optional[Condition]):
-        """Decorator to register handler for described conditions"""
-        router = self
-        for condition in conditions:
-            router = router.routes[condition]
-        return router.set_default
+    def __repr__(self):
+        return f'{self.__class__.__name__}(default={self.default_handler}, {self._routes})'
 
-    def add_route(self, condition, handler):
-        self.routes[condition] = handler
+    def add_route(self, condition: TCondition, handler: Handler):
+        self._routes[condition] = handler
 
     def find_handler(self, request: Request) -> Handler:
         """Searches and returns handler matching registered conditions"""
-        handler = self.default
-        for cond, h in self.routes.items():
+        handler = self.default_handler
+        for cond, h in self._routes.items():
             if cond(request):
                 handler = h
                 break
         if handler is None:
-            raise NoHandlerError
+            raise NoHandlerFoundError
         return handler
 
-    async def __call__(self, request: Request):
+    def __call__(self, request: Request) -> Awaitable[TResponse]:
         handler = self.find_handler(request)
-        return await handler(request)
-
-    def __repr__(self):
-        return f'{self.__class__.__name__}(default={self.default}, {self.routes})'
-
-
-def is_case_valid(condition: Condition):
-    if not callable(condition):
-        raise TypeError('`Condition` must be callable')
-    if not tools.have_kwargs_parameter(condition):
-        logger.warning('`Condition` must have a **kwargs parameter')
+        return handler(request)

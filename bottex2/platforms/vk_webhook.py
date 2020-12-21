@@ -1,21 +1,21 @@
 import asyncio
 from collections import Iterable
-from typing import Type
 
 import aiohttp.web
 from aiovk.sessions import TokenSession
 
-from bottex2 import bottex
-from bottex2.ext.users import UserBottexMiddleware
-from bottex2.handler import HandlerMiddleware, Handler
-from bottex2.platforms._webhook import AioHttpServerMixin, InvalidRequest
-from bottex2.platforms.vk import VkChat, VkUserHandlerMiddleware
+from bottex2 import multiplatform
+from bottex2.ext.users import UserMiddleware
+from bottex2.handler import Handler
+from bottex2.middlewares import THandlerMiddleware
+from bottex2.platforms._webhook import AioHttpTransportMixin, InvalidRequest
+from bottex2.platforms.vk import VkUserMiddleware
 from bottex2.server import Request
 
 
-class VkCallbackReceiver(AioHttpServerMixin):
+class VkCallbackReceiver(AioHttpTransportMixin):
     def __init__(self, handler: Handler,
-                 middlewares: Iterable[Type[HandlerMiddleware]] = (), *,
+                 middlewares: Iterable[THandlerMiddleware] = (), *,
                  token: str, group_id: str, host: str, port: int, path: str, secret: str, confirmation: str):
         super().__init__(handler, middlewares)
         self._token = token
@@ -47,4 +47,4 @@ class VkCallbackReceiver(AioHttpServerMixin):
             return Request(text=text, chat=chat, raw=request)
 
 
-bottex.manager.register_child(UserBottexMiddleware, VkCallbackReceiver, VkUserHandlerMiddleware)
+multiplatform.manager.register_child(UserMiddleware, VkCallbackReceiver, VkUserMiddleware)

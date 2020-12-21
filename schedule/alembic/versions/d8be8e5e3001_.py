@@ -9,7 +9,6 @@ import pathlib
 import sys; sys.path.append(str(pathlib.Path().absolute()))
 from alembic import op
 import sqlalchemy as sa
-import sqlalchemy.orm
 
 
 # revision identifiers, used by Alembic.
@@ -19,8 +18,8 @@ branch_labels = None
 depends_on = None
 
 
-connection = op.get_bind()
-session = sa.orm.sessionmaker(bind=connection)
+# connection = op.get_bind()
+# session = sa.orm.sessionmaker(bind=connection)
 
 
 def upgrade():

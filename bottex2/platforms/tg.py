@@ -1,57 +1,41 @@
 import asyncio
-from typing import Optional, AsyncIterator, Type, Iterable
+from typing import Optional, AsyncIterator
 
 import aiogram
 import aiohttp
 
-from bottex2 import bottex
-from bottex2.chat import AbstractChat, Keyboard
-from bottex2.ext.users import UserBottexMiddleware
-from bottex2.handler import Request, HandlerMiddleware, Handler
+from bottex2 import multiplatform
+from bottex2.ext.users import UserMiddleware
+from bottex2.handler import Request
+from bottex2.keyboard import Keyboard
 from bottex2.logging import logger
-from bottex2.server import Server
+from bottex2.server import Transport
 
 
-class TgChat(AbstractChat):
-    def __init__(self, bot: aiogram.Bot, chat_id):
-        self.chat_id = chat_id
-        self.bot = bot
+class TgTransport(Transport):
+    def __init__(self, token: str):
+        self.bot = aiogram.Bot(token)
 
-    def _prepare_kb(self, kb: Optional[Keyboard]):
+    def _button_dict(self, label: str):
+        return {
+            'text': label,
+        }
+
+    def _prepare_keyboard(self, kb: Keyboard):
         if kb is None:
             return
         if kb.empty():
-            json_kb = {'remove_keyboard': True}
-        else:
-            json_buttons = []
-            json_kb = {
-                'one_time_keyboard': kb.one_time,
-                'keyboard': json_buttons
-            }
-            for line in kb:
-                json_line = []
-                json_buttons.append(json_line)
-                for button in line:
-                    json_line.append({
-                        'text': button.label,
-                    })
-        return json_kb
+            return {'remove_keyboard': True}
 
-    async def send_message(self, text: Optional[str] = None,
-                           kb: Optional[Keyboard] = None):
-        try:
-            # noinspection PyTypeChecker
-            await self.bot.send_message(self.chat_id, text, reply_markup=self._prepare_kb(kb))
-        except (asyncio.TimeoutError, aiohttp.ClientOSError):
-            pass
+        json_buttons = []
+        for line in kb:
+            json_line = [self._button_dict(btn.label) for btn in line]
+            json_buttons.append(json_line)
 
-
-class TgServer(Server):
-    def __init__(self, handler: Handler,
-                 middlewares: Iterable[Type[HandlerMiddleware]] = (),
-                 *, token: str):
-        super().__init__(handler, middlewares)
-        self.bot = aiogram.Bot(token)
+        return {
+            'one_time_keyboard': kb.one_time,
+            'keyboard': json_buttons,
+        }
 
     async def listen(self) -> AsyncIterator[Request]:
         offset = None
@@ -66,16 +50,23 @@ class TgServer(Server):
                     offset = updates[-1].update_id + 1
                     for update in updates:
                         raw = update['message']
-                        chat = TgChat(self.bot, raw['chat']['id'])
-                        yield Request(text=raw['text'],
-                                      chat=chat,
-                                      raw=raw)
+                        yield Request(text=raw['text'], raw=raw)
+
+    async def send(self, request: Request,
+                   text: Optional[str] = None,
+                   kb: Optional[Keyboard] = None):
+        keyboard = self._prepare_keyboard(kb)
+        chat_id = request.raw['chat']['id']
+        try:
+            await self.bot.send_message(chat_id, text, reply_markup=keyboard)
+        except (asyncio.TimeoutError, aiohttp.ClientOSError):
+            pass
 
 
-class TgUserHandlerMiddleware(UserBottexMiddleware):
-    async def get_user(self, request: Request):
+class TgUserMiddleware(UserMiddleware):
+    def get_user(self, request: Request):
         uid = request.raw['from']['id']
-        return await self.get_or_create('tg', uid)
+        return self.get_or_create('tg', uid)
 
 
-bottex.manager.register_child(UserBottexMiddleware, TgServer, TgUserHandlerMiddleware)
+multiplatform.manager.register_child(UserMiddleware, TgTransport, TgUserMiddleware)

@@ -2,65 +2,51 @@ import asyncio
 import json
 import sys
 from random import randint
-from typing import Union, Optional, AsyncIterator, Iterable, Type
+from typing import Optional, AsyncIterator
 
 import aiohttp
 from aiovk import API
 from aiovk.exceptions import VkAPIError
 from aiovk.longpoll import BotsLongPoll
-from aiovk.sessions import BaseSession, TokenSession
+from aiovk.sessions import TokenSession
 
-from bottex2 import bottex
-from bottex2.chat import AbstractChat, Keyboard
-from bottex2.ext.users import UserBottexMiddleware
-from bottex2.handler import Request, HandlerMiddleware, Handler
+from bottex2 import multiplatform
+from bottex2.ext.users import UserMiddleware
+from bottex2.handler import Request
+from bottex2.keyboard import Keyboard
 from bottex2.logging import logger
-from bottex2.server import Server
+from bottex2.server import Transport
 
 
-class VkChat(AbstractChat):
-    def __init__(self, session: BaseSession, peer_id: Union[int, str]):
-        super().__init__()
-        self._api = API(session)
-        self._peer_id = peer_id
+class VkTransport(Transport):
+    def __init__(self, token: str, group_id: str):
+        self._session = TokenSession(access_token=token)
+        self._api = API(self._session)
+        self._longpoll = BotsLongPoll(self._session, mode=0, group_id=group_id)
 
-    def _prepare_kb(self, kb: Optional[Keyboard]):
+    def _button_dict(self, label):
+        return {
+            'action': {
+                'type': 'text',
+                'label': label
+            },
+            'color': 'secondary',
+        }
+
+    def _prepare_keyboard(self, kb: Optional[Keyboard]):
         if kb is None:
             return ''
         json_buttons = []
-        json_kb = {'one_time': kb.one_time,
-                   'buttons': json_buttons}
         if not kb.empty():
             for line in kb:
-                json_line = []
-                json_buttons.append(json_line)
-                for button in line:
-                    json_line.append({
-                        'action': {
-                            'type': 'text',
-                            'label': button.label
-                        },
-                        'color': 'secondary',
-                    })
+                if len(line) > 5:
+                    logger.warning('vk keyboard line lenght > 5')
+                    line = line[:5]
+                dict_line = [self._button_dict(btn.label) for btn in line]
+                json_buttons.append(dict_line)
+        json_kb = {'one_time': kb.one_time,
+                   'buttons': json_buttons}
         return json.dumps(json_kb)
-
-    async def send_message(self, text: Optional[str] = None, kb: Optional[Keyboard] = None):
-        try:
-            await self._api.messages.send(random_id=randint(0, sys.maxsize),
-                                          user_id=self._peer_id,
-                                          message=text,
-                                          keyboard=self._prepare_kb(kb))
-        except (asyncio.TimeoutError, aiohttp.ClientOSError, VkAPIError) as e:
-            logger.error(repr(e))
-
-
-class VkServer(Server):
-    def __init__(self, handler: Handler,
-                 middlewares: Iterable[Type[HandlerMiddleware]] = (),
-                 *, token: str, group_id: str):
-        super().__init__(handler, middlewares)
-        self._session = TokenSession(access_token=token)
-        self._longpoll = BotsLongPoll(self._session, mode=0, group_id=group_id)
 
     async def listen(self) -> AsyncIterator[Request]:
         while True:
@@ -72,16 +58,27 @@ class VkServer(Server):
                 for event in response['updates']:
                     if event['type'] == 'message_new':
                         message = event['object']['message']
-                        chat = VkChat(self._session, message['peer_id'])
-                        yield Request(text=message['text'],
-                                      chat=chat,
-                                      raw=event)
+                        yield Request(text=message['text'], raw=event)
+
+    async def send(self, request: Request,
+                   text: Optional[str] = None,
+                   kb: Optional[Keyboard] = None):
+        rand_id = randint(0, sys.maxsize)
+        uid = request.raw['object']['message']['peer_id']
+        keyboard = self._prepare_keyboard(kb)
+        try:
+            await self._api.messages.send(random_id=rand_id,
+                                          user_id=uid,
+                                          message=text,
+                                          keyboard=keyboard)
+        except (asyncio.TimeoutError, aiohttp.ClientOSError, VkAPIError) as e:
+            logger.error(repr(e))
 
 
-class VkUserHandlerMiddleware(UserBottexMiddleware):
-    async def get_user(self, request: Request):
+class VkUserMiddleware(UserMiddleware):
+    def get_user(self, request: Request):
         uid = request.raw['object']['message']['from_id']
-        return await self.get_or_create('vk', uid)
+        return self.get_or_create('vk', uid)
 
 
-bottex.manager.register_child(UserBottexMiddleware, VkServer, VkUserHandlerMiddleware)
+multiplatform.manager.register_child(UserMiddleware, VkTransport, VkUserMiddleware)

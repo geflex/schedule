@@ -8,17 +8,9 @@ import xlrd
 
 from schedule import models as m
 
-WEEKDAYS = [
-    'понедельник',
-    'вторник',
-    'среда',
-    'четверг',
-    'пятница',
-    'суббота',
-]
+session = m.db.session
 
-def weekday_to_db(s):
-    return m.Weekday(WEEKDAYS.index(s))
+WEEKDAY_FULLNAMES = m.Weekday.full_name.all()
 
 
 re_multispace = re.compile(r'\s+')
@@ -197,15 +189,15 @@ class LessonArea(BaseArea):
                     for teacher in self.teachers]
         places = [m.Place.get_or_create(building=building, auditory=aud)
                   for aud in self.auditories]
-        is_second_weeknum = self.weeknum or (self.weeknum == '2')
+
         if self.time:
             hours, minutes = self.time.split('.')
             t = time(int(hours), int(minutes))
         else:
             t = None
         lesson = m.Lesson(
-            second_weeknum=is_second_weeknum,
-            weekday=weekday_to_db(self.weekday),
+            second_weeknum=self.is_second_weeknum,
+            weekday_num=WEEKDAY_FULLNAMES.index(self.weekday),
             subgroup=self.subgroup,
             time=t,
             name=self.name,
@@ -213,8 +205,16 @@ class LessonArea(BaseArea):
             teachers=teachers,
             places=places,
         )
-        m.session.add(lesson)
-        m.session.commit()
+        session.add(lesson)
+        session.commit()
+
+    def set_weeknum(self, val: str):
+        if val == '1':
+            self.is_second_weeknum = False
+        elif val == '2':
+            self.is_second_weeknum = True
+        else:
+            self.is_second_weeknum = None
 
     def parse(self):
         self.name = None  # строка, которая останется после удаления совпадений
@@ -222,7 +222,7 @@ class LessonArea(BaseArea):
         self.subgroup = None  # номер подгруппы
         self.weekday = None  # день недели
         self.time = None  # время начала занятия
-        self.weeknum = None  # номер недели
+        self.is_second_weeknum = None  # номер недели
         self.building = None  # корпус
         self.auditories = []  # аудитории
         self.teachers = []  # преподаватели
@@ -241,8 +241,9 @@ class LessonArea(BaseArea):
                 if not self.lenght:  # длительность занятия
                     self.lenght = cell.search(re_length).group('len')
 
-                if not self.weeknum:  # номер недели
-                    self.weeknum = cell.search(re_week).group('num')
+                if self.is_second_weeknum is None:  # номер недели
+                    num = cell.search(re_week).group('num')
+                    self.set_weeknum(num)
 
                 if not self.building:  # корпус
                     self.building = cell.search(re_building).group('b')
@@ -277,7 +278,7 @@ class LessonArea(BaseArea):
             f'name={self.name!r}',
             f'teacher={self.teachers!r}',
             f'auditory={self.auditories!r}',
-            f'weeknum={self.weeknum!r}',
+            f'is_second_weeknum={self.is_second_weeknum!r}',
             f'building={self.building!r}'
         ]
         s = ",\n    ".join(attrs)
@@ -365,7 +366,7 @@ class SheetParser(BaseSheetParser):
         self._curr_group = None
 
     def _is_day(self, area: BaseArea):
-        return area.text in WEEKDAYS
+        return area.text in WEEKDAY_FULLNAMES
 
     def _is_time(self, area: BaseArea):
         return re_fulltime.fullmatch(area.text)
@@ -415,10 +416,10 @@ class SheetParser(BaseSheetParser):
             if lesson.ylen() < self._curr_time.ylen():
                 # находится ли блок сверху
                 if lesson.start.y == self._curr_time.start.y:
-                    lesson.weeknum = '1'
+                    lesson.is_second_weeknum = False
                 # или снизу
                 elif lesson.end.y == self._curr_time.end.y:
-                    lesson.weeknum = '2'
+                    lesson.is_second_weeknum = True
 
     def lessons(self):
         for area in self.get_areas():
@@ -454,7 +455,7 @@ class SheetParser(BaseSheetParser):
 def bntu_books():
     root = '.\\parsers\\data'
     paths = [
-        '1krs_2sem_19-20.xls',
+        # '1krs_2sem_19-20.xls',
         '2krs_2sem_19-20.xls',
     ]
     for path in paths:
@@ -462,6 +463,7 @@ def bntu_books():
 
 
 def main():
+    clear_db()
     print('filling database')
     for book in bntu_books():
         for sheet in book.sheets():
@@ -473,16 +475,15 @@ def main():
 
 def clear_db():
     print('clearing database')
-    m.session.execute(m.lesson_teachers.delete())
-    m.session.execute(m.lesson_groups.delete())
-    m.session.execute(m.lesson_places.delete())
-    m.Place.query().delete()
-    m.Building.query().delete()
-    m.Teacher.query().delete()
-    m.Lesson.query().delete()
-    m.session.commit()
+    session.execute(m.lesson_teachers.delete())
+    session.execute(m.lesson_groups.delete())
+    session.execute(m.lesson_places.delete())
+    m.Place.query.delete()
+    m.Building.query.delete()
+    m.Teacher.query.delete()
+    m.Lesson.query.delete()
+    session.commit()
 
 
 if __name__ == '__main__':
-    clear_db()
     main()

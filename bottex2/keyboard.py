@@ -1,4 +1,4 @@
-from abc import ABC, abstractmethod
+from abc import ABC
 from typing import Optional, List
 
 
@@ -38,9 +38,3 @@ class Keyboard(ABC):
 
     def __iter__(self):
         yield from self.buttons
-
-
-class AbstractChat(ABC):
-    @abstractmethod
-    async def send_message(self, text: Optional[str] = None, kb: Optional[Keyboard] = None):
-        pass

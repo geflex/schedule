@@ -1,37 +1,13 @@
 import asyncio
-from abc import abstractmethod, ABC
-from typing import AsyncIterator, Optional, Type, Iterable
+from typing import AsyncIterator, Optional
 
-from bottex2.chat import AbstractChat, Keyboard
-from bottex2.handler import Request, HandlerMiddleware, Handler
-from bottex2.server import Server
-
-
-class AbstractServerChat(AbstractChat, ABC):
-    @abstractmethod
-    def flush(self):
-        pass
+from bottex2.handler import Request
+from bottex2.keyboard import Keyboard
+from bottex2.server import Transport
 
 
-class ServerChat(AbstractChat, ABC):
-    def __init__(self, queue):
-        self._queue = queue
-        self._response = []
-
-    def flush(self):
-        self._queue.put_nowait([t.encode() for t in self._response])
-
-
-class WsgiChat(ServerChat):
-    def send_message(self,
-                     text: Optional[str] = None,
-                     kb: Optional[Keyboard] = None):
-        self._response.append(text)
-
-
-class WsgiServer(Server):
-    def __init__(self, handler: Handler, middlewares: Iterable[Type[HandlerMiddleware]] = ()):
-        super().__init__(handler, middlewares)
+class WsgiTransport(Transport):
+    def __init__(self):
         self._requests = asyncio.Queue()
 
     async def web_handler(self, environ, start_response):
@@ -46,5 +22,10 @@ class WsgiServer(Server):
         while True:
             request, queue = await self._requests.get()
             yield Request(text=request['PATH_INFO'],
-                          chat=WsgiChat(queue),
-                          raw=request)
+                          raw=request,
+                          __queue__=queue)
+
+    async def send(self, request: Request,
+                   text: Optional[str] = None,
+                   kb: Optional[Keyboard] = None):
+        request.__queue__.put_nowait(text.encode())
