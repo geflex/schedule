@@ -1,5 +1,3 @@
-from functools import cached_property
-
 from bottex2.conditions import if_text_eq
 from bottex2.ext.users import gen_state_cases
 from bottex2.handler import Request, Response
@@ -31,7 +29,7 @@ class StartLanguageInput(inputs.BaseLanguageInput):
 class StartPTypeInput(inputs.PTypeInput, inputs.BaseInputChainStep):
     state_name = 'ptype_input'
 
-    @cached_property
+    @property
     def commands(self):
         commands = super().commands
         step_commands = super(inputs.PTypeInput, self).commands
@@ -57,7 +55,7 @@ class StartPTypeInput(inputs.PTypeInput, inputs.BaseInputChainStep):
 class StartGroupInput(inputs.BaseGroupInput, inputs.BaseInputChainStep):
     state_name = 'start_group_input'
 
-    @cached_property
+    @property
     def commands(self):
         commands = super().commands
         step_commands = super(inputs.BaseGroupInput, self).commands
@@ -79,7 +77,7 @@ class StartGroupInput(inputs.BaseGroupInput, inputs.BaseInputChainStep):
 class StartSubgroupInput(inputs.BaseSubgroupInput, inputs.BaseInputChainStep):
     state_name = 'start_subgroup_input'
 
-    @cached_property
+    @property
     def commands(self):
         commands = super().commands
         step_commands = super(inputs.BaseSubgroupInput, self).commands
@@ -88,10 +86,9 @@ class StartSubgroupInput(inputs.BaseSubgroupInput, inputs.BaseInputChainStep):
     async def back(self, r: Request):
         return await StartGroupInput.switch(r)
 
-    def get_subgroup_setter(self, subgroup_num: str):
-        super_setter = super().get_subgroup_setter(subgroup_num)
+    def get_subgroup_setter(self, subgroup: models.Subgroup):
+        super_setter = super().get_subgroup_setter(subgroup)
         async def setter(r: Request):
-            old_subgroup = r.user.subgroup
             await super_setter(r)
             await r.user.update(state=state_name(main_logic.Schedule))
             return end_registration_message(r)
@@ -106,7 +103,7 @@ class StartSubgroupInput(inputs.BaseSubgroupInput, inputs.BaseInputChainStep):
 class StartNameInput(inputs.BaseNameInput, inputs.BaseInputChainStep):
     state_name = 'start_name_input'
 
-    @cached_property
+    @property
     def commands(self):
         commands = super().commands
         step_commands = super(inputs.BaseNameInput, self).commands

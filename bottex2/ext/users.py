@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Type
+from typing import Type, Iterable
 
 from sqlalchemy import Column, Integer, String
 
@@ -43,7 +43,7 @@ def state_cond(st: str) -> TCondition:
     return cond
 
 
-def gen_state_cases(handlers):
+def gen_state_cases(handlers: Iterable):
     routes = {}
     for obj in handlers:
         name, handler = state_name(obj), state_handler(obj)

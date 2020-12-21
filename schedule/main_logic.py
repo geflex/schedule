@@ -226,8 +226,8 @@ class RequiredSubGroupInput(inputs.BaseSubgroupInput, BasePTypeRequiredInput):
         commands = super(inputs.BaseSubgroupInput, self).commands
         return choises + commands
 
-    def get_subgroup_setter(self, subgroup_num: str):
-        super_setter = super().get_subgroup_setter(subgroup_num)
+    def get_subgroup_setter(self, subgroup: Subgroup):
+        super_setter = super().get_subgroup_setter(subgroup)
         async def setter(r: Request):
             await super_setter(r)
             return await save_student(r)
@@ -341,6 +341,7 @@ class Schedule(View, ABC):
         return Response(_('Главное меню'), cls(r).keyboard)
 
     def _query_conditions(self, date):
+        # noinspection PyComparisonWithNone
         week_cond = sa.or_(m.Lesson.second_weeknum == dateutils.is_second_weeknum(date),
                            m.Lesson.second_weeknum == None)
         weekday_cond = (m.Lesson.weekday_num == date.weekday())
@@ -405,6 +406,7 @@ class StudentSchedule(Schedule):
         resp = partial(Response, kb=self.keyboard)
         user = r.user
 
+        # noinspection PyComparisonWithNone
         query = m.Lesson.query.filter(
             m.Lesson.groups.any(name=user.group.name),
             sa.or_(

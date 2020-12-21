@@ -83,6 +83,7 @@ def write(filename, binary):
         print(msg, file=sys.stderr)
 
 
+# noinspection PyUnboundLocalVariable
 def parse(lines):
     messages = {}
 
@@ -195,12 +196,12 @@ def generate(messages):
     keys = sorted(messages.keys())
     offsets = []
     ids = strs = b''
-    for id in keys:
+    for id_ in keys:
         # For each string, we need size and file offset.  Each string is NUL
         # terminated; the NUL does not count into the size.
-        offsets.append((len(ids), len(id), len(strs), len(messages[id])))
-        ids += id + b'\0'
-        strs += messages[id] + b'\0'
+        offsets.append((len(ids), len(id_), len(strs), len(messages[id_])))
+        ids += id_ + b'\0'
+        strs += messages[id_] + b'\0'
     output = ''
     # The header is 7 32-bit unsigned integers.  We don't use hash tables, so
     # the keys start right after the index tables.

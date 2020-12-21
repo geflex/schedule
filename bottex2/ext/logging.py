@@ -1,5 +1,5 @@
 from logging import Logger
-from typing import Any, Awaitable
+from typing import Any
 
 from bottex2.logging import logger as bottex_logger
 from bottex2.multiplatform import MultiplatformMiddleware
@@ -9,7 +9,7 @@ class MultiplatformLoggingMiddleware(MultiplatformMiddleware):
     __unified__ = True
     logger: Logger
 
-    async def __call__(self, request) -> Awaitable[Any]:
+    async def __call__(self, request) -> Any:
         self.logger.info(f'in : {request.text!r}')
         response = await super().__call__(request)
         for message in response:

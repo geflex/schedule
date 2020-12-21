@@ -6,11 +6,11 @@ from typing import Match
 
 import xlrd
 
-from schedule import models as m
+from schedule import models
 
-session = m.db.session
+session = models.db.session
 
-WEEKDAY_FULLNAMES = m.Weekday.full_name.all()
+WEEKDAY_FULLNAMES = models.Weekday.full_name.all()
 
 
 re_multispace = re.compile(r'\s+')
@@ -180,14 +180,14 @@ exceptions = {
 class LessonArea(BaseArea):
     def save(self):
         if self.building is not None:
-            building = m.Building.get_or_create(name=self.building)
+            building = models.Building.get_or_create(name=self.building)
         else:
             building = None
-        groups = [m.Group.get_or_create(name=group)
+        groups = [models.Group.get_or_create(name=group)
                   for group in self.groups]
-        teachers = [m.Teacher.get_or_create(last_name=teacher)
+        teachers = [models.Teacher.get_or_create(last_name=teacher)
                     for teacher in self.teachers]
-        places = [m.Place.get_or_create(building=building, auditory=aud)
+        places = [models.Place.get_or_create(building=building, auditory=aud)
                   for aud in self.auditories]
 
         if self.time:
@@ -195,7 +195,7 @@ class LessonArea(BaseArea):
             t = time(int(hours), int(minutes))
         else:
             t = None
-        lesson = m.Lesson(
+        lesson = models.Lesson(
             second_weeknum=self.is_second_weeknum,
             weekday_num=WEEKDAY_FULLNAMES.index(self.weekday),
             subgroup=self.subgroup,
@@ -475,13 +475,13 @@ def main():
 
 def clear_db():
     print('clearing database')
-    session.execute(m.lesson_teachers.delete())
-    session.execute(m.lesson_groups.delete())
-    session.execute(m.lesson_places.delete())
-    m.Place.query.delete()
-    m.Building.query.delete()
-    m.Teacher.query.delete()
-    m.Lesson.query.delete()
+    session.execute(models.lesson_teachers.delete())
+    session.execute(models.lesson_groups.delete())
+    session.execute(models.lesson_places.delete())
+    models.Place.query.delete()
+    models.Building.query.delete()
+    models.Teacher.query.delete()
+    models.Lesson.query.delete()
     session.commit()
 
 

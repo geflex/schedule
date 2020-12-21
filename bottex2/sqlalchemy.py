@@ -1,4 +1,4 @@
-from sqlalchemy.engine import Engine
+from sqlalchemy.engine.base import Engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.sql.schema import MetaData

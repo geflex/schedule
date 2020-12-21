@@ -12,7 +12,8 @@ from bottex2.helpers import tables
 from bottex2.sqlalchemy import SQLAlchemy
 from . import configs
 
-_ = lambda s: s
+
+def _(s): return s
 engine = create_engine(configs.db_url)
 db = SQLAlchemy(engine)
 
@@ -84,6 +85,7 @@ class Subgroup(tables.Table):
     )
 
 
+# noinspection PyMethodParameters,PyMethodParameters
 class UserMixin(i18n.UserMixin, rights.UserMixin):
     notifications_time = Column(satypes.Time, nullable=True)
 

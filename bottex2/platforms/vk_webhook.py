@@ -1,5 +1,6 @@
 import asyncio
 from collections import Iterable
+from typing import Optional
 
 import aiohttp.web
 from aiovk.sessions import TokenSession
@@ -7,6 +8,7 @@ from aiovk.sessions import TokenSession
 from bottex2 import multiplatform
 from bottex2.ext.users import UserMiddleware
 from bottex2.handler import Handler
+from bottex2.keyboard import Keyboard
 from bottex2.middlewares import THandlerMiddleware
 from bottex2.platforms._webhook import AioHttpTransportMixin, InvalidRequest
 from bottex2.platforms.vk import VkUserMiddleware
@@ -14,6 +16,10 @@ from bottex2.server import Request
 
 
 class VkCallbackReceiver(AioHttpTransportMixin):
+    async def send(self, request: Request, text: Optional[str] = None,
+                   kb: Optional[Keyboard] = None):
+        pass
+
     def __init__(self, handler: Handler,
                  middlewares: Iterable[THandlerMiddleware] = (), *,
                  token: str, group_id: str, host: str, port: int, path: str, secret: str, confirmation: str):
@@ -43,8 +49,7 @@ class VkCallbackReceiver(AioHttpTransportMixin):
             raise InvalidRequest(e) from e
         else:
             self.response(aiohttp.web.Response(headers=self.headers))
-            chat = VkChat(self._session, from_id)
-            return Request(text=text, chat=chat, raw=request)
+            return Request(text=text, raw=request)
 
 
 multiplatform.manager.register_child(UserMiddleware, VkCallbackReceiver, VkUserMiddleware)

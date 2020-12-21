@@ -1,8 +1,8 @@
-import re
-import string
-import sre_parse
-import sre_constants
 import random
+import re
+import sre_constants
+import sre_parse
+import string
 
 
 class Gen:
@@ -149,6 +149,7 @@ def _regen(data):
         data = data.data
     if isinstance(data, (list, tuple)):
         clsname = data[0]
+        # noinspection PyProtectedMember
         if isinstance(clsname, sre_constants._NamedIntConstant):
             cls = classes[clsname]
             return cls(data[1])
