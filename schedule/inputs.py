@@ -81,7 +81,7 @@ class BaseGroupInput(View):
     @cached_property
     def router(self) -> Router:
         router = super().router
-        router.add_route(if_re_match(self.exp), self.set_group)
+        router[if_re_match(self.exp)] = self.set_group
         return router
 
     async def set_group(self, r: Request):

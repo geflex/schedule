@@ -37,11 +37,8 @@ class View(ABC):
 
     @property
     def router(self) -> Router:
-        router = Router(default=self.default)
-        for line in self.commands:
-            for command in line:
-                router.add_route(command.condition, command.callback)
-        return router
+        routes = {c.condition: c.callback for line in self.commands for c in line}
+        return Router(routes, default=self.default)
 
     @classmethod
     def handle(cls, request: Request) -> Awaitable[TResponse]:

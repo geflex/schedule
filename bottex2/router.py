@@ -28,8 +28,14 @@ class Router(Handler):
     def __repr__(self):
         return f'{self.__class__.__name__}(default={self.default_handler}, {self._routes})'
 
-    def add_route(self, condition: TCondition, handler: Handler):
+    def __getitem__(self, condition: TCondition):
+        return self._routes[condition]
+
+    def __setitem___(self, condition: TCondition, handler: Handler):
         self._routes[condition] = handler
+
+    def __delitem__(self, condition):
+        del self._routes[condition]
 
     def find_handler(self, request: Request) -> Handler:
         """Searches and returns handler matching registered conditions"""
