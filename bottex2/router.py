@@ -15,7 +15,6 @@ class Router(Handler):
                  routes: MutableMapping[TCondition, Handler] = None,
                  default: Optional[Handler] = None,
                  name: str = None):
-        super().__init__()
         self.default_handler = default
         self._routes = routes or {}
         if name:
@@ -36,6 +35,9 @@ class Router(Handler):
 
     def __delitem__(self, condition):
         del self._routes[condition]
+
+    def __len__(self):
+        return len(self._routes)
 
     def find_handler(self, request: Request) -> Handler:
         """Searches and returns handler matching registered conditions"""
