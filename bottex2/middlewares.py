@@ -26,9 +26,13 @@ def check_middleware(middleware):
 class WrappedHandler(HandlerMiddleware):
     def __init__(self, handler: Handler, middlewares: Iterable[THandlerMiddleware]):
         super().__init__(handler)
-        self._wrapped_handler = handler
-        for middleware in middlewares:
-            self._wrapped_handler = middleware(handler)
+        self._middlewares = middlewares
+        self._wrapped_handler = self.wrap_handler(handler)
+
+    def wrap_handler(self, handler: Handler):
+        for middleware in self.middlewares:
+            handler = middleware(handler)
+        return handler
 
     def __call__(self, request: Request) -> Awaitable[TResponse]:
         return self._wrapped_handler(request)
