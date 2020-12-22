@@ -11,9 +11,13 @@ class Item:
     def __init__(self, values: Iterable):
         self._values = tuple(values)
 
-        self.primary_value = self._values[self._primary_index]
+        self._primary_value = self._values[self._primary_index]
         for n, v in zip(self._column_names, values):
             setattr(self, n, v)
+
+    @property
+    def primary_value(self):
+        return self._primary_value
 
     @property
     def values(self):
