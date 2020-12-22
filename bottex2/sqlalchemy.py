@@ -1,3 +1,7 @@
+from __future__ import annotations
+
+from typing import Type
+
 from sqlalchemy.engine.base import Engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
@@ -7,7 +11,7 @@ Session = sessionmaker()
 
 
 class _QueryProperty:
-    def __get__(self, instance, owner):
+    def __get__(self, instance: BaseModel, owner: Type[BaseModel]):
         return owner.session.query(owner)
 
 
