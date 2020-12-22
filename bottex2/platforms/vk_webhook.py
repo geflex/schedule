@@ -1,14 +1,12 @@
 import asyncio
 from collections import Iterable
-from typing import Optional
 
 import aiohttp.web
 from aiovk.sessions import TokenSession
 
 from bottex2 import multiplatform
 from bottex2.ext.users import UserMiddleware
-from bottex2.handler import Handler
-from bottex2.keyboard import Keyboard
+from bottex2.handler import Handler, Response
 from bottex2.middlewares import THandlerMiddleware
 from bottex2.platforms._webhook import AioHttpTransportMixin, InvalidRequest
 from bottex2.platforms.vk import VkUserMiddleware
@@ -16,8 +14,7 @@ from bottex2.server import Request
 
 
 class VkCallbackReceiver(AioHttpTransportMixin):
-    async def send(self, request: Request, text: Optional[str] = None,
-                   kb: Optional[Keyboard] = None):
+    async def send(self, request: Request, response: Response):
         pass
 
     def __init__(self, handler: Handler,

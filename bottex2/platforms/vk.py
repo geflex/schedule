@@ -12,7 +12,7 @@ from aiovk.sessions import TokenSession
 
 from bottex2 import multiplatform
 from bottex2.ext.users import UserMiddleware
-from bottex2.handler import Request
+from bottex2.handler import Request, Response
 from bottex2.keyboard import Keyboard
 from bottex2.logging import logger
 from bottex2.server import Transport
@@ -60,16 +60,14 @@ class VkTransport(Transport):
                         message = event['object']['message']
                         yield Request(text=message['text'], raw=event)
 
-    async def send(self, request: Request,
-                   text: Optional[str] = None,
-                   kb: Optional[Keyboard] = None):
+    async def send(self, request: Request, response: Response):
         rand_id = randint(0, sys.maxsize)
         uid = request.raw['object']['message']['peer_id']
-        keyboard = self._prepare_keyboard(kb)
+        keyboard = self._prepare_keyboard(response.kb)
         try:
             await self._api.messages.send(random_id=rand_id,
                                           user_id=uid,
-                                          message=text,
+                                          message=response.text,
                                           keyboard=keyboard)
         except (asyncio.TimeoutError, aiohttp.ClientOSError, VkAPIError) as e:
             logger.error(repr(e))

@@ -1,8 +1,7 @@
-from typing import Type, AsyncIterator, List, Iterable, Optional, Dict, Awaitable
+from typing import Type, AsyncIterator, List, Iterable, Dict, Awaitable
 
-from bottex2.handler import Request, Handler, TResponse
+from bottex2.handler import Request, Handler, TResponse, Response
 from bottex2.helpers.aiotools import merge_async_iterators
-from bottex2.keyboard import Keyboard
 from bottex2.logging import logger
 from bottex2.middlewares import THandlerMiddleware, HandlerMiddleware
 from bottex2.server import Transport
@@ -31,10 +30,8 @@ class MultiplatformTransport(Transport):
         async for message in merge_async_iterators(aiters):
             yield message
 
-    async def send(self, request: MultiplatformRequest,
-                   text: Optional[str] = None,
-                   kb: Optional[Keyboard] = None):
-        await request.__transport__.send(request, text, kb)
+    async def send(self, request: MultiplatformRequest, response: Response):
+        await request.__transport__.send(request, response)
 
 
 class MiddlewareManager:

@@ -1,11 +1,9 @@
 import asyncio
 from collections import Iterable
-from typing import Optional
 
 from bottex2 import multiplatform
 from bottex2.ext.users import UserMiddleware
-from bottex2.handler import Handler
-from bottex2.keyboard import Keyboard
+from bottex2.handler import Handler, Response
 from bottex2.middlewares import THandlerMiddleware
 from bottex2.platforms._webhook import AioHttpTransportMixin
 from bottex2.platforms.tg import TgUserMiddleware
@@ -24,8 +22,7 @@ class TgWebHookReceiver(AioHttpTransportMixin):
         self._path = path
         self._requests_queue = asyncio.Queue()  # type: asyncio.Queue[dict]
 
-    async def send(self, request: Request, text: Optional[str] = None,
-                   kb: Optional[Keyboard] = None):
+    async def send(self, request: Request, response: Response):
         pass
 
     def parse_request(self, request: dict) -> Request:

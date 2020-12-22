@@ -1,4 +1,4 @@
-from bottex2.handler import Request
+from bottex2.handler import Request, Response
 from bottex2.server import Transport
 
 
@@ -9,7 +9,7 @@ def test_custom_platform():
                 raw = {'text': 'message'}
                 yield Request(text=raw['text'], raw=raw)
 
-        async def send(self, request, text=None, kb=None):
-            print(text)
+        async def send(self, request: Request, response: Response):
+            print(response.text)
 
     transport = CustomTransport()

@@ -69,7 +69,7 @@ class Settings(View):
     @classmethod
     async def switch(cls, r: Request):
         await super().switch(r)
-        return Response(_('Настройки'), Settings(r).keyboard)
+        return Response(_('Настройки'), cls(r).keyboard)
 
 
 class BaseSettingsInput(View):

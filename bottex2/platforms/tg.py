@@ -1,12 +1,12 @@
 import asyncio
-from typing import Optional, AsyncIterator
+from typing import AsyncIterator
 
 import aiogram
 import aiohttp
 
 from bottex2 import multiplatform
 from bottex2.ext.users import UserMiddleware
-from bottex2.handler import Request
+from bottex2.handler import Request, Response
 from bottex2.keyboard import Keyboard
 from bottex2.logging import logger
 from bottex2.server import Transport
@@ -52,13 +52,11 @@ class TgTransport(Transport):
                         raw = update['message']
                         yield Request(text=raw['text'], raw=raw)
 
-    async def send(self, request: Request,
-                   text: Optional[str] = None,
-                   kb: Optional[Keyboard] = None):
-        keyboard = self._prepare_keyboard(kb)
+    async def send(self, request: Request, response: Response):
+        keyboard = self._prepare_keyboard(response.kb)
         chat_id = request.raw['chat']['id']
         try:
-            await self.bot.send_message(chat_id, text, reply_markup=keyboard)
+            await self.bot.send_message(chat_id, response.text, reply_markup=keyboard)
         except (asyncio.TimeoutError, aiohttp.ClientOSError):
             pass
 

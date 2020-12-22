@@ -1,9 +1,8 @@
 from abc import ABC, abstractmethod
-from typing import AsyncIterator, Iterable, Optional, Awaitable
+from typing import AsyncIterator, Iterable, Awaitable
 
-from bottex2.handler import Request, ErrorResponse, Handler, TResponse
+from bottex2.handler import Request, ErrorResponse, Handler, TResponse, Response
 from bottex2.helpers import aiotools
-from bottex2.keyboard import Keyboard
 
 
 class AbstractServer(ABC):
@@ -16,9 +15,7 @@ class AbstractServer(ABC):
         pass
 
     @abstractmethod
-    async def send(self, request: Request,
-                   text: Optional[str] = None,
-                   kb: Optional[Keyboard] = None):
+    async def send(self, request: Request, response: Response):
         pass
 
     async def handle(self, request: Request):
@@ -28,7 +25,7 @@ class AbstractServer(ABC):
             response = e.resp
         if isinstance(response, Iterable):
             for resp in response:
-                await self.send(request, resp.text, resp.kb)
+                await self.send(request, resp)
 
     async def serve_async(self):
         async for request in self.listen():
@@ -46,9 +43,7 @@ class Transport(ABC):
         yield
 
     @abstractmethod
-    async def send(self, request: Request,
-                   text: Optional[str] = None,
-                   kb: Optional[Keyboard] = None):
+    async def send(self, request: Request, response: Response):
         pass
 
 
@@ -63,7 +58,5 @@ class Server(AbstractServer, ABC):
     def listen(self):
         return self._transport.listen()
 
-    def send(self, request: Request,
-                   text: Optional[str] = None,
-                   kb: Optional[Keyboard] = None):
-        return self._transport.send(request, text, kb)
+    def send(self, request: Request, response):
+        return self._transport.send(request, response)

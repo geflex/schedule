@@ -1,8 +1,7 @@
 import asyncio
-from typing import AsyncIterator, Optional
+from typing import AsyncIterator
 
-from bottex2.handler import Request
-from bottex2.keyboard import Keyboard
+from bottex2.handler import Request, Response
 from bottex2.server import Transport
 
 
@@ -25,7 +24,5 @@ class WsgiTransport(Transport):
                           raw=request,
                           __queue__=queue)
 
-    async def send(self, request: Request,
-                   text: Optional[str] = None,
-                   kb: Optional[Keyboard] = None):
-        request.__queue__.put_nowait(text.encode())
+    async def send(self, request: Request, response: Response):
+        request.__queue__.put_nowait(response.text.encode())

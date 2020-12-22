@@ -2,12 +2,11 @@ from __future__ import annotations
 
 import asyncio
 from dataclasses import dataclass
-from typing import AsyncIterator, Optional
+from typing import AsyncIterator
 
 from bottex2 import multiplatform
 from bottex2.ext.users import UserMiddleware
-from bottex2.handler import Request
-from bottex2.keyboard import Keyboard
+from bottex2.handler import Request, Response
 from bottex2.server import Transport
 
 
@@ -34,10 +33,8 @@ class PyTransport(Transport):
             message = await self._queue.get()
             yield Request(text=message.text, raw=message, )
 
-    async def send(self, request: Request,
-                   text: Optional[str] = None,
-                   kb: Optional[Keyboard] = None):
-        await request.raw.queue.put(PyMessage(text, self._queue, request.raw.response_id))
+    async def send(self, request: Request, response: Response):
+        await request.raw.queue.put(PyMessage(response.text, self._queue, request.raw.response_id))
 
 
 class PyUserMiddleware(UserMiddleware):
