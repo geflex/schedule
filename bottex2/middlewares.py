@@ -18,11 +18,6 @@ class HandlerMiddleware(Handler):
 THandlerMiddleware = Callable[[Handler], Handler]
 
 
-def check_middleware(middleware):
-    if not callable(middleware):
-        raise TypeError('middleware must be callable')
-
-
 class WrappedHandler(HandlerMiddleware):
     def __init__(self, handler: Handler, middlewares: Iterable[THandlerMiddleware]):
         super().__init__(handler)
