@@ -81,7 +81,7 @@ class MultiplatformI18nMiddleware(MultiplatformMiddleware):
     def tranlate_keyboard(cls, kb: Optional[Keyboard], locale: str):
         if kb is None:
             return kb
-        for line in kb.buttons:
+        for line in kb:
             for button in line:
                 button.label = cls.translate(button.label, locale)
         return kb
