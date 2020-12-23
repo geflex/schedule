@@ -44,13 +44,17 @@ class View(ABC):
     def handle(cls, request: Request) -> Awaitable[TResponse]:
         return cls(request).router(request)
 
-    def __call__(self, request: Request) -> Awaitable[TResponse]:
-        return self.handle(request)
+    async def __call__(self, request: Request) -> TResponse:
+        responses = await self.handle(request)
+        for resp in responses:
+            if resp.kb is None:
+                resp.kb = self.keyboard   # !!! changing existing response
+        return responses
 
     async def default(self, r: Request) -> TResponse:
-        return Response('Command not found', self.keyboard)
+        return Response('Command not found')
 
     @classmethod
     async def switch(cls, r: Request) -> TResponse:
         await r.user.update(state=state_name(cls))
-        return
+        return None
