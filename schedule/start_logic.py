@@ -26,7 +26,7 @@ class StartLanguageInput(inputs.BaseLanguageInput):
         return Response(_('Выбери язык'), cls(r).keyboard)
 
 
-class StartPTypeInput(inputs.PTypeInput, inputs.BaseInputChainStep):
+class StartPTypeInput(inputs.PTypeInput, inputs.InputChainStep):
     state_name = 'ptype_input'
 
     @property
@@ -52,7 +52,7 @@ class StartPTypeInput(inputs.PTypeInput, inputs.BaseInputChainStep):
         return Response(_('Выбери тип профиля'), cls(r).keyboard)
 
 
-class StartGroupInput(inputs.BaseGroupInput, inputs.BaseInputChainStep):
+class StartGroupInput(inputs.BaseGroupInput, inputs.InputChainStep):
     state_name = 'start_group_input'
 
     @property
@@ -74,7 +74,7 @@ class StartGroupInput(inputs.BaseGroupInput, inputs.BaseInputChainStep):
         return Response(_('Введи номер группы'), cls(r).keyboard)
 
 
-class StartSubgroupInput(inputs.BaseSubgroupInput, inputs.BaseInputChainStep):
+class StartSubgroupInput(inputs.BaseSubgroupInput, inputs.InputChainStep):
     state_name = 'start_subgroup_input'
 
     @property
@@ -100,7 +100,7 @@ class StartSubgroupInput(inputs.BaseSubgroupInput, inputs.BaseInputChainStep):
         return Response(_('Выбери подгруппу'), cls(r).keyboard)
 
 
-class StartNameInput(inputs.BaseNameInput, inputs.BaseInputChainStep):
+class StartNameInput(inputs.BaseNameInput, inputs.InputChainStep):
     state_name = 'start_name_input'
 
     @property

@@ -108,7 +108,7 @@ class BaseNameInput(View):
         return self.set_name(r)
 
 
-class BaseInputChainStep(View, ABC):
+class InputChainStep(View, ABC):
     @property
     def commands(self) -> List[List[Command]]:
         return [[Command(_c('Назад'), self.back)]]
