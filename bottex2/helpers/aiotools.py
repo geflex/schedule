@@ -1,5 +1,5 @@
 import asyncio
-from typing import Collection, AsyncIterator, Awaitable
+from typing import Collection, AsyncIterator, Awaitable, Iterable
 
 
 def merge_async_iterators(aiters: Collection[AsyncIterator]):
@@ -23,7 +23,7 @@ def merge_async_iterators(aiters: Collection[AsyncIterator]):
         finally:
             run_count -= 1
 
-    async def merged(tasks: Collection[asyncio.Task]):
+    async def merged(tasks: Iterable[asyncio.Task]):
         try:
             while run_count:
                 raised, next_item = await queue.get()
@@ -34,7 +34,7 @@ def merge_async_iterators(aiters: Collection[AsyncIterator]):
         finally:
             cancel_tasks(tasks)
 
-    def cancel_tasks(tasks: Collection[asyncio.Task]):
+    def cancel_tasks(tasks: Iterable[asyncio.Task]):
         nonlocal cancelling
         cancelling = True
         for t in tasks:

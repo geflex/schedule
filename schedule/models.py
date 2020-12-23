@@ -37,6 +37,12 @@ class DepartmentEnum(Enum):
     mido = 'mido'
 
 
+class RightsEnum(IntFlag):
+    view = 1
+    edit = 2
+    notifying = 3
+
+
 class PType(tables.Table):
     name = tables.Column(primary=True)
     num = tables.Column()
@@ -47,12 +53,6 @@ class PType(tables.Table):
     )
 
 
-class RightsEnum(IntFlag):
-    view = 1
-    edit = 2
-    notifying = 3
-
-
 class Lang(BaseLang):
     __values__ = (
         ('ru', 'Русский'),
@@ -61,7 +61,7 @@ class Lang(BaseLang):
     )
 
 
-i18n = I18n(Lang, default_lang=Lang['ru'], domain='schedule')
+i18n = I18n(Lang, default_lang=Lang['ru'], domain_name='schedule')
 rights = RightsEnv(RightsEnum)
 
 

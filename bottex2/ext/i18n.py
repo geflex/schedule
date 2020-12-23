@@ -109,7 +109,7 @@ class I18n:
     def __init__(self,
                  lang_table: Type[BaseLang],
                  default_lang: BaseLang,
-                 domain: str,
+                 domain_name: str,
                  reversed_domain='reversed',
                  reversible_domain='reversible'):
         self.Lang = lang_table
@@ -118,7 +118,7 @@ class I18n:
         self.reversible_domain_name = reversible_domain
 
         self.translate = partial(translate, default_lang=default_lang)
-        self.gettext = partial(gettext, domain=domain)
+        self.gettext = partial(gettext, domain=domain_name)
         self.rgettext = partial(gettext, domain=reversible_domain)
 
         self.Middleware = type('MultiplatformI18nMiddleware', (MultiplatformI18nMiddleware,), {
