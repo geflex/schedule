@@ -31,7 +31,7 @@ class PTypeInput(View):
         await self.r.user.update(ptype=models.PType['teacher'])
 
     async def default(self, r: Request):
-        return Response(_('Неизвестный тип профиля'), self.keyboard)
+        return Response(_('Неизвестный тип профиля'))
 
 
 class BaseLanguageInput(View):
@@ -49,7 +49,7 @@ class BaseLanguageInput(View):
         return setter
 
     async def default(self, r: Request):
-        return Response(_('Выбранный язык не поддерживается'), self.keyboard)
+        return Response(_('Выбранный язык не поддерживается'))
 
 
 class BaseSubgroupInput(View):
@@ -67,7 +67,7 @@ class BaseSubgroupInput(View):
         return setter
 
     async def default(self, r: Request):
-        return Response(_('Такой подгруппы не существует'), self.keyboard)
+        return Response(_('Такой подгруппы не существует'))
 
 
 class BaseGroupInput(View):
@@ -88,12 +88,12 @@ class BaseGroupInput(View):
         try:
             group = models.Group.query.filter(models.Group.name == r.text).one()
         except NoResultFound:
-            raise ErrorResponse(Response(_('Такой группы не существует'), self.keyboard))
+            raise ErrorResponse(Response(_('Такой группы не существует')))
         else:
             await r.user.update(group=group)
 
     async def default(self, r: Request):
-        return Response(_('Номер группы должен состоять из 8 цифр'), self.keyboard)
+        return Response(_('Номер группы должен состоять из 8 цифр'))
 
 
 class BaseNameInput(View):

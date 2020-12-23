@@ -1,5 +1,5 @@
 from abc import abstractmethod, ABC
-from functools import cached_property, partial
+from functools import cached_property
 from typing import List, Type
 
 import sqlalchemy as sa
@@ -339,7 +339,7 @@ class Schedule(View, ABC):
         ]
 
     async def default(self, r: Request):
-        return Response(_('Непонятная команда'), self.keyboard)
+        return Response(_('Непонятная команда'))
 
     @classmethod
     async def switch(cls, r: Request):
@@ -375,14 +375,13 @@ class Schedule(View, ABC):
         return handler
 
     def no_lessons_response(self) -> Response:
-        return Response(_('Занятий нет)'), self.keyboard)
+        return Response(_('Занятий нет)'))
 
 
 class TeacherSchedule(Schedule):
     formatter_cls = TeacherFormatter
 
     def _schedule(self, date: Date, r: Request):
-        resp = partial(Response, kb=self.keyboard)
         user = r.user
 
         query = m.Lesson.query.filter(
@@ -394,8 +393,8 @@ class TeacherSchedule(Schedule):
             message_str = _('Преподаватель {}\n'
                             '{}').format(user.name, self.formatter_cls.datefmt(date))
             lessons_str = '\n'.join(str(self.formatter_cls(l)) for l in query)
-            return [resp(message_str),
-                    resp(lessons_str)]
+            return [Response(message_str),
+                    Response(lessons_str)]
         return self.no_lessons_response()
 
 
@@ -403,7 +402,6 @@ class StudentSchedule(Schedule):
     formatter_cls = StudentFormatter
 
     def _schedule(self, date: Date, r: Request):
-        resp = partial(Response, kb=self.keyboard)
         user = r.user
 
         # noinspection PyComparisonWithNone
@@ -423,8 +421,8 @@ class StudentSchedule(Schedule):
                                          user.subgroup.name,
                                          self.formatter_cls.datefmt(date))
             lessons_str = '\n'.join(str(self.formatter_cls(l)) for l in query)
-            return [resp(message_str),
-                    resp(lessons_str)]
+            return [Response(message_str),
+                    Response(lessons_str)]
         return self.no_lessons_response()
 
 
