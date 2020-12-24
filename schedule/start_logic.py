@@ -1,6 +1,8 @@
+from typing import Awaitable
+
 from bottex2.conditions import if_text_eq
 from bottex2.ext.users import gen_state_cases
-from bottex2.handler import Request, Response
+from bottex2.handler import Request, Response, TResponse
 from bottex2.helpers.tools import state_name
 from bottex2.keyboard import Keyboard
 from bottex2.router import Router
@@ -37,8 +39,8 @@ class StartPTypeInput(inputs.PTypeInput, inputs.InputChainStep):
         return commands + step_commands
 
     @staticmethod
-    async def back(r: Request):
-        return await StartLanguageInput.switch(r)
+    def back(r: Request) -> Awaitable[TResponse]:
+        return StartLanguageInput.switch(r)
 
     @classmethod
     async def set_stutent_ptype(cls, r: Request):
@@ -66,8 +68,8 @@ class StartGroupInput(inputs.BaseGroupInput, inputs.InputChainStep):
         return commands + step_commands
 
     @staticmethod
-    async def back(r: Request):
-        return await StartPTypeInput.switch(r)
+    def back(r: Request):
+        return StartPTypeInput.switch(r)
 
     @classmethod
     async def set_group(cls, r: Request):
@@ -90,8 +92,8 @@ class StartSubgroupInput(inputs.BaseSubgroupInput, inputs.InputChainStep):
         return commands + step_commands
 
     @staticmethod
-    async def back(r: Request):
-        return await StartGroupInput.switch(r)
+    def back(r: Request):
+        return StartGroupInput.switch(r)
 
     @classmethod
     def get_subgroup_setter(cls, subgroup: models.Subgroup):
@@ -118,8 +120,8 @@ class StartNameInput(inputs.BaseNameInput, inputs.InputChainStep):
         return commands + step_commands
 
     @staticmethod
-    async def back(r: Request):
-        return await StartPTypeInput.switch(r)
+    def back(r: Request):
+        return StartPTypeInput.switch(r)
 
     @classmethod
     async def set_name(cls, r: Request):

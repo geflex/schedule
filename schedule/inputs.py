@@ -1,12 +1,12 @@
 import re
 from abc import ABC, abstractmethod
 from functools import cached_property
-from typing import List
+from typing import List, Awaitable
 
 from sqlalchemy.orm.exc import NoResultFound
 
 from bottex2.conditions import if_re_match
-from bottex2.handler import Request, Response, ErrorResponse
+from bottex2.handler import Request, Response, ErrorResponse, TResponse
 from bottex2.helpers import regexp
 from bottex2.router import Router
 from bottex2.views import View, Command
@@ -121,5 +121,5 @@ class InputChainStep(View, ABC):
 
     @staticmethod
     @abstractmethod
-    async def back(r: Request):
+    def back(r: Request) -> Awaitable[TResponse]:
         pass

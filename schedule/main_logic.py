@@ -53,20 +53,20 @@ class Settings(View):
         return commands
 
     @staticmethod
-    async def become_student(r: Request):
+    def become_student(r: Request):
         if not r.user.group:
-            return await RequiredGroupInput.switch(r)
+            return RequiredGroupInput.switch(r)
         if not r.user.subgroup:
-            return await RequiredSubGroupInput.switch(r)
+            return RequiredSubGroupInput.switch(r)
         else:
-            return await save_student(r)
+            return save_student(r)
 
     @staticmethod
-    async def become_teacher(r: Request):
+    def become_teacher(r: Request):
         if not r.user.name:
-            return await RequiredNameInput.switch(r)
+            return RequiredNameInput.switch(r)
         else:
-            return await save_teacher(r)
+            return save_teacher(r)
 
     @classmethod
     async def switch(cls, r: Request):
@@ -199,8 +199,8 @@ class BasePTypeRequiredInput(BaseSettingsInput):
         return [[Command(_c('Отмена'), self.cancel)]]
 
     @staticmethod
-    async def cancel(r: Request):
-        return await Settings.switch(r)
+    def cancel(r: Request):
+        return Settings.switch(r)
 
 
 class RequiredGroupInput(inputs.BaseGroupInput, BasePTypeRequiredInput):
