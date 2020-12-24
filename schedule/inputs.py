@@ -24,11 +24,13 @@ class PTypeInput(View):
             Command(_c('Препод'), self.set_teacher_ptype),
         ]]
 
-    async def set_stutent_ptype(self, r: Request):
-        await self.r.user.update(ptype=models.PType['student'])
+    @staticmethod
+    async def set_stutent_ptype(r: Request):
+        await r.user.update(ptype=models.PType['student'])
 
-    async def set_teacher_ptype(self, r: Request):
-        await self.r.user.update(ptype=models.PType['teacher'])
+    @staticmethod
+    async def set_teacher_ptype(r: Request):
+        await r.user.update(ptype=models.PType['teacher'])
 
     async def default(self, r: Request):
         return Response(_('Неизвестный тип профиля'))
@@ -43,7 +45,8 @@ class BaseLanguageInput(View):
         ]
         return commands
 
-    def get_lang_setter(self, lang: models.Lang):
+    @staticmethod
+    def get_lang_setter(lang: models.Lang):
         async def setter(r: Request):
             await r.user.update(locale=lang)
         return setter
@@ -61,7 +64,8 @@ class BaseSubgroupInput(View):
         ]]
         return commands
 
-    def get_subgroup_setter(self, subgroup: models.Subgroup):
+    @staticmethod
+    def get_subgroup_setter(subgroup: models.Subgroup):
         async def setter(r: Request):
             await r.user.update(subgroup=subgroup)
         return setter
@@ -84,7 +88,8 @@ class BaseGroupInput(View):
         router[if_re_match(self.exp)] = self.set_group
         return router
 
-    async def set_group(self, r: Request):
+    @staticmethod
+    async def set_group(r: Request):
         try:
             group = models.Group.query.filter(models.Group.name == r.text).one()
         except NoResultFound:
@@ -101,7 +106,8 @@ class BaseNameInput(View):
     def commands(self) -> List[List[Command]]:
         return []
 
-    async def set_name(self, r: Request):
+    @staticmethod
+    async def set_name(r: Request):
         await r.user.update(name=r.text)
 
     def default(self, r: Request):
@@ -113,6 +119,7 @@ class InputChainStep(View, ABC):
     def commands(self) -> List[List[Command]]:
         return [[Command(_c('Назад'), self.back)]]
 
+    @staticmethod
     @abstractmethod
-    async def back(self, r: Request):
+    async def back(r: Request):
         pass

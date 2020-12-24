@@ -52,7 +52,8 @@ class Settings(View):
         add(_c('Назад'), Schedule.switch)
         return commands
 
-    async def become_student(self, r: Request):
+    @staticmethod
+    async def become_student(r: Request):
         if not r.user.group:
             return await RequiredGroupInput.switch(r)
         if not r.user.subgroup:
@@ -60,7 +61,8 @@ class Settings(View):
         else:
             return await save_student(r)
 
-    async def become_teacher(self, r: Request):
+    @staticmethod
+    async def become_teacher(r: Request):
         if not r.user.name:
             return await RequiredNameInput.switch(r)
         else:
@@ -87,7 +89,8 @@ class SettingsLanguageInput(inputs.BaseLanguageInput, BaseSettingsInput):
         commands2 = super(inputs.BaseLanguageInput, self).commands
         return commands + commands2
 
-    def get_lang_setter(self, lang: Lang):
+    @classmethod
+    def get_lang_setter(cls, lang: Lang):
         super_setter = super().get_lang_setter(lang)
         async def setter(r: Request):
             old = r.user.locale
@@ -117,7 +120,8 @@ class SettingsGroupInput(inputs.BaseGroupInput, BaseSettingsInput):
         commands2 = super(inputs.BaseGroupInput, self).commands
         return commands + commands2
 
-    async def set_group(self, r: Request):
+    @classmethod
+    async def set_group(cls, r: Request):
         old = r.user.group
         await super().set_group(r)
         await r.user.update(state=state_name(Settings))
@@ -143,7 +147,8 @@ class SettingsNameInput(inputs.BaseNameInput, BaseSettingsInput):
         commands2 = super(inputs.BaseNameInput, self).commands
         return commands + commands2
 
-    async def set_name(self, r: Request):
+    @classmethod
+    async def set_name(cls, r: Request):
         old = r.user.name
         await super().set_name(r)
         await r.user.update(state=state_name(Settings))
@@ -167,7 +172,8 @@ class SettingsSubgroupInput(inputs.BaseSubgroupInput, BaseSettingsInput):
         commands2 = super(inputs.BaseSubgroupInput, self).commands
         return commands + commands2
 
-    def get_subgroup_setter(self, subgroup: Subgroup):
+    @classmethod
+    def get_subgroup_setter(cls, subgroup: Subgroup):
         super_setter = super().get_subgroup_setter(subgroup)
         async def setter(r: Request):
             old = r.user.subgroup
@@ -192,7 +198,8 @@ class BasePTypeRequiredInput(BaseSettingsInput):
     def commands(self) -> List[List[Command]]:
         return [[Command(_c('Отмена'), self.cancel)]]
 
-    async def cancel(self, r: Request):
+    @staticmethod
+    async def cancel(r: Request):
         return await Settings.switch(r)
 
 
@@ -205,7 +212,8 @@ class RequiredGroupInput(inputs.BaseGroupInput, BasePTypeRequiredInput):
         commands2 = super(inputs.BaseGroupInput, self).commands
         return commands + commands2
 
-    async def set_group(self, r: Request):
+    @classmethod
+    async def set_group(cls, r: Request):
         result = await super().set_group(r)
         if not r.user.subgroup:
             return await RequiredSubGroupInput.switch(r)
@@ -226,14 +234,16 @@ class RequiredSubGroupInput(inputs.BaseSubgroupInput, BasePTypeRequiredInput):
         commands = super(inputs.BaseSubgroupInput, self).commands
         return choises + commands
 
-    def get_subgroup_setter(self, subgroup: Subgroup):
+    @classmethod
+    def get_subgroup_setter(cls, subgroup: Subgroup):
         super_setter = super().get_subgroup_setter(subgroup)
         async def setter(r: Request):
             await super_setter(r)
             return await save_student(r)
         return setter
 
-    async def cancel(self, r: Request):
+    @staticmethod
+    async def cancel(r: Request):
         await r.user.update(ptype=PType['teacher'])
         return await Settings.switch(r)
 
@@ -252,7 +262,8 @@ class RequiredNameInput(inputs.BaseNameInput, BasePTypeRequiredInput):
         commands2 = super(inputs.BaseNameInput, self).commands
         return commands + commands2
 
-    async def set_name(self, r: Request):
+    @classmethod
+    async def set_name(cls, r: Request):
         await super().set_name(r)
         return await save_teacher(r)
 
@@ -346,14 +357,16 @@ class Schedule(View, ABC):
         await super().switch(r)
         return Response(_('Главное меню'), cls(r).keyboard)
 
-    def _query_conditions(self, date):
+    @staticmethod
+    def _query_conditions(date):
         # noinspection PyComparisonWithNone
         week_cond = sa.or_(m.Lesson.second_weeknum == dateutils.is_second_weeknum(date),
                            m.Lesson.second_weeknum == None)
         weekday_cond = (m.Lesson.weekday_num == date.weekday())
         return week_cond, weekday_cond
 
-    async def _schedule(self, date: Date, r: Request):
+    @classmethod
+    async def _schedule(cls, date: Date, r: Request):
         pass
 
     @classmethod
@@ -374,34 +387,37 @@ class Schedule(View, ABC):
             return cls(r)._schedule(date, r)
         return handler
 
-    def no_lessons_response(self) -> Response:
+    @staticmethod
+    def no_lessons_response() -> Response:
         return Response(_('Занятий нет)'))
 
 
 class TeacherSchedule(Schedule):
     formatter_cls = TeacherFormatter
 
-    def _schedule(self, date: Date, r: Request):
+    @classmethod
+    def _schedule(cls, date: Date, r: Request):
         user = r.user
 
         query = m.Lesson.query.filter(
             m.Lesson.teachers.any(last_name=user.name),
-            *self._query_conditions(date),
+            *cls._query_conditions(date),
         )
         query = query.all()
         if query:
             message_str = _('Преподаватель {}\n'
-                            '{}').format(user.name, self.formatter_cls.datefmt(date))
-            lessons_str = '\n'.join(str(self.formatter_cls(l)) for l in query)
+                            '{}').format(user.name, cls.formatter_cls.datefmt(date))
+            lessons_str = '\n'.join(str(cls.formatter_cls(l)) for l in query)
             return [Response(message_str),
                     Response(lessons_str)]
-        return self.no_lessons_response()
+        return cls.no_lessons_response()
 
 
 class StudentSchedule(Schedule):
     formatter_cls = StudentFormatter
 
-    def _schedule(self, date: Date, r: Request):
+    @classmethod
+    def _schedule(cls, date: Date, r: Request):
         user = r.user
 
         # noinspection PyComparisonWithNone
@@ -411,7 +427,7 @@ class StudentSchedule(Schedule):
                 m.Lesson.subgroup == user.subgroup,
                 m.Lesson.subgroup == None,
             ),
-            *self._query_conditions(date),
+            *cls._query_conditions(date),
         )
         query = query.all()
         if query:
@@ -419,11 +435,11 @@ class StudentSchedule(Schedule):
                             '{} подгруппа\n'
                             '{}').format(user.group.name,
                                          user.subgroup.name,
-                                         self.formatter_cls.datefmt(date))
-            lessons_str = '\n'.join(str(self.formatter_cls(l)) for l in query)
+                                         cls.formatter_cls.datefmt(date))
+            lessons_str = '\n'.join(str(cls.formatter_cls(l)) for l in query)
             return [Response(message_str),
                     Response(lessons_str)]
-        return self.no_lessons_response()
+        return cls.no_lessons_response()
 
 
 schedule = Router({

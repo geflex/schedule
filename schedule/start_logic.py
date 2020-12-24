@@ -13,7 +13,8 @@ _c = models.i18n.rgettext
 class StartLanguageInput(inputs.BaseLanguageInput):
     state_name = 'start_setup'
 
-    def get_lang_setter(self, lang: models.Lang):
+    @classmethod
+    def get_lang_setter(cls, lang: models.Lang):
         super_setter = super().get_lang_setter(lang)
         async def setter(r: Request):
             await super_setter(r)
@@ -35,14 +36,17 @@ class StartPTypeInput(inputs.PTypeInput, inputs.InputChainStep):
         step_commands = super(inputs.PTypeInput, self).commands
         return commands + step_commands
 
-    async def back(self, r: Request):
+    @staticmethod
+    async def back(r: Request):
         return await StartLanguageInput.switch(r)
 
-    async def set_stutent_ptype(self, r: Request):
+    @classmethod
+    async def set_stutent_ptype(cls, r: Request):
         await super().set_stutent_ptype(r)
         return await StartGroupInput.switch(r)
 
-    async def set_teacher_ptype(self, r: Request):
+    @classmethod
+    async def set_teacher_ptype(cls, r: Request):
         await super().set_teacher_ptype(r)
         return await StartNameInput.switch(r)
 
@@ -61,10 +65,12 @@ class StartGroupInput(inputs.BaseGroupInput, inputs.InputChainStep):
         step_commands = super(inputs.BaseGroupInput, self).commands
         return commands + step_commands
 
-    async def back(self, r: Request):
+    @staticmethod
+    async def back(r: Request):
         return await StartPTypeInput.switch(r)
 
-    async def set_group(self, r: Request):
+    @classmethod
+    async def set_group(cls, r: Request):
         await super().set_group(r)
         return await StartSubgroupInput.switch(r)
 
@@ -83,10 +89,12 @@ class StartSubgroupInput(inputs.BaseSubgroupInput, inputs.InputChainStep):
         step_commands = super(inputs.BaseSubgroupInput, self).commands
         return commands + step_commands
 
-    async def back(self, r: Request):
+    @staticmethod
+    async def back(r: Request):
         return await StartGroupInput.switch(r)
 
-    def get_subgroup_setter(self, subgroup: models.Subgroup):
+    @classmethod
+    def get_subgroup_setter(cls, subgroup: models.Subgroup):
         super_setter = super().get_subgroup_setter(subgroup)
         async def setter(r: Request):
             await super_setter(r)
@@ -109,10 +117,12 @@ class StartNameInput(inputs.BaseNameInput, inputs.InputChainStep):
         step_commands = super(inputs.BaseNameInput, self).commands
         return commands + step_commands
 
-    async def back(self, r: Request):
+    @staticmethod
+    async def back(r: Request):
         return await StartPTypeInput.switch(r)
 
-    async def set_name(self, r: Request):
+    @classmethod
+    async def set_name(cls, r: Request):
         await super().set_name(r)
         await r.user.update(state=state_name(main_logic.Schedule))
         return end_registration_message(r)
