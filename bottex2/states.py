@@ -23,6 +23,9 @@ def state_handler(obj):
 class StateUserMixin:
     state = Column(String)
 
+    async def set_state(self, state):
+        await self.update(state=state_name(state))
+
 
 def state_cond(st: str) -> TCondition:
     def cond(request: Request) -> bool:

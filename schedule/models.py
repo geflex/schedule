@@ -91,7 +91,6 @@ class Subgroup(tables.Table):
     )
 
 
-# noinspection PyMethodParameters,PyMethodParameters
 class User(db.Model, MultiplatformUserMixin, StateUserMixin, i18n.UserMixin, rights.UserMixin):
     __tablename__ = 'users'
 

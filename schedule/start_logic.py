@@ -4,7 +4,7 @@ from bottex2.conditions import if_text_eq
 from bottex2.handler import Request, Response, TResponse
 from bottex2.keyboard import Keyboard
 from bottex2.router import Router
-from bottex2.states import state_name, gen_state_cases
+from bottex2.states import gen_state_cases
 from . import inputs, models, main_logic
 
 _ = models.i18n.gettext
@@ -99,7 +99,7 @@ class StartSubgroupInput(inputs.BaseSubgroupInput, inputs.InputChainStep):
         super_setter = super().get_subgroup_setter(subgroup)
         async def setter(r: Request):
             await super_setter(r)
-            await r.user.update(state=state_name(main_logic.Schedule))
+            await r.user.set_state(main_logic.Schedule)
             return end_registration_message(r)
         return setter
 
@@ -125,7 +125,7 @@ class StartNameInput(inputs.BaseNameInput, inputs.InputChainStep):
     @classmethod
     async def set_name(cls, r: Request):
         await super().set_name(r)
-        await r.user.update(state=state_name(main_logic.Schedule))
+        await r.user.set_state(main_logic.Schedule)
         return end_registration_message(r)
 
     @classmethod

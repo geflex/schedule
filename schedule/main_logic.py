@@ -94,7 +94,7 @@ class SettingsLanguageInput(inputs.BaseLanguageInput, BaseSettingsInput):
         async def setter(r: Request):
             old = r.user.locale
             await super_setter(r)
-            await r.user.update(state=state_name(Settings))
+            await r.user.set_state(Settings)
             return Response(
                 _('Язык изменен с {} на {}').format(old.name, lang.name),
                 Settings(r).keyboard
@@ -123,7 +123,7 @@ class SettingsGroupInput(inputs.BaseGroupInput, BaseSettingsInput):
     async def set_group(cls, r: Request):
         old = r.user.group
         await super().set_group(r)
-        await r.user.update(state=state_name(Settings))
+        await r.user.set_state(Settings)
         return Response(
             _('Группа изменена с {} на {}').format(group_str(old), group_str(r.user.group)),
             Settings(r).keyboard
@@ -150,7 +150,7 @@ class SettingsNameInput(inputs.BaseNameInput, BaseSettingsInput):
     async def set_name(cls, r: Request):
         old = r.user.name
         await super().set_name(r)
-        await r.user.update(state=state_name(Settings))
+        await r.user.set_state(Settings)
         return Response(_('Имя изменено с {} на {}').format(old, r.text),
                         Settings(r).keyboard)
 
@@ -177,7 +177,7 @@ class SettingsSubgroupInput(inputs.BaseSubgroupInput, BaseSettingsInput):
         async def setter(r: Request):
             old = r.user.subgroup
             await super_setter(r)
-            await r.user.update(state=state_name(Settings))
+            await r.user.set_state(Settings)
             return Response(
                 _('Подгруппа изменена с {} на {}').format(old.name, subgroup.name),
                 Settings(r).keyboard

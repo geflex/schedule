@@ -5,7 +5,6 @@ from bottex2.conditions import if_text_eq
 from bottex2.handler import Request, Handler, Response, TResponse
 from bottex2.keyboard import Keyboard, Button
 from bottex2.router import Router, TCondition
-from bottex2.states import state_name
 
 
 class Command:
@@ -56,5 +55,5 @@ class View(ABC):
 
     @classmethod
     async def switch(cls, r: Request) -> TResponse:
-        await r.user.update(state=state_name(cls))
+        await r.user.set_state(cls)
         return None
