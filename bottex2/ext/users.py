@@ -1,10 +1,8 @@
 from abc import ABC, abstractmethod
-from typing import Type, Iterable
+from typing import Type
 
 from bottex2.handler import Request
-from bottex2.helpers.tools import state_name, state_handler
 from bottex2.multiplatform import MultiplatformMiddleware
-from bottex2.router import TCondition
 from bottex2.sqlalchemy import BaseModel
 
 
@@ -25,20 +23,6 @@ class UserMiddleware(MultiplatformMiddleware, ABC):
     async def __call__(self, request: Request):
         request.user = await self.get_user(request)
         return await super().__call__(request)
-
-
-def state_cond(st: str) -> TCondition:
-    def cond(request: Request) -> bool:
-        return request.user.state == st
-    return cond
-
-
-def gen_state_cases(handlers: Iterable):
-    routes = {}
-    for obj in handlers:
-        name, handler = state_name(obj), state_handler(obj)
-        routes[state_cond(name)] = handler
-    return routes
 
 
 class Users:

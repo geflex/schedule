@@ -1,20 +1,5 @@
 import inspect
 
-
-def state_name(obj):
-    if hasattr(obj, 'state_name'):
-        return obj.state_name
-    else:
-        return obj.__name__
-
-
-def state_handler(obj):
-    if isinstance(obj, type) and hasattr(obj, 'handle'):
-        return obj.handle
-    else:
-        return obj
-
-
 invisible_space = '\u200b'
 
 

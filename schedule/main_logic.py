@@ -4,10 +4,9 @@ from typing import List, Type
 
 import sqlalchemy as sa
 
-from bottex2.ext.users import gen_state_cases
 from bottex2.handler import Request, Response, Handler
-from bottex2.helpers.tools import state_name
 from bottex2.router import Router
+from bottex2.states import state_name, gen_state_cases
 from bottex2.views import View, Command
 from . import dateutils
 from . import inputs

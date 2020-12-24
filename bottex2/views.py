@@ -1,13 +1,11 @@
 from abc import abstractmethod, ABC
 from typing import List, Optional, Awaitable
 
-from sqlalchemy import Column, String
-
 from bottex2.conditions import if_text_eq
 from bottex2.handler import Request, Handler, Response, TResponse
-from bottex2.helpers.tools import state_name
 from bottex2.keyboard import Keyboard, Button
 from bottex2.router import Router, TCondition
+from bottex2.states import state_name
 
 
 class Command:
@@ -60,7 +58,3 @@ class View(ABC):
     async def switch(cls, r: Request) -> TResponse:
         await r.user.update(state=state_name(cls))
         return None
-
-
-class StateUserMixin:
-    state = Column(String)

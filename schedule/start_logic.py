@@ -1,11 +1,10 @@
 from typing import Awaitable
 
 from bottex2.conditions import if_text_eq
-from bottex2.ext.users import gen_state_cases
 from bottex2.handler import Request, Response, TResponse
-from bottex2.helpers.tools import state_name
 from bottex2.keyboard import Keyboard
 from bottex2.router import Router
+from bottex2.states import state_name, gen_state_cases
 from . import inputs, models, main_logic
 
 _ = models.i18n.gettext

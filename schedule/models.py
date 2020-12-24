@@ -10,7 +10,7 @@ from bottex2.ext.users import Users
 from bottex2.helpers import tables
 from bottex2.multiplatform import MultiplatformUserMixin
 from bottex2.sqlalchemy import SQLAlchemy
-from bottex2.views import StateUserMixin
+from bottex2.states import StateUserMixin
 from . import configs
 
 
