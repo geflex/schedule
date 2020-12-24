@@ -1,5 +1,7 @@
 from typing import Type, AsyncIterator, List, Iterable, Dict, Awaitable
 
+from sqlalchemy import Column, Integer, String
+
 from bottex2.handler import Request, Handler, TResponse, Response
 from bottex2.helpers.aiotools import merge_async_iterators
 from bottex2.logging import logger
@@ -85,3 +87,8 @@ class MultiplatformWrappedHandler(HandlerMiddleware):
         transport = request.__transport__
         handler = self.wrap_handler(type(transport))
         return handler(request)
+
+
+class MultiplatformUserMixin:
+    uid = Column(Integer, primary_key=True)
+    platform = Column(String)

@@ -2,14 +2,15 @@ from enum import Enum, IntFlag
 
 from sqlalchemy import Column, Table, ForeignKey, create_engine
 from sqlalchemy import types as satypes
-from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import relationship
 
 from bottex2.ext.i18n import I18n, BaseLang
 from bottex2.ext.rights import Rights as RightsEnv
 from bottex2.ext.users import Users
 from bottex2.helpers import tables
+from bottex2.multiplatform import MultiplatformUserMixin
 from bottex2.sqlalchemy import SQLAlchemy
+from bottex2.views import StateUserMixin
 from . import configs
 
 
@@ -91,24 +92,20 @@ class Subgroup(tables.Table):
 
 
 # noinspection PyMethodParameters,PyMethodParameters
-class UserMixin(i18n.UserMixin, rights.UserMixin):
+class User(db.Model, MultiplatformUserMixin, StateUserMixin, i18n.UserMixin, rights.UserMixin):
+    __tablename__ = 'users'
+
     notifications_time = Column(satypes.Time, nullable=True)
 
     ptype = Column(satypes.Enum(PType))
     name = Column(satypes.String)  # for teacher
-
     subgroup = Column(satypes.Enum(Subgroup))  # only for student
+    group_name = Column(satypes.String, ForeignKey('groups.name'))
 
-    @declared_attr
-    def group_name(cls):
-        return Column(satypes.String, ForeignKey('groups.name'))
-
-    @declared_attr
-    def group(cls):
-        return relationship("Group")
+    group = relationship("Group")
 
 
-users = Users(db, UserMixin)
+users = Users(User)
 
 
 class Group(db.Model):

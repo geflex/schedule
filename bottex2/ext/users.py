@@ -1,21 +1,11 @@
 from abc import ABC, abstractmethod
 from typing import Type, Iterable
 
-from sqlalchemy import Column, Integer, String
-
 from bottex2.handler import Request
 from bottex2.helpers.tools import state_name, state_handler
 from bottex2.multiplatform import MultiplatformMiddleware
 from bottex2.router import TCondition
-from bottex2.sqlalchemy import BaseModel, SQLAlchemy
-
-
-class BaseUserMixin:
-    __tablename__ = 'users'
-
-    uid = Column(Integer, primary_key=True)
-    platform = Column(String)
-    state = Column(String)
+from bottex2.sqlalchemy import BaseModel
 
 
 class UserMiddleware(MultiplatformMiddleware, ABC):
@@ -52,8 +42,8 @@ def gen_state_cases(handlers: Iterable):
 
 
 class Users:
-    def __init__(self, db: SQLAlchemy, user_mixin=object):
-        self.User = type('User', (db.Model, BaseUserMixin, user_mixin), {})
+    def __init__(self, user_cls: type):
+        self.User = user_cls
         self.Middleware = type('UserMiddleware', (UserMiddleware,), {
             'user_model': self.User,
         })
