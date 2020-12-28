@@ -104,11 +104,11 @@ class SettingsLanguageInput(inputs.BaseLanguageInput, BaseSettingsInput):
     def get_lang_setter(cls, lang: Lang):
         super_setter = super().get_lang_setter(lang)
         async def setter(r: Request):
-            old = r.user.locale
+            old_lang = r.user.locale
             await super_setter(r)
             await r.user.set_state(Settings)
             return Response(
-                _('Язык изменен с {} на {}').format(old.name, lang.name),
+                _('Язык изменен с {} на {}').format(old_lang.name, lang.name),
                 Settings(r).keyboard
             )
         return setter
@@ -116,9 +116,9 @@ class SettingsLanguageInput(inputs.BaseLanguageInput, BaseSettingsInput):
     @classmethod
     async def switch(cls, r: Request):
         kb = cls(r).keyboard
-        current = r.user.locale  # type: Lang
+        current_lang = r.user.locale  # type: Lang
         await super().switch(r)
-        return [Response(_('Текущий язык: {}').format(current.name), kb),
+        return [Response(_('Текущий язык: {}').format(current_lang.name), kb),
                 Response(_('Выбери новый язык'), kb)]
 
 
@@ -133,11 +133,11 @@ class SettingsGroupInput(inputs.BaseGroupInput, BaseSettingsInput):
 
     @classmethod
     async def set_group(cls, r: Request):
-        old = r.user.group
+        old_group = r.user.group
         await super().set_group(r)
         await r.user.set_state(Settings)
         return Response(
-            _('Группа изменена с {} на {}').format(group_str(old), group_str(r.user.group)),
+            _('Группа изменена с {} на {}').format(group_str(old_group), group_str(r.user.group)),
             Settings(r).keyboard
         )
 
@@ -160,10 +160,10 @@ class SettingsNameInput(inputs.BaseNameInput, BaseSettingsInput):
 
     @classmethod
     async def set_name(cls, r: Request):
-        old = r.user.name
+        old_name = r.user.name
         await super().set_name(r)
         await r.user.set_state(Settings)
-        return Response(_('Имя изменено с {} на {}').format(old, r.text),
+        return Response(_('Имя изменено с {} на {}').format(old_name, r.text),
                         Settings(r).keyboard)
 
     @classmethod
@@ -187,11 +187,11 @@ class SettingsSubgroupInput(inputs.BaseSubgroupInput, BaseSettingsInput):
     def get_subgroup_setter(cls, subgroup: Subgroup):
         super_setter = super().get_subgroup_setter(subgroup)
         async def setter(r: Request):
-            old = r.user.subgroup
+            old_subgroup = r.user.subgroup
             await super_setter(r)
             await r.user.set_state(Settings)
             return Response(
-                _('Подгруппа изменена с {} на {}').format(old.name, subgroup.name),
+                _('Подгруппа изменена с {} на {}').format(old_subgroup.name, subgroup.name),
                 Settings(r).keyboard
             )
         return setter
