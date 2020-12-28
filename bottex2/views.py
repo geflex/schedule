@@ -41,10 +41,10 @@ class View(ABC):
 
     @classmethod
     def handle(cls, request: Request) -> Awaitable[TResponse]:
-        return cls(request).router(request)
+        return cls(request)(request)
 
     async def __call__(self, request: Request) -> TResponse:
-        responses = await self.handle(request)
+        responses = await self.router(request)
         for resp in responses:
             if resp.kb is None:
                 resp.kb = self.keyboard   # !!! changing existing response
