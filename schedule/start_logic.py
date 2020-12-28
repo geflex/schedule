@@ -30,10 +30,9 @@ class StartLanguageInput(inputs.BaseLanguageInput):
 class StartPTypeInput(inputs.PTypeInput, inputs.InputChainStep):
     state_name = 'ptype_input'
 
-    @property
     def commands(self):
-        commands = super().commands
-        step_commands = super(inputs.PTypeInput, self).commands
+        commands = super().commands()
+        step_commands = super(inputs.PTypeInput, self).commands()
         return commands + step_commands
 
     @staticmethod
@@ -58,10 +57,9 @@ class StartPTypeInput(inputs.PTypeInput, inputs.InputChainStep):
 class StartGroupInput(inputs.BaseGroupInput, inputs.InputChainStep):
     state_name = 'start_group_input'
 
-    @property
     def commands(self):
-        commands = super().commands
-        step_commands = super(inputs.BaseGroupInput, self).commands
+        commands = super().commands()
+        step_commands = super(inputs.BaseGroupInput, self).commands()
         return commands + step_commands
 
     @staticmethod
@@ -81,10 +79,9 @@ class StartGroupInput(inputs.BaseGroupInput, inputs.InputChainStep):
 class StartSubgroupInput(inputs.BaseSubgroupInput, inputs.InputChainStep):
     state_name = 'start_subgroup_input'
 
-    @property
     def commands(self):
-        commands = super().commands
-        step_commands = super(inputs.BaseSubgroupInput, self).commands
+        commands = super().commands()
+        step_commands = super(inputs.BaseSubgroupInput, self).commands()
         return commands + step_commands
 
     @staticmethod
@@ -108,10 +105,9 @@ class StartSubgroupInput(inputs.BaseSubgroupInput, inputs.InputChainStep):
 class StartNameInput(inputs.BaseNameInput, inputs.InputChainStep):
     state_name = 'start_name_input'
 
-    @property
     def commands(self):
-        commands = super().commands
-        step_commands = super(inputs.BaseNameInput, self).commands
+        commands = super().commands()
+        step_commands = super(inputs.BaseNameInput, self).commands()
         return commands + step_commands
 
     @staticmethod

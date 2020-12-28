@@ -1,5 +1,4 @@
 from abc import abstractmethod, ABC
-from functools import cached_property
 from typing import List, Type
 
 import sqlalchemy as sa
@@ -29,8 +28,7 @@ is_teacher = ptype_cond(PType['teacher'])
 
 class Settings(View, ABC):
     state_name = 'settings'
-    
-    @property
+
     def commands(self):
         commands = [
             [Command(_c('Изменить язык'), SettingsLanguageInput.switcher)],
@@ -44,14 +42,13 @@ class Settings(View, ABC):
 
 
 class StudentSettings(Settings):
-    @property
     def commands(self):
         commands = [
             [Command(_c('Режим преподавателя'), self.become_teacher)],
             [Command(_c('Изменить группу'), SettingsGroupInput.switcher)],
             [Command(_c('Изменить подгруппу'), SettingsSubgroupInput.switcher)],
         ]
-        return commands + super().commands
+        return commands + super().commands()
 
     @staticmethod
     def become_teacher(r: Request):
@@ -62,13 +59,12 @@ class StudentSettings(Settings):
 
 
 class TeacherSettings(Settings):
-    @property
     def commands(self):
         commands = [
             [Command(_c('Режим студента'), self.become_student)],
             [Command(_c('Изменить имя'), SettingsNameInput.switcher)],
         ]
-        return commands + super().commands
+        return commands + super().commands()
 
     @staticmethod
     def become_student(r: Request):
@@ -81,7 +77,6 @@ class TeacherSettings(Settings):
 
 
 class BaseSettingsInput(View):
-    @property
     def commands(self):
         return [[Command(_c('Отмена'), Settings.switcher)]]
 
@@ -89,10 +84,9 @@ class BaseSettingsInput(View):
 class SettingsLanguageInput(inputs.BaseLanguageInput, BaseSettingsInput):
     state_name = 'settings_lang'
 
-    @cached_property
     def commands(self):
-        commands = super().commands
-        commands2 = super(inputs.BaseLanguageInput, self).commands
+        commands = super().commands()
+        commands2 = super(inputs.BaseLanguageInput, self).commands()
         return commands + commands2
 
     @classmethod
@@ -118,10 +112,9 @@ class SettingsLanguageInput(inputs.BaseLanguageInput, BaseSettingsInput):
 class SettingsGroupInput(inputs.BaseGroupInput, BaseSettingsInput):
     state_name = 'settings_group'
 
-    @property
     def commands(self) -> List[List[Command]]:
-        commands = super().commands
-        commands2 = super(inputs.BaseGroupInput, self).commands
+        commands = super().commands()
+        commands2 = super(inputs.BaseGroupInput, self).commands()
         return commands + commands2
 
     @staticmethod
@@ -148,10 +141,9 @@ class SettingsGroupInput(inputs.BaseGroupInput, BaseSettingsInput):
 class SettingsNameInput(inputs.BaseNameInput, BaseSettingsInput):
     state_name = 'settings_name'
 
-    @cached_property
     def commands(self) -> List[List[Command]]:
-        commands = super().commands
-        commands2 = super(inputs.BaseNameInput, self).commands
+        commands = super().commands()
+        commands2 = super(inputs.BaseNameInput, self).commands()
         return commands + commands2
 
     @classmethod
@@ -171,10 +163,9 @@ class SettingsNameInput(inputs.BaseNameInput, BaseSettingsInput):
 class SettingsSubgroupInput(inputs.BaseSubgroupInput, BaseSettingsInput):
     state_name = 'settings_subgroup'
 
-    @cached_property
     def commands(self):
-        commands = super().commands
-        commands2 = super(inputs.BaseSubgroupInput, self).commands
+        commands = super().commands()
+        commands2 = super(inputs.BaseSubgroupInput, self).commands()
         return commands + commands2
 
     @classmethod
@@ -197,7 +188,6 @@ class SettingsSubgroupInput(inputs.BaseSubgroupInput, BaseSettingsInput):
 
 
 class BasePTypeRequiredInput(BaseSettingsInput):
-    @property
     def commands(self) -> List[List[Command]]:
         return [[Command(_c('Отмена'), self.cancel)]]
 
@@ -209,10 +199,9 @@ class BasePTypeRequiredInput(BaseSettingsInput):
 class RequiredGroupInput(inputs.BaseGroupInput, BasePTypeRequiredInput):
     state_name = 'group_after_switching_ptype'
 
-    @cached_property
     def commands(self):
-        commands = super().commands
-        commands2 = super(inputs.BaseGroupInput, self).commands
+        commands = super().commands()
+        commands2 = super(inputs.BaseGroupInput, self).commands()
         return commands + commands2
 
     @classmethod
@@ -230,10 +219,9 @@ class RequiredGroupInput(inputs.BaseGroupInput, BasePTypeRequiredInput):
 class RequiredSubGroupInput(inputs.BaseSubgroupInput, BasePTypeRequiredInput):
     state_name = 'subgroup_after_switching_ptype'
 
-    @cached_property
     def commands(self) -> List[List[Command]]:
-        choises = super().commands
-        commands = super(inputs.BaseSubgroupInput, self).commands
+        choises = super().commands()
+        commands = super(inputs.BaseSubgroupInput, self).commands()
         return choises + commands
 
     @classmethod
@@ -257,10 +245,9 @@ class RequiredSubGroupInput(inputs.BaseSubgroupInput, BasePTypeRequiredInput):
 class RequiredNameInput(inputs.BaseNameInput, BasePTypeRequiredInput):
     state_name = 'name_after_switching_ptype'
 
-    @cached_property
     def commands(self):
-        commands = super().commands
-        commands2 = super(inputs.BaseNameInput, self).commands
+        commands = super().commands()
+        commands2 = super(inputs.BaseNameInput, self).commands()
         return commands + commands2
 
     @classmethod
@@ -341,7 +328,6 @@ class Schedule(View, ABC):
     formatter_cls: Type[LessonFormatter]
     state_name = 'schedule'
 
-    @property
     def commands(self):
         return [
             [Command(_c('Сегодня'), self.today), Command(_c('Завтра'), self.tomorrow)],

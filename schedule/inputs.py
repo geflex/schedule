@@ -17,14 +17,13 @@ _c = models.i18n.rgettext
 
 
 class PTypeInput(View):
-    @property
     def commands(self) -> List[List[Command]]:
         return [[Command(_c(t.name), self.get_ptype_setter(t)) for t in models.PType]]
 
     @staticmethod
     def get_ptype_setter(ptype: models.PType):
         async def setter(r: Request):
-            r.user.update(ptype=ptype)
+            await r.user.update(ptype=ptype)
         return setter
 
     async def default(self, r: Request):
@@ -32,7 +31,6 @@ class PTypeInput(View):
 
 
 class BaseLanguageInput(View):
-    @property
     def commands(self):
         commands = [
             [Command(lang.name, self.get_lang_setter(lang))]
@@ -51,7 +49,6 @@ class BaseLanguageInput(View):
 
 
 class BaseSubgroupInput(View):
-    @property
     def commands(self):
         commands = [[
             Command(_c(sg.name), self.get_subgroup_setter(sg))
@@ -73,7 +70,6 @@ class BaseGroupInput(View):
     exp = re.compile(r'\d{8}')
     revexp = regexp.compile(exp)
 
-    @property
     def commands(self) -> List[List[Command]]:
         return []
 
@@ -97,7 +93,6 @@ class BaseGroupInput(View):
 
 
 class BaseNameInput(View):
-    @property
     def commands(self) -> List[List[Command]]:
         return []
 
@@ -110,7 +105,6 @@ class BaseNameInput(View):
 
 
 class InputChainStep(View, ABC):
-    @property
     def commands(self) -> List[List[Command]]:
         return [[Command(_c('Назад'), self.back)]]
 

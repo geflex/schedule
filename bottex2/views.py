@@ -20,7 +20,6 @@ class View(ABC):
     def __init__(self, request: Request):
         self.r = request
 
-    @property
     @abstractmethod
     def commands(self) -> List[List[Command]]:
         pass
@@ -28,7 +27,7 @@ class View(ABC):
     @property
     def keyboard(self) -> Keyboard:
         keyboard = Keyboard()
-        for line in self.commands:
+        for line in self.commands():
             keyboard.append_line()
             for command in line:
                 keyboard.append_button(Button(command.text))
@@ -36,7 +35,7 @@ class View(ABC):
 
     @property
     def router(self) -> Router:
-        routes = {c.condition: c.callback for line in self.commands for c in line}
+        routes = {c.condition: c.callback for line in self.commands() for c in line}
         return Router(routes, default=self.default)
 
     @classmethod
