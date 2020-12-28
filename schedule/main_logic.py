@@ -18,10 +18,6 @@ _ = i18n.gettext
 _c = i18n.rgettext
 
 
-def group_str(group):
-    return group.name if group else ''
-
-
 def ptype_cond(ptype: PType):
     def cond(r):
         return r.user.ptype is ptype
@@ -131,13 +127,18 @@ class SettingsGroupInput(inputs.BaseGroupInput, BaseSettingsInput):
         commands2 = super(inputs.BaseGroupInput, self).commands
         return commands + commands2
 
+    @staticmethod
+    def group_str(group):
+        return group.name if group else ''
+
     @classmethod
     async def set_group(cls, r: Request):
         old_group = r.user.group
         await super().set_group(r)
         await r.user.set_state(Settings)
         return Response(
-            _('Группа изменена с {} на {}').format(group_str(old_group), group_str(r.user.group)),
+            _('Группа изменена с {} на {}').format(cls.group_str(old_group),
+                                                   cls.group_str(r.user.group)),
             Settings(r).keyboard
         )
 
@@ -145,7 +146,7 @@ class SettingsGroupInput(inputs.BaseGroupInput, BaseSettingsInput):
     async def switch(cls, r: Request):
         kb = cls(r).keyboard
         await super().switch(r)
-        return [Response(_('Текущая группа: {}').format(group_str(r.user.group)), kb),
+        return [Response(_('Текущая группа: {}').format(cls.group_str(r.user.group)), kb),
                 Response(_('Введи номер группы'), kb)]
 
 
