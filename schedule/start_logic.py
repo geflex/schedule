@@ -19,13 +19,12 @@ class StartLanguageInput(inputs.BaseLanguageInput):
         super_setter = super().get_lang_setter(lang)
         async def setter(r: Request):
             await super_setter(r)
-            return await StartPTypeInput.switch(r)
+            return await StartPTypeInput.switcher(r)
         return setter
 
-    @classmethod
-    async def switch(cls, r: Request):
-        await super().switch(r)
-        return Response(_('Выбери язык'), cls(r).keyboard)
+    async def switch(self):
+        await super().switch()
+        return Response(_('Выбери язык'))
 
 
 class StartPTypeInput(inputs.PTypeInput, inputs.InputChainStep):
@@ -39,22 +38,21 @@ class StartPTypeInput(inputs.PTypeInput, inputs.InputChainStep):
 
     @staticmethod
     def back(r: Request) -> Awaitable[TResponse]:
-        return StartLanguageInput.switch(r)
+        return StartLanguageInput.switcher(r)
 
     @classmethod
     async def set_stutent_ptype(cls, r: Request):
         await super().set_stutent_ptype(r)
-        return await StartGroupInput.switch(r)
+        return await StartGroupInput.switcher(r)
 
     @classmethod
     async def set_teacher_ptype(cls, r: Request):
         await super().set_teacher_ptype(r)
-        return await StartNameInput.switch(r)
+        return await StartNameInput.switcher(r)
 
-    @classmethod
-    async def switch(cls, r: Request):
-        await super().switch(r)
-        return Response(_('Выбери тип профиля'), cls(r).keyboard)
+    async def switch(self):
+        await super().switch()
+        return Response(_('Выбери тип профиля'))
 
 
 class StartGroupInput(inputs.BaseGroupInput, inputs.InputChainStep):
@@ -68,17 +66,16 @@ class StartGroupInput(inputs.BaseGroupInput, inputs.InputChainStep):
 
     @staticmethod
     def back(r: Request):
-        return StartPTypeInput.switch(r)
+        return StartPTypeInput.switcher(r)
 
     @classmethod
     async def set_group(cls, r: Request):
         await super().set_group(r)
-        return await StartSubgroupInput.switch(r)
+        return await StartSubgroupInput.switcher(r)
 
-    @classmethod
-    async def switch(cls, r: Request):
-        await super().switch(r)
-        return Response(_('Введи номер группы'), cls(r).keyboard)
+    async def switch(self):
+        await super().switch()
+        return Response(_('Введи номер группы'))
 
 
 class StartSubgroupInput(inputs.BaseSubgroupInput, inputs.InputChainStep):
@@ -92,7 +89,7 @@ class StartSubgroupInput(inputs.BaseSubgroupInput, inputs.InputChainStep):
 
     @staticmethod
     def back(r: Request):
-        return StartGroupInput.switch(r)
+        return StartGroupInput.switcher(r)
 
     @classmethod
     def get_subgroup_setter(cls, subgroup: models.Subgroup):
@@ -103,10 +100,9 @@ class StartSubgroupInput(inputs.BaseSubgroupInput, inputs.InputChainStep):
             return end_registration_message(r)
         return setter
 
-    @classmethod
-    async def switch(cls, r: Request):
-        await super().switch(r)
-        return Response(_('Выбери подгруппу'), cls(r).keyboard)
+    async def switch(self):
+        await super().switch()
+        return Response(_('Выбери подгруппу'))
 
 
 class StartNameInput(inputs.BaseNameInput, inputs.InputChainStep):
@@ -120,7 +116,7 @@ class StartNameInput(inputs.BaseNameInput, inputs.InputChainStep):
 
     @staticmethod
     def back(r: Request):
-        return StartPTypeInput.switch(r)
+        return StartPTypeInput.switcher(r)
 
     @classmethod
     async def set_name(cls, r: Request):
@@ -128,10 +124,9 @@ class StartNameInput(inputs.BaseNameInput, inputs.InputChainStep):
         await r.user.set_state(main_logic.Schedule)
         return end_registration_message(r)
 
-    @classmethod
-    async def switch(cls, r: Request):
-        await super().switch(r)
-        return Response(_('Введи имя'), cls(r).keyboard)
+    async def switch(self):
+        await super().switch()
+        return Response(_('Введи имя'))
 
 
 def end_registration_message(r: Request):
@@ -153,4 +148,4 @@ cases = gen_state_cases([
 main = Router({if_text_eq('delete me'): delete_me,  # works in any states
                **cases,
                **main_logic.cases},
-              default=StartLanguageInput.switch)
+              default=StartLanguageInput.switcher)

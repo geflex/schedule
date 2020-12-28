@@ -43,17 +43,26 @@ class View(ABC):
     def handle(cls, request: Request) -> Awaitable[TResponse]:
         return cls(request)(request)
 
+    def wrap_response(self, response: TResponse):
+        if response is not None:
+            for resp in response:
+                if resp.kb is None:
+                    resp.kb = self.keyboard   # !!! changing existing response
+        return response
+
     async def __call__(self, request: Request) -> TResponse:
-        responses = await self.router(request)
-        for resp in responses:
-            if resp.kb is None:
-                resp.kb = self.keyboard   # !!! changing existing response
-        return responses
+        response = await self.router(request)
+        return self.wrap_response(response)
 
     async def default(self, r: Request) -> TResponse:
         return Response('Command not found')
 
-    @classmethod
-    async def switch(cls, r: Request) -> TResponse:
-        await r.user.set_state(cls)
+    async def switch(self) -> TResponse:
+        await self.r.user.set_state(self.__class__)
         return None
+
+    @classmethod
+    async def switcher(cls, r: Request) -> TResponse:
+        obj = cls(r)
+        response = await obj.switch()
+        return obj.wrap_response(response)

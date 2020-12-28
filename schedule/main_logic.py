@@ -33,15 +33,14 @@ class Settings(View, ABC):
     @property
     def commands(self):
         commands = [
-            [Command(_c('Изменить язык'), SettingsLanguageInput.switch)],
-            [Command(_c('Назад'), Schedule.switch)],
+            [Command(_c('Изменить язык'), SettingsLanguageInput.switcher)],
+            [Command(_c('Назад'), Schedule.switcher)],
         ]
         return commands
 
-    @classmethod
-    async def switch(cls, r: Request):
-        await super().switch(r)
-        return Response(_('Настройки'), cls(r).keyboard)
+    async def switch(self):
+        await super().switch()
+        return Response(_('Настройки'))
 
 
 class StudentSettings(Settings):
@@ -49,15 +48,15 @@ class StudentSettings(Settings):
     def commands(self):
         commands = [
             [Command(_c('Режим преподавателя'), self.become_teacher)],
-            [Command(_c('Изменить группу'), SettingsGroupInput.switch)],
-            [Command(_c('Изменить подгруппу'), SettingsSubgroupInput.switch)],
+            [Command(_c('Изменить группу'), SettingsGroupInput.switcher)],
+            [Command(_c('Изменить подгруппу'), SettingsSubgroupInput.switcher)],
         ]
         return commands + super().commands
 
     @staticmethod
     def become_teacher(r: Request):
         if not r.user.name:
-            return RequiredNameInput.switch(r)
+            return RequiredNameInput.switcher(r)
         else:
             return save_teacher(r)
 
@@ -67,16 +66,16 @@ class TeacherSettings(Settings):
     def commands(self):
         commands = [
             [Command(_c('Режим студента'), self.become_student)],
-            [Command(_c('Изменить имя'), SettingsNameInput.switch)],
+            [Command(_c('Изменить имя'), SettingsNameInput.switcher)],
         ]
         return commands + super().commands
 
     @staticmethod
     def become_student(r: Request):
         if not r.user.group:
-            return RequiredGroupInput.switch(r)
+            return RequiredGroupInput.switcher(r)
         if not r.user.subgroup:
-            return RequiredSubGroupInput.switch(r)
+            return RequiredSubGroupInput.switcher(r)
         else:
             return save_student(r)
 
@@ -84,7 +83,7 @@ class TeacherSettings(Settings):
 class BaseSettingsInput(View):
     @property
     def commands(self):
-        return [[Command(_c('Отмена'), Settings.switch)]]
+        return [[Command(_c('Отмена'), Settings.switcher)]]
 
 
 class SettingsLanguageInput(inputs.BaseLanguageInput, BaseSettingsInput):
@@ -109,13 +108,11 @@ class SettingsLanguageInput(inputs.BaseLanguageInput, BaseSettingsInput):
             )
         return setter
 
-    @classmethod
-    async def switch(cls, r: Request):
-        kb = cls(r).keyboard
-        current_lang = r.user.locale  # type: Lang
-        await super().switch(r)
-        return [Response(_('Текущий язык: {}').format(current_lang.name), kb),
-                Response(_('Выбери новый язык'), kb)]
+    async def switch(self):
+        current_lang = self.r.user.locale  # type: Lang
+        await super().switch()
+        return [Response(_('Текущий язык: {}').format(current_lang.name)),
+                Response(_('Выбери новый язык'))]
 
 
 class SettingsGroupInput(inputs.BaseGroupInput, BaseSettingsInput):
@@ -142,12 +139,10 @@ class SettingsGroupInput(inputs.BaseGroupInput, BaseSettingsInput):
             Settings(r).keyboard
         )
 
-    @classmethod
-    async def switch(cls, r: Request):
-        kb = cls(r).keyboard
-        await super().switch(r)
-        return [Response(_('Текущая группа: {}').format(cls.group_str(r.user.group)), kb),
-                Response(_('Введи номер группы'), kb)]
+    async def switch(self):
+        await super().switch()
+        return [Response(_('Текущая группа: {}').format(self.group_str(self.r.user.group))),
+                Response(_('Введи номер группы'))]
 
 
 class SettingsNameInput(inputs.BaseNameInput, BaseSettingsInput):
@@ -167,12 +162,10 @@ class SettingsNameInput(inputs.BaseNameInput, BaseSettingsInput):
         return Response(_('Имя изменено с {} на {}').format(old_name, r.text),
                         Settings(r).keyboard)
 
-    @classmethod
-    async def switch(cls, r: Request):
-        kb = cls(r).keyboard
-        await super().switch(r)
-        return [Response(_('Текущее имя: {}').format(r.user.name), kb),
-                Response(_('Введи новое имя'), kb)]
+    async def switch(self):
+        await super().switch()
+        return [Response(_('Текущее имя: {}').format(self.r.user.name)),
+                Response(_('Введи новое имя'))]
 
 
 class SettingsSubgroupInput(inputs.BaseSubgroupInput, BaseSettingsInput):
@@ -197,12 +190,10 @@ class SettingsSubgroupInput(inputs.BaseSubgroupInput, BaseSettingsInput):
             )
         return setter
 
-    @classmethod
-    async def switch(cls, r: Request):
-        kb = cls(r).keyboard
-        await super().switch(r)
-        return [Response(_('Текущая подгруппа: {}').format(r.user.subgroup.name), kb),
-                Response(_('Введи номер подгруппы'), kb)]
+    async def switch(self):
+        await super().switch()
+        return [Response(_('Текущая подгруппа: {}').format(self.r.user.subgroup.name)),
+                Response(_('Введи номер подгруппы'))]
 
 
 class BasePTypeRequiredInput(BaseSettingsInput):
@@ -212,7 +203,7 @@ class BasePTypeRequiredInput(BaseSettingsInput):
 
     @staticmethod
     def cancel(r: Request):
-        return Settings.switch(r)
+        return Settings.switcher(r)
 
 
 class RequiredGroupInput(inputs.BaseGroupInput, BasePTypeRequiredInput):
@@ -228,13 +219,12 @@ class RequiredGroupInput(inputs.BaseGroupInput, BasePTypeRequiredInput):
     async def set_group(cls, r: Request):
         result = await super().set_group(r)
         if not r.user.subgroup:
-            return await RequiredSubGroupInput.switch(r)
+            return await RequiredSubGroupInput.switcher(r)
         return await save_student(r)
 
-    @classmethod
-    async def switch(cls, r: Request):
-        await super().switch(r)
-        return Response(_('Введи номер группы'), cls(r).keyboard)
+    async def switch(self):
+        await super().switch()
+        return Response(_('Введи номер группы'))
 
 
 class RequiredSubGroupInput(inputs.BaseSubgroupInput, BasePTypeRequiredInput):
@@ -257,12 +247,11 @@ class RequiredSubGroupInput(inputs.BaseSubgroupInput, BasePTypeRequiredInput):
     @staticmethod
     async def cancel(r: Request):
         await r.user.update(ptype=PType['teacher'])
-        return await Settings.switch(r)
+        return await Settings.switcher(r)
 
-    @classmethod
-    async def switch(cls, r: Request):
-        await super().switch(r)
-        return Response(_('Выбери подгруппу'), cls(r).keyboard)
+    async def switch(self):
+        await super().switch()
+        return Response(_('Выбери подгруппу'))
 
 
 class RequiredNameInput(inputs.BaseNameInput, BasePTypeRequiredInput):
@@ -279,10 +268,9 @@ class RequiredNameInput(inputs.BaseNameInput, BasePTypeRequiredInput):
         await super().set_name(r)
         return await save_teacher(r)
 
-    @classmethod
-    async def switch(cls, r: Request):
-        await super().switch(r)
-        return Response(_('Введи имя'), cls(r).keyboard)
+    async def switch(self):
+        await super().switch()
+        return Response(_('Введи имя'))
 
 
 async def save_teacher(r: Request):
@@ -358,16 +346,15 @@ class Schedule(View, ABC):
         return [
             [Command(_c('Сегодня'), self.today), Command(_c('Завтра'), self.tomorrow)],
             [Command(_c(wd.short_name.capitalize()), self.weekday(wd)) for wd in list(Weekday)],
-            [Command(_c('Настройки'), Settings.switch)],
+            [Command(_c('Настройки'), Settings.switcher)],
         ]
 
     async def default(self, r: Request):
         return Response(_('Непонятная команда'))
 
-    @classmethod
-    async def switch(cls, r: Request):
-        await super().switch(r)
-        return Response(_('Главное меню'), cls(r).keyboard)
+    async def switch(self):
+        await super().switch()
+        return Response(_('Главное меню'))
 
     @staticmethod
     def _query_conditions(date):
