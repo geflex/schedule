@@ -19,18 +19,13 @@ _c = models.i18n.rgettext
 class PTypeInput(View):
     @property
     def commands(self) -> List[List[Command]]:
-        return [[
-            Command(_c('Студент'), self.set_stutent_ptype),
-            Command(_c('Препод'), self.set_teacher_ptype),
-        ]]
+        return [[Command(_c(t.name), self.get_ptype_setter(t)) for t in models.PType]]
 
     @staticmethod
-    async def set_stutent_ptype(r: Request):
-        await r.user.update(ptype=models.PType['student'])
-
-    @staticmethod
-    async def set_teacher_ptype(r: Request):
-        await r.user.update(ptype=models.PType['teacher'])
+    def get_ptype_setter(ptype: models.PType):
+        async def setter(r: Request):
+            r.user.update(ptype=ptype)
+        return setter
 
     async def default(self, r: Request):
         return Response(_('Неизвестный тип профиля'))

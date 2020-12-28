@@ -1,4 +1,4 @@
-from enum import Enum, IntFlag
+from enum import IntFlag
 
 from sqlalchemy import Column, Table, ForeignKey, create_engine
 from sqlalchemy import types as satypes
@@ -19,38 +19,38 @@ engine = create_engine(configs.db_url)
 db = SQLAlchemy(engine)
 
 
-class DepartmentEnum(Enum):
-    atf = 'atf'
-    fgde = 'fgde'
-    msf = 'msf'
-    mtf = 'mtf'
-    fmmp = 'fmmp'
-    ef = 'ef'
-    fitr = 'fitr'
-    ftug = 'ftug'
-    ipf = 'ipf'
-    fes = 'fes'
-    af = 'af'
-    sf = 'sf'
-    psf = 'psf'
-    ftk = 'ftk'
-    vtf = 'vtf'
-    mido = 'mido'
+class Department(tables.Table):
+    abbr = tables.Column(primary=True)
+    name = tables.Column()
 
-
-class RightsEnum(IntFlag):
-    view = 1
-    edit = 2
-    notifying = 3
+    __values__ = (
+        ('АТФ', 'Автотракторный Факультет'),
+        ('ФГДЕ', 'Факультет горного дела и инженерной экологии'),
+        ('МСФ', 'Машиностроительный Факультет'),
+        ('МТФ', 'Механикотехнологический Факультет'),
+        ('ФММП', 'Факультет Маркетинга, менеджмента и предпринимательства'),
+        ('ЭФ', 'Энергитический Факультет'),
+        ('ФИТР', 'Факультет информационных технологий и робототехники'),
+        ('ФТУГ', 'Факультет технологий управления и гуманитаризации'),
+        ('ИПФ', 'Инженерно-педагогический факультет'),
+        ('ФЭС', 'Факультет энергитического строительства'),
+        ('АФ', 'Фрхитектурный Факультет'),
+        ('СФ', 'Строительный факультет'),
+        ('ПСФ', 'Приборостроительный факультет'),
+        ('ФТК', 'Факультет транспортных коммуникаций'),
+        ('ВТФ', 'Военно-технический факультет'),
+        ('СТФ', 'Спортивно-технический факультет'),
+    )
 
 
 class PType(tables.Table):
-    name = tables.Column(primary=True)
+    db_val = tables.Column(primary=True)
+    name = tables.Column()
     num = tables.Column()
 
     __values__ = (
-        ('student', 0),
-        ('teacher', 1),
+        ('student', _('студент'), 0),
+        ('teacher', _('преподаватель'), 1),
     )
 
 
@@ -61,8 +61,14 @@ class Lang(BaseLang):
         ('be', 'Беларусская'),
     )
 
-
 i18n = I18n(Lang, default_lang=Lang['ru'], domain_name='schedule')
+
+
+class RightsEnum(IntFlag):
+    view = 1
+    edit = 2
+    notifying = 3
+
 rights = RightsEnv(RightsEnum)
 
 
