@@ -31,25 +31,49 @@ is_student = ptype_cond(PType['student'])
 is_teacher = ptype_cond(PType['teacher'])
 
 
-class Settings(View):
+class Settings(View, ABC):
     state_name = 'settings'
     
-    @cached_property
+    @property
     def commands(self):
-        commands = []
-        def add(text, cb):
-            commands.append([Command(text, cb)])
-
-        add(_c('Изменить язык'), SettingsLanguageInput.switch)
-        if self.r.user.ptype is PType['teacher']:
-            add(_c('Режим студента'), self.become_student)
-            add(_c('Изменить имя'), SettingsNameInput.switch)
-        else:
-            add(_c('Режим преподавателя'), self.become_teacher)
-            add(_c('Изменить группу'), SettingsGroupInput.switch)
-            add(_c('Изменить подгруппу'), SettingsSubgroupInput.switch)
-        add(_c('Назад'), Schedule.switch)
+        commands = [
+            [Command(_c('Изменить язык'), SettingsLanguageInput.switch)],
+            [Command(_c('Назад'), Schedule.switch)],
+        ]
         return commands
+
+    @classmethod
+    async def switch(cls, r: Request):
+        await super().switch(r)
+        return Response(_('Настройки'), cls(r).keyboard)
+
+
+class StudentSettings(Settings):
+    @property
+    def commands(self):
+        commands = [
+            [Command(_c('Режим преподавателя'), self.become_teacher)],
+            [Command(_c('Изменить группу'), SettingsGroupInput.switch)],
+            [Command(_c('Изменить подгруппу'), SettingsSubgroupInput.switch)],
+        ]
+        return commands + super().commands
+
+    @staticmethod
+    def become_teacher(r: Request):
+        if not r.user.name:
+            return RequiredNameInput.switch(r)
+        else:
+            return save_teacher(r)
+
+
+class TeacherSettings(Settings):
+    @property
+    def commands(self):
+        commands = [
+            [Command(_c('Режим студента'), self.become_student)],
+            [Command(_c('Изменить имя'), SettingsNameInput.switch)],
+        ]
+        return commands + super().commands
 
     @staticmethod
     def become_student(r: Request):
@@ -59,18 +83,6 @@ class Settings(View):
             return RequiredSubGroupInput.switch(r)
         else:
             return save_student(r)
-
-    @staticmethod
-    def become_teacher(r: Request):
-        if not r.user.name:
-            return RequiredNameInput.switch(r)
-        else:
-            return save_teacher(r)
-
-    @classmethod
-    async def switch(cls, r: Request):
-        await super().switch(r)
-        return Response(_('Настройки'), cls(r).keyboard)
 
 
 class BaseSettingsInput(View):
@@ -273,13 +285,13 @@ class RequiredNameInput(inputs.BaseNameInput, BasePTypeRequiredInput):
 
 
 async def save_teacher(r: Request):
-    await r.user.update(state=state_name(Settings), ptype=PType['teacher'])
-    return Response(_('Включен режим преподавателя'), Settings(r).keyboard)
+    await r.user.update(state=state_name(TeacherSettings), ptype=PType['teacher'])
+    return Response(_('Включен режим преподавателя'), TeacherSettings(r).keyboard)
 
 
 async def save_student(r: Request):
-    await r.user.update(state=state_name(Settings), ptype=PType['student'])
-    return Response(_('Включен режим студента'), Settings(r).keyboard)
+    await r.user.update(state=state_name(StudentSettings), ptype=PType['student'])
+    return Response(_('Включен режим студента'), StudentSettings(r).keyboard)
 
 
 class LessonFormatter(ABC):
@@ -446,10 +458,15 @@ schedule = Router({
     is_teacher: TeacherSchedule.handle,
 }, name=state_name(Schedule))
 
+settings = Router({
+    is_student: StudentSettings.handle,
+    is_teacher: TeacherSettings.handle,
+}, name=state_name(Settings))
+
 
 cases = gen_state_cases([
     schedule,
-    Settings,
+    settings,
     RequiredGroupInput,
     RequiredSubGroupInput,
     RequiredNameInput,
