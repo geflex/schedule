@@ -1,12 +1,11 @@
 from abc import abstractmethod, ABC
-from typing import List, Type, Awaitable
+from typing import List, Type
 
 import sqlalchemy as sa
 
-from bottex2.handler import Request, Response, Handler, TResponse
-from bottex2.router import Router, ConditionDict
+from bottex2.handler import Request, Response, Handler
 from bottex2.states import state_name, gen_state_cases
-from bottex2.views import View, Command
+from bottex2.views import View, Command, ViewRouter
 from . import dateutils
 from . import inputs
 from . import models as m
@@ -29,6 +28,7 @@ is_teacher = ptype_cond(PType['teacher'])
 class BaseSettings(View, ABC):
     state_name = 'settings'
 
+    @abstractmethod
     def commands(self):
         commands = [
             [Command(_c('Изменить язык'), SettingsLanguageInput.switcher)],
@@ -76,20 +76,10 @@ class TeacherSettings(BaseSettings):
             return save_student(r)
 
 
-class Settings:
-    state_name = state_name(BaseSettings)
-    subclasses = ConditionDict({
-        is_student: StudentSettings,
-        is_teacher: TeacherSettings,
-    })
-
-    @classmethod
-    def switcher(cls, r: Request, response: TResponse = None) -> Awaitable[TResponse]:
-        return cls.subclasses.get_value(r).switcher(r, response)
-
-    @classmethod
-    def handle(cls, r: Request) -> Awaitable[TResponse]:
-        return cls.subclasses.get_value(r).handle(r)
+Settings = ViewRouter(BaseSettings, {
+    is_student: StudentSettings,
+    is_teacher: TeacherSettings,
+})
 
 
 class BaseSettingsInput(View):
@@ -343,7 +333,7 @@ class StudentFormatter(LessonFormatter):
         return f'{self.time()} {self.name()} к.{self.building()}, а.{self.auditory()}, {self.teacher()}'
 
 
-class Schedule(View, ABC):
+class BaseSchedule(View, ABC):
     formatter_cls: Type[LessonFormatter]
     state_name = 'schedule'
 
@@ -370,6 +360,7 @@ class Schedule(View, ABC):
         return week_cond, weekday_cond
 
     @classmethod
+    @abstractmethod
     async def _schedule(cls, date: Date, r: Request):
         pass
 
@@ -396,7 +387,7 @@ class Schedule(View, ABC):
         return Response(_('Занятий нет)'))
 
 
-class TeacherSchedule(Schedule):
+class TeacherSchedule(BaseSchedule):
     formatter_cls = TeacherFormatter
 
     @classmethod
@@ -417,7 +408,7 @@ class TeacherSchedule(Schedule):
         return cls.no_lessons_response()
 
 
-class StudentSchedule(Schedule):
+class StudentSchedule(BaseSchedule):
     formatter_cls = StudentFormatter
 
     @classmethod
@@ -446,14 +437,14 @@ class StudentSchedule(Schedule):
         return cls.no_lessons_response()
 
 
-schedule = Router({
-    is_student: StudentSchedule.handle,
-    is_teacher: TeacherSchedule.handle,
-}, state_name=state_name(Schedule))
+Schedule = ViewRouter(BaseSchedule, {
+    is_student: StudentSchedule,
+    is_teacher: TeacherSchedule,
+})
 
 
 cases = gen_state_cases([
-    schedule,
+    Schedule,
     Settings,
     RequiredGroupInput,
     RequiredSubGroupInput,

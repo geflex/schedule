@@ -1,10 +1,11 @@
 from abc import abstractmethod, ABC
-from typing import List, Optional, Awaitable
+from typing import List, Optional, Awaitable, Dict, Type
 
 from bottex2.conditions import if_text_eq
 from bottex2.handler import Request, Handler, Response, TResponse
 from bottex2.keyboard import Keyboard, Button
-from bottex2.router import Router, TCondition
+from bottex2.router import Router, TCondition, ConditionDict
+from bottex2.states import state_name
 
 
 class Command:
@@ -67,3 +68,15 @@ class View(ABC):
         if response is None:
             response = default_response
         return obj.wrap_response(response)
+
+
+class ViewRouter(ABC):
+    def __init__(self, base: Type[View], classes: Dict[TCondition, Type[View]]):
+        self.classes = ConditionDict(classes)
+        self.state_name = state_name(base)
+
+    def switcher(self, r: Request, response: TResponse = None) -> Awaitable[TResponse]:
+        return self.classes.get_value(r).switcher(r, response)
+
+    def handle(self, r: Request) -> Awaitable[TResponse]:
+        return self.classes.get_value(r).handle(r)

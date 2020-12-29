@@ -14,7 +14,7 @@ def state_name(obj):
 
 
 def state_handler(obj):
-    if isinstance(obj, type) and hasattr(obj, 'handle'):
+    if hasattr(obj, 'handle'):
         return obj.handle
     else:
         return obj
