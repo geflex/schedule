@@ -331,7 +331,7 @@ class Schedule(View, ABC):
     def commands(self):
         return [
             [Command(_c('Сегодня'), self.today), Command(_c('Завтра'), self.tomorrow)],
-            [Command(_c(wd.short_name.capitalize()), self.weekday(wd)) for wd in list(Weekday)],
+            [Command(_c(wd.short_name), self.weekday(wd)) for wd in list(Weekday)],
             [Command(_c('Настройки'), Settings.switcher)],
         ]
 
@@ -419,7 +419,7 @@ class StudentSchedule(Schedule):
             message_str = _('Группа {}\n'
                             '{} подгруппа\n'
                             '{}').format(user.group.name,
-                                         user.subgroup.name,
+                                         _c(user.subgroup.name).capitalize(),
                                          cls.formatter_cls.datefmt(date))
             lessons_str = '\n'.join(str(cls.formatter_cls(l)) for l in query)
             return [Response(message_str),
