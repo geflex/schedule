@@ -4,7 +4,7 @@ from typing import List, Type, Awaitable
 import sqlalchemy as sa
 
 from bottex2.handler import Request, Response, Handler, TResponse
-from bottex2.router import Router
+from bottex2.router import Router, ConditionDict
 from bottex2.states import state_name, gen_state_cases
 from bottex2.views import View, Command
 from . import dateutils
@@ -76,20 +76,20 @@ class TeacherSettings(BaseSettings):
             return save_student(r)
 
 
-class Settings(View):
+class Settings:
     state_name = state_name(BaseSettings)
-    subclasses = Router({
+    subclasses = ConditionDict({
         is_student: StudentSettings,
         is_teacher: TeacherSettings,
     })
 
     @classmethod
     def switcher(cls, r: Request, response: TResponse = None) -> Awaitable[TResponse]:
-        return cls.subclasses.find_handler(r).switcher(r, response)
+        return cls.subclasses.get_value(r).switcher(r, response)
 
     @classmethod
     def handle(cls, r: Request) -> Awaitable[TResponse]:
-        return cls.subclasses.find_handler(r).handle(r)
+        return cls.subclasses.get_value(r).handle(r)
 
 
 class BaseSettingsInput(View):
@@ -449,7 +449,7 @@ class StudentSchedule(Schedule):
 schedule = Router({
     is_student: StudentSchedule.handle,
     is_teacher: TeacherSchedule.handle,
-}, name=state_name(Schedule))
+}, state_name=state_name(Schedule))
 
 
 cases = gen_state_cases([
