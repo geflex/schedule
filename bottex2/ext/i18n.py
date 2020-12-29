@@ -39,18 +39,25 @@ class Translatable(str):
         return self
 
     def __str__(self) -> str:
-        return self.enforce()
+        return self.trans('', '')
 
     def string(self) -> str:
         return super().__str__()
 
-    def enforce(self, translated: Optional[str] = None) -> str:
-        """
-        Accepts all transformations to self or to translated
-        """
-        s = self.string() if translated is None else translated
+    def trans(self, lcdir: str, lang: str) -> str:
+        try:
+            gettext = gettext_module.translation(self.domain, lcdir, [lang]).gettext
+        except FileNotFoundError as e:
+            logger.warn(e)
+            def gettext(x): return x
+
+        s = gettext(self.string())
         if self.formatted:
-            s = s.format(*self.fmt_args, **self.fmt_kwargs)
+            fmt_args = [a.trans(lcdir, lang) if isinstance(a, Translatable) else a
+                        for a in self.fmt_args]
+            fmt_kwargs = {k: (v.trans(lcdir, lang) if isinstance(v, Translatable) else v)
+                          for k, v in self.fmt_kwargs.items()}
+            s = s.format(*fmt_args, **fmt_kwargs)
         if self.capitalized:
             s = s.capitalize()
         return s
@@ -68,15 +75,7 @@ class I18nUserMixin:
 def translate(text: Union[str, Translatable], lang: str,
               lcdir: str, default_lang: Optional[str] = None):
     if isinstance(text, Translatable) and lang != default_lang:
-        domain = text.domain
-        try:
-            trans = gettext_module.translation(domain, lcdir, [lang])
-        except FileNotFoundError as e:
-            logger.warn(e)
-            return str(text)
-        else:
-            translated = trans.gettext(text)
-            return text.enforce(translated)
+        return text.trans(lcdir, lang)
     return text
 
 
