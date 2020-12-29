@@ -39,10 +39,18 @@ class Translatable(str):
         return self
 
     def __str__(self) -> str:
-        return self.trans('', '')
+        return self.enforce()
 
-    def string(self) -> str:
+    def raw(self) -> str:
         return super().__str__()
+
+    def enforce(self):
+        s = self.raw()
+        if self.formatted:
+            s = s.format(*self.fmt_args, **self.fmt_kwargs)
+        if self.capitalized:
+            s = s.capitalize()
+        return s
 
     def trans(self, lcdir: str, lang: str) -> str:
         try:
@@ -51,7 +59,7 @@ class Translatable(str):
             logger.warn(e)
             def gettext(x): return x
 
-        s = gettext(self.string())
+        s = gettext(self.raw())
         if self.formatted:
             fmt_args = [a.trans(lcdir, lang) if isinstance(a, Translatable) else a
                         for a in self.fmt_args]
@@ -136,7 +144,7 @@ class I18n:
         self.rgettext = partial(Translatable.init, domain=reversible_domain)
 
         self.Middleware = type('MultiplatformI18nMiddleware', (MultiplatformI18nMiddleware,), {
-            'translate': partial(translate, default_lang=default_lang, lcdir=lcdir),
+            'translate': partial(translate, default_lang=default_lang.abbr, lcdir=lcdir),
             'reversed_domain': reversed_domain,
         })
 
