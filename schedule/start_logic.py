@@ -129,7 +129,8 @@ class StartNameInput(inputs.BaseNameInput, inputs.InputChainStep):
 
 
 def end_registration_message(r: Request):
-    return Response(_('Профиль настроен'), main_logic.Schedule(r).keyboard)
+    response = Response(_('Профиль настроен'))
+    return main_logic.Schedule.switcher(r, response)
 
 
 async def delete_me(r: Request):

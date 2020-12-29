@@ -61,7 +61,9 @@ class View(ABC):
         return None
 
     @classmethod
-    async def switcher(cls, r: Request) -> TResponse:
+    async def switcher(cls, r: Request, response: TResponse = None) -> TResponse:
         obj = cls(r)
-        response = await obj.switch()
+        default_response = await obj.switch()
+        if response is None:
+            response = default_response
         return obj.wrap_response(response)

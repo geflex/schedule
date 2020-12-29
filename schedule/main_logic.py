@@ -84,8 +84,8 @@ class Settings(View):
     })
 
     @classmethod
-    def switcher(cls, r: Request) -> Awaitable[TResponse]:
-        return cls.subclasses.find_handler(r).switcher(r)
+    def switcher(cls, r: Request, response: TResponse = None) -> Awaitable[TResponse]:
+        return cls.subclasses.find_handler(r).switcher(r, response)
 
     @classmethod
     def handle(cls, r: Request) -> Awaitable[TResponse]:
@@ -112,10 +112,9 @@ class SettingsLanguageInput(inputs.BaseLanguageInput, BaseSettingsInput):
             old_lang = r.user.locale
             await super_setter(r)
             await r.user.set_state(Settings)
-            return Response(
-                _('Язык изменен с {} на {}').format(old_lang.name, lang.name),
-                Settings(r).keyboard
-            )
+            response = Response(_('Язык изменен с {} на {}').
+                                format(old_lang.name, lang.name))
+            return await Settings.switcher(r, response)
         return setter
 
     async def switch(self):
@@ -142,11 +141,12 @@ class SettingsGroupInput(inputs.BaseGroupInput, BaseSettingsInput):
         old_group = r.user.group
         await super().set_group(r)
         await r.user.set_state(Settings)
-        return Response(
-            _('Группа изменена с {} на {}').format(cls.group_str(old_group),
-                                                   cls.group_str(r.user.group)),
-            Settings(r).keyboard
+        response = Response(
+            _('Группа изменена с {} на {}').
+            format(cls.group_str(old_group), cls.group_str(r.user.group)),
         )
+        return await Settings.switcher(r, response)
+
 
     async def switch(self):
         await super().switch()
@@ -167,8 +167,8 @@ class SettingsNameInput(inputs.BaseNameInput, BaseSettingsInput):
         old_name = r.user.name
         await super().set_name(r)
         await r.user.set_state(Settings)
-        return Response(_('Имя изменено с {} на {}').format(old_name, r.text),
-                        Settings(r).keyboard)
+        response = Response(_('Имя изменено с {} на {}').format(old_name, r.text))
+        return await Settings.switcher(r, response)
 
     async def switch(self):
         await super().switch()
@@ -191,10 +191,11 @@ class SettingsSubgroupInput(inputs.BaseSubgroupInput, BaseSettingsInput):
             old_subgroup = r.user.subgroup
             await super_setter(r)
             await r.user.set_state(Settings)
-            return Response(
-                _('Подгруппа изменена с {} на {}').format(old_subgroup.name, subgroup.name),
-                StudentSettings(r).keyboard
+            response = Response(
+                _('Подгруппа изменена с {} на {}').
+                format(old_subgroup.name, subgroup.name),
             )
+            return await Settings.switcher(r, response)
         return setter
 
     async def switch(self):
@@ -278,12 +279,14 @@ class RequiredNameInput(inputs.BaseNameInput, BasePTypeRequiredInput):
 
 async def save_teacher(r: Request):
     await r.user.update(state=state_name(TeacherSettings), ptype=PType['teacher'])
-    return Response(_('Включен режим преподавателя'), TeacherSettings(r).keyboard)
+    response = Response(_('Включен режим преподавателя'))
+    return await Settings.switcher(r, response)
 
 
 async def save_student(r: Request):
     await r.user.update(state=state_name(StudentSettings), ptype=PType['student'])
-    return Response(_('Включен режим студента'), StudentSettings(r).keyboard)
+    response = Response(_('Включен режим студента'))
+    return await Settings.switcher(r, response)
 
 
 class LessonFormatter(ABC):
