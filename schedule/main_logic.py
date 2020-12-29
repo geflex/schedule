@@ -1,9 +1,9 @@
 from abc import abstractmethod, ABC
-from typing import List, Type
+from typing import List, Type, Awaitable
 
 import sqlalchemy as sa
 
-from bottex2.handler import Request, Response, Handler
+from bottex2.handler import Request, Response, Handler, TResponse
 from bottex2.router import Router
 from bottex2.states import state_name, gen_state_cases
 from bottex2.views import View, Command
@@ -26,7 +26,7 @@ is_student = ptype_cond(PType['student'])
 is_teacher = ptype_cond(PType['teacher'])
 
 
-class Settings(View, ABC):
+class BaseSettings(View, ABC):
     state_name = 'settings'
 
     def commands(self):
@@ -41,7 +41,7 @@ class Settings(View, ABC):
         return Response(_('Настройки'))
 
 
-class StudentSettings(Settings):
+class StudentSettings(BaseSettings):
     def commands(self):
         commands = [
             [Command(_c('Режим преподавателя'), self.become_teacher)],
@@ -58,7 +58,7 @@ class StudentSettings(Settings):
             return save_teacher(r)
 
 
-class TeacherSettings(Settings):
+class TeacherSettings(BaseSettings):
     def commands(self):
         commands = [
             [Command(_c('Режим студента'), self.become_student)],
@@ -74,6 +74,22 @@ class TeacherSettings(Settings):
             return RequiredSubGroupInput.switcher(r)
         else:
             return save_student(r)
+
+
+class Settings(View):
+    state_name = state_name(BaseSettings)
+    subclasses = Router({
+        is_student: StudentSettings,
+        is_teacher: TeacherSettings,
+    })
+
+    @classmethod
+    def switcher(cls, r: Request) -> Awaitable[TResponse]:
+        return cls.subclasses.find_handler(r).switcher(r)
+
+    @classmethod
+    def handle(cls, r: Request) -> Awaitable[TResponse]:
+        return cls.subclasses.find_handler(r).handle(r)
 
 
 class BaseSettingsInput(View):
@@ -177,7 +193,7 @@ class SettingsSubgroupInput(inputs.BaseSubgroupInput, BaseSettingsInput):
             await r.user.set_state(Settings)
             return Response(
                 _('Подгруппа изменена с {} на {}').format(old_subgroup.name, subgroup.name),
-                Settings(r).keyboard
+                StudentSettings(r).keyboard
             )
         return setter
 
@@ -432,15 +448,10 @@ schedule = Router({
     is_teacher: TeacherSchedule.handle,
 }, name=state_name(Schedule))
 
-settings = Router({
-    is_student: StudentSettings.handle,
-    is_teacher: TeacherSettings.handle,
-}, name=state_name(Settings))
-
 
 cases = gen_state_cases([
     schedule,
-    settings,
+    Settings,
     RequiredGroupInput,
     RequiredSubGroupInput,
     RequiredNameInput,
