@@ -61,7 +61,9 @@ class Lang(BaseLang):
         ('be', 'Беларусская'),
     )
 
-i18n = I18n(Lang, default_lang=Lang['ru'], domain_name='schedule')
+i18n = I18n(Lang, default_lang=Lang['ru'],
+            lcdir='schedule/locales',
+            domain_name='schedule')
 
 
 class RightsEnum(IntFlag):

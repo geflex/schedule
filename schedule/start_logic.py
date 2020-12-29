@@ -1,7 +1,7 @@
 from typing import Awaitable
 
 from bottex2.conditions import if_text_eq
-from bottex2.handler import Request, Response, TResponse
+from bottex2.handler import Request, Response, TResponse, Handler, ErrorResponse
 from bottex2.keyboard import Keyboard
 from bottex2.router import Router
 from bottex2.states import gen_state_cases
@@ -40,14 +40,17 @@ class StartPTypeInput(inputs.PTypeInput, inputs.InputChainStep):
         return StartLanguageInput.switcher(r)
 
     @classmethod
-    async def set_stutent_ptype(cls, r: Request):
-        await super().set_stutent_ptype(r)
-        return await StartGroupInput.switcher(r)
-
-    @classmethod
-    async def set_teacher_ptype(cls, r: Request):
-        await super().set_teacher_ptype(r)
-        return await StartNameInput.switcher(r)
+    def get_ptype_setter(cls, ptype: models.PType) -> Handler:
+        super_setter = super().get_ptype_setter(ptype)
+        async def setter(r: Request):
+            await super_setter(r)
+            if ptype is models.PType['student']:
+                return await StartGroupInput.switcher(r)
+            elif ptype is models.PType['teacher']:
+                return await StartNameInput.switcher(r)
+            else:
+                raise ErrorResponse(Response('invalid data'))
+        return setter
 
     async def switch(self):
         await super().switch()
