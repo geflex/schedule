@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2020-11-22 17:42+0300\n"
+"POT-Creation-Date: 2020-12-29 05:15+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -15,63 +15,119 @@ msgstr ""
 "Generated-By: pygettext.py 1.5\n"
 
 
-#: schedule\inputs.py:32
-msgid "Студент"
-msgstr ""
-
-#: schedule\inputs.py:33
-msgid "Препод"
-msgstr ""
-
-#: schedule\inputs.py:68
-msgid "Первая"
-msgstr ""
-
-#: schedule\inputs.py:69
-msgid "Вторая"
-msgstr ""
-
-#: schedule\inputs.py:123 schedule\main_logic.py:39
+#: schedule\inputs.py:109 schedule\main_logic.py:35
 msgid "Назад"
 msgstr ""
 
-#: schedule\main_logic.py:31
+#: schedule\main_logic.py:34
 msgid "Изменить язык"
 msgstr ""
 
-#: schedule\main_logic.py:33
-msgid "Режим студента"
-msgstr ""
-
-#: schedule\main_logic.py:34
-msgid "Изменить имя"
-msgstr ""
-
-#: schedule\main_logic.py:36
+#: schedule\main_logic.py:47
 msgid "Режим преподавателя"
 msgstr ""
 
-#: schedule\main_logic.py:37
+#: schedule\main_logic.py:48
 msgid "Изменить группу"
 msgstr ""
 
-#: schedule\main_logic.py:38
+#: schedule\main_logic.py:49
 msgid "Изменить подгруппу"
 msgstr ""
 
-#: schedule\main_logic.py:65 schedule\main_logic.py:183
+#: schedule\main_logic.py:64
+msgid "Режим студента"
+msgstr ""
+
+#: schedule\main_logic.py:65
+msgid "Изменить имя"
+msgstr ""
+
+#: schedule\main_logic.py:81 schedule\main_logic.py:192
 msgid "Отмена"
 msgstr ""
 
-#: schedule\main_logic.py:274
-msgid "Сегодня"
-msgstr ""
-
-#: schedule\main_logic.py:275
+#: schedule\main_logic.py:333
 msgid "Завтра"
 msgstr ""
 
-#: schedule\main_logic.py:276
+#: schedule\main_logic.py:333
+msgid "Сегодня"
+msgstr ""
+
+#: schedule\main_logic.py:335
 msgid "Настройки"
+msgstr ""
+
+#: schedule\models.py:53
+msgid "студент"
+msgstr ""
+
+#: schedule\models.py:54
+msgid "преподаватель"
+msgstr ""
+
+#: schedule\models.py:84
+msgid "пн"
+msgstr ""
+
+#: schedule\models.py:84
+msgid "понедельник"
+msgstr ""
+
+#: schedule\models.py:85
+msgid "вт"
+msgstr ""
+
+#: schedule\models.py:85
+msgid "вторник"
+msgstr ""
+
+#: schedule\models.py:86
+msgid "ср"
+msgstr ""
+
+#: schedule\models.py:86
+msgid "среда"
+msgstr ""
+
+#: schedule\models.py:87
+msgid "четверг"
+msgstr ""
+
+#: schedule\models.py:87
+msgid "чт"
+msgstr ""
+
+#: schedule\models.py:88
+msgid "пт"
+msgstr ""
+
+#: schedule\models.py:88
+msgid "пятница"
+msgstr ""
+
+#: schedule\models.py:89
+msgid "сб"
+msgstr ""
+
+#: schedule\models.py:89
+msgid "суббота"
+msgstr ""
+
+#: schedule\models.py:90
+msgid "воскресенье"
+msgstr ""
+
+#: schedule\models.py:90
+msgid "вс"
+msgstr ""
+
+#: schedule\models.py:98
+msgid "первая"
+msgstr ""
+
+#: schedule\models.py:99
+msgid "вторая"
 msgstr ""
 

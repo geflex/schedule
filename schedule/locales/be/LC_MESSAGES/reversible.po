@@ -5,72 +5,131 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2020-11-22 17:42+0300\n"
+"POT-Creation-Date: 2020-12-29 05:15+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
-"Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=cp1251\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: \n"
 "Generated-By: pygettext.py 1.5\n"
 
-#: schedule\inputs.py:32
-msgid "Студент"
-msgstr "Студэнт"
-
-#: schedule\inputs.py:33
-msgid "Препод"
-msgstr "Выкладчык"
-
-#: schedule\inputs.py:68
-msgid "Первая"
-msgstr "Першая"
-
-#: schedule\inputs.py:69
-msgid "Вторая"
-msgstr "Другая"
-
-#: schedule\inputs.py:123 schedule\main_logic.py:39
+#: schedule\inputs.py:109 schedule\main_logic.py:35
 msgid "Назад"
 msgstr "Назад"
 
-#: schedule\main_logic.py:31
+#: schedule\main_logic.py:34
 msgid "Изменить язык"
 msgstr "Змяніць мову"
 
-#: schedule\main_logic.py:33
-msgid "Режим студента"
-msgstr "Рэжым студэнта"
-
-#: schedule\main_logic.py:34
-msgid "Изменить имя"
-msgstr "Змяніць імя"
-
-#: schedule\main_logic.py:36
+#: schedule\main_logic.py:47
 msgid "Режим преподавателя"
 msgstr "Рэжым выкладчыка"
 
-#: schedule\main_logic.py:37
+#: schedule\main_logic.py:48
 msgid "Изменить группу"
 msgstr "Змяніць групу"
 
-#: schedule\main_logic.py:38
+#: schedule\main_logic.py:49
 msgid "Изменить подгруппу"
 msgstr "Змяніць падгрупу"
 
-#: schedule\main_logic.py:65 schedule\main_logic.py:183
+#: schedule\main_logic.py:64
+msgid "Режим студента"
+msgstr "Рэжым студэнта"
+
+#: schedule\main_logic.py:65
+msgid "Изменить имя"
+msgstr "Змяніць імя"
+
+#: schedule\main_logic.py:81 schedule\main_logic.py:192
 msgid "Отмена"
 msgstr "Адмена"
 
-#: schedule\main_logic.py:274
-msgid "Сегодня"
-msgstr "Сёння"
-
-#: schedule\main_logic.py:275
+#: schedule\main_logic.py:333
 msgid "Завтра"
 msgstr "Заўтра"
 
-#: schedule\main_logic.py:276
+#: schedule\main_logic.py:333
+msgid "Сегодня"
+msgstr "Сёння"
+
+#: schedule\main_logic.py:335
 msgid "Настройки"
 msgstr "Налады"
+
+#: schedule\models.py:53
+msgid "студент"
+msgstr "студэнт"
+
+#: schedule\models.py:54
+msgid "преподаватель"
+msgstr "выкладчык"
+
+#: schedule\models.py:84
+msgid "пн"
+msgstr "пн"
+
+#: schedule\models.py:84
+msgid "понедельник"
+msgstr "панядзелак"
+
+#: schedule\models.py:85
+msgid "вт"
+msgstr "аў"
+
+#: schedule\models.py:85
+msgid "вторник"
+msgstr "аўторак"
+
+#: schedule\models.py:86
+msgid "ср"
+msgstr "ср"
+
+#: schedule\models.py:86
+msgid "среда"
+msgstr "серада"
+
+#: schedule\models.py:87
+msgid "четверг"
+msgstr "чацвер"
+
+#: schedule\models.py:87
+msgid "чт"
+msgstr "чц"
+
+#: schedule\models.py:88
+msgid "пт"
+msgstr "пт"
+
+#: schedule\models.py:88
+msgid "пятница"
+msgstr "пятніца"
+
+#: schedule\models.py:89
+msgid "сб"
+msgstr "сб"
+
+#: schedule\models.py:89
+msgid "суббота"
+msgstr "субота"
+
+#: schedule\models.py:90
+msgid "воскресенье"
+msgstr "нядзеля"
+
+#: schedule\models.py:90
+msgid "вс"
+msgstr "нд"
+
+#: schedule\models.py:98
+msgid "первая"
+msgstr "першая"
+
+#: schedule\models.py:99
+msgid "вторая"
+msgstr "другая"
+
+#~ msgid "Препод"
+#~ msgstr "Выкладчык"
